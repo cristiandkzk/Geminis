@@ -125,10 +125,16 @@ depende de que nadie lo atestigüe.
 
 **I5 · Las transiciones son aditivas en la interfaz.** Toda dirección y toda transacción
 llevan etiqueta de generación desde el bloque 0. Una transición puede **agregar** formatos; no
-puede quitarlos. Es la invariante que decide el modo de falla de todo integrador externo:
-quien no llegó a soportar la generación nueva **sigue operando en la anterior** y degrada en
-vez de detenerse; y cuando encuentra un objeto nuevo falla cerrado y ruidoso —*"versión que no
-conozco"*— en vez de malinterpretarlo, que es la falla que pierde fondos.
+puede quitarlos.
+
+Es la invariante que decide el modo de falla de todo **integrador externo** — un exchange, una
+wallet: software que lee la cadena desde afuera, no un nodo. No significa que se quede en una
+cadena vieja: **los objetos de la generación anterior nunca dejan de ser válidos**, así que el
+integrador que no se actualizó los sigue procesando igual que siempre. Lo que no puede es
+entender los nuevos — y ahí, como toda transacción lleva etiqueta de generación desde el bloque
+0, **falla cerrado y ruidoso** (*"versión que no conozco"*) en vez de parsearlos bajo las reglas
+viejas y sacar un resultado plausible y equivocado, que es la falla que pierde fondos. Eso es
+degradar: funciona para lo viejo, se planta ante lo nuevo.
 
 ---
 
