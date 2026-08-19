@@ -23,6 +23,14 @@ de verdad es **[Genesis Paper.md](Genesis%20Paper.md)** —~19.500 palabras, con
 desarrolladas y el registro de qué se descartó en el camino—; `genesis-paper.html` es su render
 y se regenera con `python render.py`, no se edita a mano.
 
+⚠️ **Ojo con los números de sección: este resumen tiene numeración propia.** Fusionó secciones,
+así que tiene 10 y el paper tiene 12, y **no coinciden** — la cola de impugnaciones es §5.3 acá y
+§6.3 allá; la creación de activos es §6.4 acá y §8.5 allá. Cuando saltes al paper largo, buscá
+por título y no por número.
+
+**Y si venís a escribir código:** [`ROADMAP.md`](ROADMAP.md) tiene el glosario de los conceptos,
+la estructura de módulos y las fases con sus criterios de aprobado.
+
 Y cada número de acá tiene su medición, con `RESULTADOS.md` y scripts:
 
 | directorio | qué contesta |
