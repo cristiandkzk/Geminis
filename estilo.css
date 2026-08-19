@@ -1,0 +1,378 @@
+:root {
+    --ground:      #F6F8F8;
+    --surface:     #FFFFFF;
+    --surface-alt: #EEF2F2;
+    --ink:         #12181A;
+    --ink-soft:    #3D4A4D;
+    --ink-mute:    #6B797C;
+    --rule:        #D9E0E1;
+    --rule-soft:   #E8EDED;
+    --accent:      #0B6B68;
+    --accent-soft: #E0EFEE;
+    --warn:        #8F452A;
+    --warn-soft:   #F6E9E3;
+
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+    --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+    --measure: 68ch;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:      #0D1214;
+      --surface:     #141B1D;
+      --surface-alt: #1A2325;
+      --ink:         #E3E9E9;
+      --ink-soft:    #B4C0C1;
+      --ink-mute:    #859294;
+      --rule:        #253032;
+      --rule-soft:   #1C2527;
+      --accent:      #4EC6BE;
+      --accent-soft: #16302F;
+      --warn:        #D29074;
+      --warn-soft:   #2C1E18;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground:      #0D1214;
+    --surface:     #141B1D;
+    --surface-alt: #1A2325;
+    --ink:         #E3E9E9;
+    --ink-soft:    #B4C0C1;
+    --ink-mute:    #859294;
+    --rule:        #253032;
+    --rule-soft:   #1C2527;
+    --accent:      #4EC6BE;
+    --accent-soft: #16302F;
+    --warn:        #D29074;
+    --warn-soft:   #2C1E18;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.68;
+    margin: 0;
+    padding: 0 1.5rem 8rem;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: var(--measure);
+    margin: 0 auto;
+  }
+
+  /* ---------- masthead ---------- */
+
+  header.masthead {
+    padding: 5.5rem 0 2.5rem;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 3.5rem;
+  }
+
+  .kicker {
+    font-family: var(--mono);
+    font-size: .7rem;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 1.4rem;
+  }
+
+  h1 {
+    font-size: clamp(2.1rem, 6vw, 2.9rem);
+    line-height: 1.12;
+    font-weight: 600;
+    letter-spacing: -.015em;
+    text-wrap: balance;
+    margin: 0 0 1.2rem;
+  }
+
+  .standfirst {
+    font-size: 1.15rem;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    margin: 0;
+    text-wrap: pretty;
+  }
+
+  /* ---------- abstract ---------- */
+
+  .abstract {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--accent);
+    padding: 1.6rem 1.7rem;
+    margin: 0 0 4rem;
+  }
+
+  .abstract p { margin: 0; }
+  .abstract p + p { margin-top: .9rem; }
+
+  .callout {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--accent);
+    padding: 1.05rem 1.25rem;
+    margin: 1.4rem 0;
+  }
+
+  .callout p { margin: 0; }
+  .callout p + p { margin-top: .7rem; }
+  .callout .ch {
+    display: block;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: .3rem;
+  }
+
+  .resuelto {
+    border-left: 2px solid var(--accent);
+    background: var(--accent-soft);
+    padding: 1rem 1.2rem;
+    margin: 1.6rem 0 0;
+    font-size: .95rem;
+  }
+
+  .resuelto p { margin: 0; }
+  .resuelto .rh {
+    display: block;
+    font-family: var(--mono);
+    font-size: .68rem;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: .45rem;
+  }
+
+  /* ---------- sections ---------- */
+
+  section { margin-bottom: 3.75rem; }
+
+  .snum {
+    display: block;
+    font-family: var(--mono);
+    font-size: .7rem;
+    letter-spacing: .16em;
+    color: var(--accent);
+    margin-bottom: .55rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: -.01em;
+    text-wrap: balance;
+    margin: 0 0 1.1rem;
+    padding-bottom: .55rem;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+
+  h3 {
+    font-size: 1.06rem;
+    font-weight: 600;
+    line-height: 1.35;
+    text-wrap: balance;
+    margin: 2.3rem 0 .7rem;
+  }
+
+  p { margin: 0 0 1.05rem; text-wrap: pretty; }
+
+  strong { font-weight: 600; }
+
+  em { font-style: italic; color: var(--ink-soft); }
+
+  code {
+    font-family: var(--mono);
+    font-size: .86em;
+    background: var(--surface-alt);
+    padding: .1em .34em;
+    border-radius: 2px;
+  }
+
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  /* ---------- lists ---------- */
+
+  ol.invariants {
+    list-style: none;
+    counter-reset: inv;
+    padding: 0;
+    margin: 1.4rem 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  ol.invariants li {
+    counter-increment: inv;
+    display: grid;
+    grid-template-columns: 2.1rem 1fr;
+    gap: .3rem;
+  }
+
+  ol.invariants li::before {
+    content: "I" counter(inv);
+    font-family: var(--mono);
+    font-size: .78rem;
+    color: var(--accent);
+    padding-top: .32em;
+  }
+
+  ol.invariants .inv-body {
+    display: flex;
+    flex-direction: column;
+    gap: .75rem;
+    min-width: 0;
+  }
+
+  ol.invariants li p { margin: 0; }
+
+  ul.plain {
+    padding-left: 1.15rem;
+    margin: 0 0 1.05rem;
+    display: flex;
+    flex-direction: column;
+    gap: .55rem;
+  }
+
+  /* ---------- diagram ---------- */
+
+  figure {
+    margin: 2rem 0;
+    padding: 0;
+  }
+
+  .figbox {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    padding: 1.9rem 1.4rem 1.5rem;
+    overflow-x: auto;
+  }
+
+  .figbox svg { display: block; margin: 0 auto; min-width: 460px; }
+
+  figcaption {
+    font-family: var(--mono);
+    font-size: .74rem;
+    line-height: 1.55;
+    color: var(--ink-mute);
+    margin-top: .8rem;
+    letter-spacing: .01em;
+  }
+
+  .svg-ink    { fill: var(--ink); }
+  .svg-mute   { fill: var(--ink-mute); }
+  .svg-accent { fill: var(--accent); }
+  .stroke-rule   { stroke: var(--rule); }
+  .stroke-ink    { stroke: var(--ink); }
+  .stroke-accent { stroke: var(--accent); }
+  .fill-surface  { fill: var(--surface-alt); }
+  .fill-accsoft  { fill: var(--accent-soft); }
+  .svg-label {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: .06em;
+  }
+  .svg-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .08em;
+  }
+
+  /* ---------- formula ---------- */
+
+  .formula {
+    font-family: var(--mono);
+    font-size: .86rem;
+    line-height: 1.7;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    padding: 1rem 1.15rem;
+    margin: 1.4rem 0;
+    overflow-x: auto;
+    white-space: pre;
+    color: var(--ink-soft);
+  }
+
+  /* ---------- boundary blocks ---------- */
+
+  .frontera {
+    border-left: 2px solid var(--warn);
+    background: var(--warn-soft);
+    padding: 1.05rem 1.25rem;
+    margin: 0 0 1rem;
+  }
+
+  .frontera p { margin: 0; }
+  .frontera p + p { margin-top: .7rem; }
+  .frontera .fh {
+    display: block;
+    font-weight: 600;
+    color: var(--warn);
+    margin-bottom: .3rem;
+  }
+
+  /* ---------- tests ---------- */
+
+  .test {
+    border-top: 1px solid var(--rule);
+    padding: 1.15rem 0 .3rem;
+  }
+
+  .test:last-of-type { border-bottom: 1px solid var(--rule); margin-bottom: 1.4rem; }
+
+  .test-id {
+    font-family: var(--mono);
+    font-size: .7rem;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: .4rem;
+  }
+
+  .test h3 { margin: 0 0 .5rem; }
+  .test p { margin: 0 0 .8rem; }
+
+  /* ---------- table ---------- */
+
+  .tablewrap { overflow-x: auto; margin: 1.5rem 0; }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: .92rem;
+    min-width: 420px;
+  }
+
+  th, td {
+    text-align: left;
+    vertical-align: top;
+    padding: .7rem .85rem;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+
+  thead th {
+    font-family: var(--mono);
+    font-size: .68rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    font-weight: 400;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
