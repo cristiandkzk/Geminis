@@ -18,6 +18,24 @@ ejecuta ese cambio sin voto, sin fork político y sin intervención humana en la
 >
 > Todo lo que figura como *medido* tiene script reproducible y datos crudos.
 
+**Dónde está el resto, si querés ir al fondo de algo.** Este archivo es el resumen. La fuente
+de verdad es **[Genesis Paper.md](Genesis%20Paper.md)** —~19.500 palabras, con las fronteras
+desarrolladas y el registro de qué se descartó en el camino—; `genesis-paper.html` es su render
+y se regenera con `python render.py`, no se edita a mano.
+
+Y cada número de acá tiene su medición, con `RESULTADOS.md` y scripts:
+
+| directorio | qué contesta |
+|---|---|
+| [`test1-transicion/`](test1-transicion/RESULTADOS.md) | si el mecanismo tiene cliente afuera — los casos de §7 |
+| [`test2-interprete/`](test2-interprete/RESULTADOS.md) | el presupuesto del intérprete en hardware real, con el paquete del benchmark |
+| [`test4-ventana-k/`](test4-ventana-k/RESULTADOS.md) | el ataque de auto-pago, y la ventana que resultó vacía |
+| [`cola-impugnaciones/`](cola-impugnaciones/RESULTADOS.md) | si la cola de §5.3 satura — de dónde salen los diez nodos PoD |
+| [`expiracion-estado/`](expiracion-estado/RESULTADOS.md) | cuánto estado se genera y qué cuesta poder revivirlo |
+| [`amortizacion-mint/`](amortizacion-mint/RESULTADOS.md) | por qué la tasa no puede bajar por depositar más |
+| [`parametros-mint/`](parametros-mint/RESULTADOS.md) | los parámetros de §6.4, y cuál de ellos es realmente una decisión |
+| [`presupuesto-nodo/`](presupuesto-nodo/RESULTADOS.md) | cuánto ocupa una entrada, y de dónde salen `θ*` y `L_max` |
+
 ---
 
 ## 1. El problema
