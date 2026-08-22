@@ -44,3 +44,6 @@ CONTEXTO.md
 # Lo que no se versiona es la copia de seguridad previa al render — para eso
 # está el historial de git, que es justamente lo que este repo viene a dar.
 genesis-paper.html.bak
+
+# El paquete para el telefono: se regenera con herramientas/empaquetar_vm.py
+genesis/vm-telefono.tar.gz

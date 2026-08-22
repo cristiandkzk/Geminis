@@ -30,8 +30,8 @@ que hay que entender para no construir lo que no toca:
 > afuera.
 
 **Lo que este roadmap no cubre, a propósito:** el lanzamiento del bloque 0. Depende de dos cosas
-que no son código —encontrar comprador para el trabajo verificable de §6.2, y decidir los dos
-números abiertos de §10.3— y el claim es **irrepetible**, así que lanzar antes de tiempo gasta el
+que no son código —encontrar comprador para el trabajo verificable de §6.2, y cerrar los dos
+problemas abiertos de §10.3— y el claim es **irrepetible**, así que lanzar antes de tiempo gasta el
 único evento de distribución que existe.
 
 ---
@@ -80,9 +80,13 @@ tiene que seguir pasando** (ver Fase 0).
 
 - **I1** — el intérprete vive en Genesis y **no cambia nunca**. Una transición selecciona un
   punto de un espacio que el nodo ya sabe ejecutar; no introduce código de nodo.
-- **I2** — el trigger se computa sólo desde el estado, **y su aproximación es observable**: tiene
-  que publicar *cuántos bloques faltan al ritmo actual*. Computable no alcanza; tiene que verse
-  venir.
+- **I2** — el trigger se computa sólo desde el estado, **y nadie elige el momento**. Computable no
+  alcanza: *"la dirección X recibió 1 wei"* se computa desde el estado y es una compuerta con
+  dueño. Se cumple de dos formas y toda regla declara en cuál está: por **aproximación
+  observable** —publica *cuántos bloques faltan al ritmo actual* y no puede disparar desde el
+  reposo— o por **capacidad demostrada** —no hay aproximación y no puede haberla, y producir el
+  hecho exige exactamente la capacidad ante la que la transición reacciona: el canario de §6.6—.
+  *(Reformulada el 19/8/2026: la letra anterior dejaba fuera al propio canario. Ver C9–C11.)*
 - **I3** — el estado cruza la transición **íntegro**. Sin migración, sin reasignación.
 - **I4** — cada generación commitea a su ancestro.
 - **I5** — las transiciones son **aditivas en la interfaz**. Se pueden agregar formatos, nunca
@@ -99,10 +103,28 @@ del consenso.** Su ingreso es el pago del pedido que ejecutó.
 la capa liviana. La inferencia **no se verifica** — se verifica que la salida satisfaga el
 predicado. Lo que no se puede expresar así, la red no lo puede liquidar.
 
-**Techo de pasos de VM.** El segundo filtro del predicado: además de pasar los vectores, hay que
-verificar por debajo de un tope de **pasos ejecutados** (no tiempo de reloj — el reloj sería un
-oráculo). **Es una condición de seguridad, no de rendimiento:** es lo que impide que exista una
-impugnación más cara de verificar que de crear. **El número no está elegido** (§10.3).
+**Los dos techos del predicado.** Además de pasar los vectores, hay que verificar por debajo de un
+tope de **pasos ejecutados** y tocando menos de un tope de **páginas de 4 KiB** (nunca tiempo de
+reloj — el reloj sería un oráculo). **Son condiciones de seguridad, no de rendimiento:** son lo que
+impide que exista una impugnación más cara de verificar que de crear.
+
+El de pasos **no es un número elegido: es una cuenta** —`f* × tiempo_de_bloque × R_declarado /
+tx_por_bloque`—, y lo que Genesis congela es la fórmula, no el valor. *(Cerrado el 20/8/2026; era
+el primer problema abierto de §10.3.)*
+
+El de páginas **también se deriva**, desde el 21/8/2026: es un parámetro del ruleset —96 páginas de
+4 KiB en Genesis— y lo que Genesis congela es la **curva** de ritmo contra memoria. **Lo agregó la Fase 4 y no estaba en
+el diseño:** un techo de pasos solo supone que un paso vale un paso, y la peor mezcla de
+instrucciones corre 23× más lento que la carga real. No se arregla pesando instrucciones —`lw`
+cuesta lo mismo que `addi` con el dato en caché y 23× más sin él, **es el mismo opcode**—, así que
+hay que contar lo único que se ve mientras corre: las páginas distintas que toca.
+
+**Y ésa fue la corrección más importante de la fase, porque tocaba el núcleo:** un techo derivado
+*encarece* —una primitiva cara entra bajando `tx_por_bloque`— y uno constante **sólo puede
+excluir**. Las tres primitivas de la familia ML-DSA tocan 26, 40 y 65 páginas, así que el primer
+número elegido (48) dejaba a la tercera afuera para siempre. **En este diseño, un número que hay
+que elegir suele ser una cuenta que falta escribir** — pasó dos veces con el mismo techo. *(21/8/2026,
+`genesis/predicado/RESULTADOS.md`.)*
 
 **Ventana de impugnación.** Cómo se finaliza: una interacción queda firme cuando pasa la ventana
 sin que nadie presente prueba de conflicto. No hay quórum ni conjunto de validadores. Lo que
@@ -199,8 +221,8 @@ genesis/
 │   └── computo.py          # acepta pedidos, ejecuta, entrega. Fuera del consenso
 │
 ├── red/
-│   ├── p2p.py              # transporte entre nodos
-│   └── sync.py             # descarga de cadena, incluida la verificación de linaje
+│   ├── p2p.py              # transporte entre nodos — NO EXISTE, y es ingeniería
+│   └── sync.py             # ✅ validación y sincronización: el primer nodo que no produce
 │
 ├── api/
 │   └── server.py           # HTTP: consultar estado, publicar pedidos, ver la distancia al disparo
@@ -301,7 +323,7 @@ los fees en unidades abstractas.
   margen medido se compara contra los diez nodos PoD que predice §6.3. Si hacen falta cien, la
   predicción del paper está mal y hay que decirlo.
 
-### Fase 4 · La VM y el predicado
+### Fase 4 · La VM y el predicado — ✅ cerrada
 
 **Acá cambia el lenguaje, y es a propósito.** La máquina determinista **no se escribe en
 Python**: ya existe el arnés de seis motores de `test2-interprete/telefono` en Rust, con
@@ -314,12 +336,26 @@ Python**: ya existe el arnés de seis motores de `test2-interprete/telefono` en 
   es condición sobre Genesis y después no se levanta;
 - el conteo de pasos reproduce bit a bit entre x86-64 y ARM64.
 
-**Bloqueada por una decisión que no es código:** el techo de pasos no tiene número ni ubicación
-(§10.3, primer problema abierto). Se puede construir la máquina con el techo parametrizado, pero
-**no se puede cerrar la fase sin ese número** — y tampoco se puede escribir el bloque 0 sin él,
-porque el claim de clase PoD lo necesita (§7.2).
+**Corrida el 20/8/2026, con seis criterios aprobados y el séptimo reprobado** —y el reprobado es
+lo que valió la fase—. Se agregaron cuatro criterios a los tres del roadmap al leer el intérprete
+que se iba a reutilizar: el arnés de Test 2 corre un guest de confianza y esto corre el programa de
+un adversario. Agregar criterios está permitido; ablandarlos no.
 
-### Fase 5 · Estado con costo
+> **El hallazgo:** el techo de pasos prometía un presupuesto que no cumplía **por 23×**, porque un
+> paso no vale un paso. Salieron de ahí un segundo techo sobre páginas tocadas, `R_declarado` de
+> 300 a 70 M pasos/s, y la capacidad inicial de 67 a 15 tx por bloque. Más dos agujeros de
+> amplificación en el cargador que ningún test de corrección habría encontrado —los encontró que un
+> barrido tardara minutos—. Todo en `genesis/predicado/RESULTADOS.md`.
+
+**Cerrada el 21/8/2026**, con los siete criterios resueltos: los vectores reproducen bit a bit entre
+x86-64 y aarch64, y C1 está medido sobre el hardware de referencia (354 ms de 1.500, margen 4,24×).
+
+> **Y dejó un problema abierto que el paper no tenía:** cuál hardware es el peor caso. El diseño
+> supone que la capa liviana es la que ata, y medido eso es falso para los patrones adversariales de
+> memoria. **Dos máquinas no alcanzan para fijar un piso de hardware** — cerrarlo necesita más
+> máquinas, no más análisis.
+
+### Fase 5 · Estado con costo — ✅ corrida
 
 Se construye `estado/permanencia.py`, `arbol.py` y `desalojo.py`.
 
@@ -328,11 +364,17 @@ acumulador se mantiene en el orden de los cientos de bytes **totales** y no por 
 qué cuesta de verdad mantener una prueba de reactivación al día, que es la dependencia de archivo
 que §10.2 declara y no puede garantizar.
 
-**Bloqueada parcialmente:** el mecanismo se puede construir entero; **la regla que mueve la tasa
-no está elegida** (§10.3, segundo problema abierto) y su nivel inicial tampoco. Se construye con
-la tasa parametrizada y se deja el lazo de control para cuando haya con qué calibrarlo.
+**Corrida el 21/8/2026**, con ocho criterios aprobados y uno reprobado — y el que reprobó lo hizo
+**contra el paper**: §8.5 afirmaba que el piso salía dieciséis horas de guardado, y la cuenta, ya
+escrita, da otro orden. Desarrollo en `genesis/estado/RESULTADOS.md`.
 
-### Fase 6 · El devnet desechable
+**Sigue bloqueada donde estaba:** la regla que mueve la tasa no está elegida y no hay con qué
+calibrarla. Lo que sí se cerró es **por qué ésa no es una cuenta que falta escribir sino una
+frontera** —el techo tenía sus dos lados físicos y la tasa tiene uno monetario, y ninguna cuenta
+cruza eso sin leer un precio—. De ahí salió denominar el piso en épocas de guardado, con lo cual
+**el problema abierto pasó a ser un número en vez de dos**.
+
+### Fase 6 · El devnet desechable — ✅ corrida
 
 Recién acá se junta todo y aparece un token — **con la advertencia de la sección 4 puesta por
 escrito y con fecha de reset declarada de antemano.**
@@ -344,6 +386,17 @@ de desalojo—.
 **Para qué no sirve, y no hay que confundirse:** para saber si alguien deja la GPU prendida, cuál
 es la elasticidad de la demanda de guardado, si la moneda se atesora, o si el antispam aguanta.
 **Eso necesita plata real o revisión externa, y va por otro carril.**
+
+**Corrida el 21/8/2026, acotada a dos de las cuatro preguntas** — la cola con `N` real la contestó
+la Fase 3 y el presupuesto bajo bloques reales la Fase 4, y correr de nuevo lo ya medido no agrega
+evidencia pero sí agrega la tentación de mirar el número hasta que dé.
+
+> **El hallazgo (B3):** el depósito de permanencia se compraba en byte-**épocas**, la época se
+> cuenta en bloques y el tiempo de bloque es un parámetro interno — así que una conmutación que lo
+> moviera hacía que **un depósito ya pagado comprara el doble de guardado**. I3 se cumplía: los
+> bytes cruzaban idénticos. Lo que cambiaba era lo que valían, y **eso no lo mira ninguna de las
+> cinco invariantes**. Corregido denominando en byte-segundos declarados. Desarrollo en
+> `genesis/devnet/RESULTADOS.md`.
 
 ---
 
