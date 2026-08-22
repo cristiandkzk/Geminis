@@ -66,6 +66,23 @@ ser saturable. Y `h = 0,10` es conservador por un factor grande: Test 2 midió 6
 tx/s con **un cuarto de núcleo** en un teléfono de 8 núcleos, así que el headroom
 real es de varios múltiplos del bloque, no de una décima.
 
+> **Nota del 20/8/2026 — la Fase 3 corrió esta fórmula con una cola de verdad, y le
+> encontró un supuesto.** No se reescribe nada de arriba: el modelo es correcto y su
+> aritmética también. Lo que la implementación mostró es que **`drenar = N·h·T/γ`
+> supone que los `N` nodos no se pisan**, y esta medición no lo dice porque no tenía
+> por qué — es un modelo de capacidades, no de asignación.
+>
+> Corrido con nodos que eligen: con **partición por hash** da los diez clavados, pero
+> eso exige saber cuántos nodos hay, que es justo lo que un diseño sin conjunto de
+> validadores no tiene. **Al azar, sin coordinación, hacen falta once**, y el atraso
+> se estabiliza en vez de crecer. Y con la regla que cualquiera escribiría —*la más
+> vieja primero*— los `N` nodos verifican la misma impugnación y **no alcanza ninguna
+> cantidad de nodos**.
+>
+> El diez de esta tabla sigue siendo el piso teórico correcto. Lo que faltaba era una
+> condición sobre cómo elige cada nodo, y **se escribió en §6.3 el mismo día**.
+> Detalle en `genesis/liquidacion/RESULTADOS.md` §3.
+
 ## 3. La pieza que sostiene todo: el techo de pasos de VM
 
 `γ` es el parámetro que decide, y no es libre.

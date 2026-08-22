@@ -17,6 +17,15 @@ vez"*. Las condiciones, textuales:
 No hace falta escribir protocolo: es una búsqueda, como Test 3, y se corrió con el mismo
 método de dos vocabularios.
 
+> **Nota del 19/8/2026 — I2 se reformuló después de correr este test, y la condición 1
+> quedó escrita con su letra vieja.** No se reescribe: un criterio de un test cerrado se
+> anota, no se acomoda. **El resultado no cambia**, y por un motivo que conviene decir:
+> los tres clientes encontrados son recalibraciones de parámetros agregados —blobs, gas
+> limit, bomba de dificultad— y los tres disparan por **aproximación observable**, que es
+> la forma de I2 que la condición 1 ya exigía. La forma que se agregó —*capacidad
+> demostrada*— habilita triggers que este test no buscó, así que si algo hace, es ampliar
+> el universo de clientes posibles, nunca invalidar los encontrados.
+
 ---
 
 ## 1. Método

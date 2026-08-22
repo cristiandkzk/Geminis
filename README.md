@@ -137,10 +137,20 @@ El espacio está partido: los parámetros **internos** —emisión, fees, tamañ
 tiempos— cambian en cualquier transición; los **visibles en la interfaz** —primitiva de firma,
 formato de dirección, serialización— sólo por la vía de I5.
 
-**I2 · El trigger se computa sólo desde el estado, y su aproximación es observable.** Sin
-oráculos, sin firmas, sin votos. Pero computable no alcanza: el trigger tiene que ser
-**monótono en su aproximación** y exponer on-chain *cuántos bloques faltan al ritmo actual*.
-Un trigger que no se puede ver venir no es admisible aunque se pueda calcular.
+**I2 · El trigger se computa sólo desde el estado, y nadie elige el momento.** Sin oráculos, sin
+firmas, sin votos. Pero computable no alcanza: *"la dirección X recibió 1 wei"* se computa sólo
+desde el estado y es una compuerta con dueño. Hay dos formas de cumplirlo y toda regla declara en
+cuál está. Por **aproximación observable**: la cantidad que dispara es monótona, la cadena publica
+*cuántos bloques faltan al ritmo actual*, y la regla **no puede disparar desde el reposo** — si el
+bloque anterior no publicó distancia, era un escalón. Por **capacidad demostrada**: no hay
+aproximación ni puede haberla —la rotura de una primitiva ocurre, no se aproxima— y es admisible
+sólo si producir el hecho exige **exactamente la capacidad ante la que la transición reacciona**,
+declarada on-chain. Es el canario de §6.6, y su condición es que la instancia debilitada se
+**derive** de una semilla pública: si alguien la genera, retiene la trampa y el canario es suyo.
+
+*Ningún nodo puede verificar que la capacidad declarada sea la verdadera; eso se audita en
+Genesis, y por eso la declaración es obligatoria y explícita. Y la distancia es una proyección al
+ritmo actual, no una promesa: la promesa es `Δ`.*
 
 **I3 · El estado se conserva íntegro a través de la transición.** No hay migración de saldos,
 no hay snapshot — y por lo tanto no hay bridge, que es el componente más atacado de la
@@ -254,10 +264,16 @@ de impugnación** sin que nadie presente prueba de conflicto.
 > hacen todos los nodos PoD **a la vez**.
 
 El margen es `N · h / γ`. Con `γ ≈ 1` —que es lo que garantiza el techo de pasos de VM— y 10%
-de headroom por nodo, **alcanzan diez nodos PoD** para que la cola no acumule atraso. Dos
-condiciones lo sostienen y ninguna es automática: **cualquier nodo PoD resuelve cualquier
-impugnación**, y la cola es **por orden de llegada con bono plano** — si se ordenara por tamaño
-de bono, el capital compraría prioridad.
+de headroom por nodo, la fórmula da **diez nodos PoD**; corrida con una cola de verdad hacen
+falta **once**. Tres condiciones lo sostienen y ninguna es automática: **cualquier nodo PoD
+resuelve cualquier impugnación**; la cola es **por orden de llegada con bono plano** —si se
+ordenara por tamaño de bono, el capital compraría prioridad—; y **cada nodo elige en su propio
+orden y no en el de la cola**. Esta última apareció al correrla: si todos toman de la cabeza,
+los `N` nodos verifican la misma impugnación, el paralelismo se evapora —con cincuenta nodos el
+margen es el de uno— y la espera de una impugnación legítima no es un plazo fijo sino una rampa
+de `9·T`. Se arregla sin coordinación: cada nodo recorre la cola en un orden pseudoaleatorio
+derivado de su identidad, y ése es el costo de diez a once. Al azar el atraso **se estabiliza**
+—con once nodos, ~400 impugnaciones y cuatro bloques de espera media— en vez de crecer.
 
 El bono no tiene que ser grande, sólo distinto de cero: **el del impugnador honesto vuelve** y
 **el del atacante se quema**.
@@ -317,10 +333,18 @@ los golpes:
 
 **El guante mide seguridad; el costo lo mide otra cláusula.** Una implementación correcta e
 irrompible pero diez veces más cara sobrevive la ventana y queda instalada para siempre — y ahí
-el presupuesto de §5.1 se rompe *desde adentro del protocolo*. Por eso el predicado lleva **dos**
-cláusulas: pasar los vectores **y** verificar por debajo de un **techo de pasos de VM** — pasos
-ejecutados, no tiempo de reloj, porque el conteo de instrucciones es idéntico entre
-arquitecturas (medido) y el reloj sería un oráculo.
+el presupuesto de §5.1 se rompe *desde adentro del protocolo*. Por eso el predicado lleva **tres**
+cláusulas: pasar los vectores, verificar por debajo de un **techo de pasos de VM**, y hacerlo
+tocando menos de un **techo de páginas**. Las dos cotas son cantidades ejecutadas, no tiempo de
+reloj: el conteo es idéntico entre arquitecturas (medido) y el reloj sería un oráculo.
+
+**La tercera cláusula la agregó construir la máquina, y no estaba en el diseño.** Un techo de pasos
+supone que un paso vale un paso, y no: la peor mezcla de instrucciones corre **23× más lento** que
+la carga real, así que el techo prometía 22 ms por transacción y la mezcla tardaba 596. No se
+arregla pesando instrucciones —lo que hace el gas— porque la mezcla que abre el hueco es una
+lectura de memoria, y una lectura cuesta lo mismo que una suma cuando el dato está en caché: **es
+el mismo opcode**, y lo que cambia es dónde cae el dato. Lo único que se puede contar mientras
+corre son las páginas distintas que toca.
 
 **Convergencia previa.** Justin Drake propuso *cryptographic canaries* en Ethereum Research en
 febrero de 2018: bounty, prueba de amenaza, conmutación automática a un respaldo. Este diseño se
@@ -476,10 +500,23 @@ Esta sección es la que decide cuánto vale todo lo anterior.
 
 **Medido contra el mundo (evidencia externa):**
 
-- **El mecanismo tiene cliente.** Ethereum recalibra los parámetros de capacidad de blobs
-  (`blobSchedule`) y construyó un tipo de fork dedicado a abaratar ese cambio (EIP-7892) porque
-  *"los cambios grandes e infrecuentes generan costos e ineficiencias"* — pero el disparo sigue
-  siendo un timestamp escrito a mano. En mayo de 2026 el patrón se repitió sobre el gas limit
+- **El mecanismo corre y se midió contra el historial real de Ethereum** (agosto 2026), con las
+  alturas y los offsets verificados contra los EIPs y contra la configuración que corren los nodos.
+  **Dos de los tres casos fueron en contra**, y por eso va primero: en la **bomba de dificultad**,
+  una regla con un solo número elegido de antemano reproduce las seis decisiones humanas dentro de
+  37 días —pero ese número es el promedio de un criterio que se movió **41×**, y cinco de los seis
+  forks fueron preventivos—; en los **blobs**, la regla habría actuado **383 días antes** donde la
+  restricción era la demanda y **nunca** donde era la capacidad; en el **gas limit** directamente
+  **no hay trigger admisible**, porque EIP-1559 clava la ocupación (correlación **−0,02** contra un
+  precio que se movió 650×), el precio nominal caduca y el relativo se vuelve trinquete.
+- **El mecanismo tiene cliente, y se está acercando solo.** Ethereum recalibra los parámetros de
+  capacidad de blobs (`blobSchedule`) y construyó un tipo de fork dedicado a abaratar ese cambio
+  —EIP-7892, hoy **`Final`**: *"the current approach of only modifying blob parameters in large,
+  infrequent hard forks is not agile enough to keep up with L2 growth"*—. Ya lo usó dos veces: el
+  target fue de 3 a 6, 10 y 14 en veintidós meses, y las dos últimas subas se anunciaron **juntas y
+  por adelantado**. O sea que el cliente llegó solo hasta *escribir el cronograma antes*, que es la
+  forma de BIP-103; lo que le falta para llegar acá es I2 — el disparo sigue siendo un timestamp
+  escrito a mano. En mayo de 2026 el patrón se repitió sobre el gas limit
   (EIP-8261), con un cronograma que declara explícitamente **no** ser regla de consenso.
   Corroboran la bomba de dificultad —retrasada por hard fork **seis veces en cinco años** para
   instalar un entero que la cadena podía calcular sola— y la emisión terminal, que Monero
@@ -572,22 +609,57 @@ sabiendas. Las que más pesan:
 
 ---
 
-## 9. Los dos problemas abiertos
+## 9. Los problemas abiertos, y el que se cerró
 
-Ninguno es un mecanismo: son un número, dónde vive ese número, y una regla sin elegir.
+**Cerrado en agosto de 2026 · el techo de pasos de VM.** Estaba declarado como *un número y dónde
+vive*, con un acople que parecía obligar a elegir entre dos formas malas: congelado hay que elegirlo
+generoso —tiene que sobrevivir primitivas que no existen— y generoso deja pasar la implementación
+correcta pero 10× más lenta; apretado obliga a que sea parámetro interno, o sea una palanca.
 
-**1 · El techo de pasos de VM no está calibrado, y tiene dos filos.** Muy apretado, y la cadena no
-puede adoptar una primitiva futura legítimamente más cara. Muy holgado, y vuelve el caso exacto que
-el techo existe para bloquear. La salida elegante hay que resistirla: anclarlo a lo entregado en la
-misma ronda —*el mejor candidato por un múltiplo*— es determinístico y nunca queda corto, pero se
-rebasa en cada generación, y un 2× por transición son 1.024× a las diez.
+**La disyuntiva era falsa: el techo no se elige, se deriva.**
 
-**Y el número está acoplado a dónde vive.** Congelado en la máquina hay que elegirlo generoso —tiene
-que sobrevivir veinte años de primitivas que no existen— y generoso es justamente lo que deja pasar
-la implementación lenta; apretado obliga a que sea parámetro interno, y un parámetro interno es una
-palanca que alguien va a querer mover. **El número y su ubicación son un solo problema.**
+```
+techo = f* × tiempo_de_bloque × R_declarado(páginas) / tx_por_bloque
+```
 
-**2 · La regla que mueve la tasa de permanencia, y el nivel del que parte.** Que la tasa no puede
+Lo que se congela en la máquina es **la fórmula**; el valor lo pone cada generación con parámetros
+que ya están en el espacio. No es una palanca —moverlo exige mover capacidad o tiempo de bloque— y
+**no compone**, porque no depende de qué primitiva esté instalada. Y el filo de las primitivas
+futuras se disuelve: una más cara no queda afuera, **entra pagando capacidad**, y eso lo cobra una
+transición con su `Δ` y su aviso.
+
+Quedan dos constantes que **son decisiones y se declaran como tales**: `f*` (fracción del nodo
+liviano para verificar firmas, con piso medido en el headroom que §5.3 necesita) y `R_declarado`
+(ritmo del hardware de entrada, declarado por debajo del real porque el sobrante es headroom). Con
+25% y 70 M pasos/s, un bloque de 6 s con 15 tx da **7 millones de pasos** — el doble de la
+implementación de referencia de ML-DSA-44 y la quinta parte de la lenta que Test 2 encontró.
+
+> **Y construir la máquina falsó la primera calibración de esos números.** Decían 300 M pasos/s y
+> 67 transacciones. Aquel ritmo era el de **una** mezcla de instrucciones, y el de la máquina
+> depende de la mezcla por 23×. **La fórmula sobrevivió sin un cambio** —que es exactamente lo que
+> se gana cuando un techo es una cuenta y no un número—, pero la calibración costó tres cuartas
+> partes de la capacidad del bloque, y hizo falta un segundo techo, sobre páginas tocadas: **96
+> páginas de 4 KiB**.
+>
+> Y ese segundo techo trajo su propia lección, que terminó siendo la más útil de la fase. Un techo
+> derivado de la capacidad **encarece**; uno constante **sólo puede excluir**, porque no hay precio
+> que la primitiva pueda pagar — y las tres primitivas de la familia tocan 26, 40 y 65 páginas, así
+> que el primer número elegido dejaba a la tercera afuera para siempre sin que ninguna cuenta lo
+> señalara. **Se cerró con la misma jugada que había cerrado el primero: congelar la curva en vez
+> del punto.** Genesis fija cuánto ritmo sostiene el hardware de referencia para cada presupuesto de
+> memoria, el presupuesto pasa a ser un parámetro, y pedir más memoria se paga en capacidad como
+> todo lo demás. La medición está en `genesis/predicado/RESULTADOS.md`.
+
+**Abierto · cuál hardware es el peor caso.** Todo el diseño supone que la capa liviana es la que
+ata —de ahí sale la entrada barata de nodos— y con ese supuesto se calibra `R_declarado`. **Medido,
+es falso para los patrones adversariales de memoria:** un teléfono de gama media corre el peor
+programa admisible a 80,8 M pasos/s y un escritorio x86-64 a 78,9, y con más memoria la distancia
+se abre al doble a favor del teléfono. Las dos máquinas se rompen por lugares distintos. No
+invalida el techo —se calibra contra el hardware declarado como referencia— pero sí la frase de que
+el hardware más barato es el peor caso. **Dos máquinas no alcanzan para fijar un piso**, y cerrarlo
+necesita más máquinas, no más análisis.
+
+**Abierto · la regla que mueve la tasa de permanencia, y el nivel del que parte.** Que la tasa no puede
 quedar congelada ya está dicho. La única variable a la que puede indexarse sin violar I2 es la
 **ocupación del estado** — un hecho del estado, no una lectura de mercado. Lo que falta es qué regla
 se escribe.
@@ -597,6 +669,13 @@ mueve la tasa, no dónde empieza, y dónde empieza es un precio —cuánto vale 
 unidades del token— que la cadena no puede leer sin violar I2. O se fija a mano en Genesis, y
 entonces lo único que el diseño promete es que la regla lo corrija si estaba mal, o hay que anclarlo
 a algo que esté en el estado y todavía no aparece qué.
+
+> **Y se puede decir por qué ésta no cede a la jugada que cerró el techo dos veces.** El techo
+> tenía sus dos lados en el mundo físico —pasos y segundos— y la cadena puede contar los dos. La
+> tasa tiene un lado físico, bytes × épocas, y uno monetario, y **ninguna cuenta cruza esos dos
+> lados sin leer un precio**. No es una cuenta que falta escribir: es una frontera. De ahí salió
+> denominar el piso en épocas de guardado en vez de en unidades del token — con eso **lo que
+> queda abierto es un solo número y no dos**.
 
 ---
 
