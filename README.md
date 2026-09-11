@@ -19,8 +19,8 @@ ejecuta ese cambio sin voto, sin fork político y sin intervención humana en la
 > Todo lo que figura como *medido* tiene script reproducible y datos crudos.
 
 **Dónde está el resto, si querés ir al fondo de algo.** Este archivo es el resumen. La fuente
-de verdad es **[Genesis Paper.md](Genesis%20Paper.md)** —~19.500 palabras, con las fronteras
-desarrolladas y el registro de qué se descartó en el camino—; `genesis-paper.html` es su render
+de verdad es **[Geminis Paper.md](Geminis%20Paper.md)** —~19.500 palabras, con las fronteras
+desarrolladas y el registro de qué se descartó en el camino—; `Geminis-paper.html` es su render
 y se regenera con `python render.py`, no se edita a mano.
 
 ⚠️ **Ojo con los números de sección: este resumen tiene numeración propia.** Fusionó secciones,
@@ -62,7 +62,7 @@ Las tres funcionan. Ninguna es determinista: en las tres, **qué viene después*
 tomada en el momento, por gente, bajo presión. Y esa decisión es donde un protocolo se vuelve
 político.
 
-La propuesta: que la regla de sucesión viva dentro de Genesis y se ejecute sola cuando el
+La propuesta: que la regla de sucesión viva dentro de Geminis y se ejecute sola cuando el
 estado de la cadena cumple una condición verificable. El resultado no es una familia de
 cadenas — es **una sola cadena que conmuta su ruleset por generaciones**, conservando el
 estado íntegro y encadenando cada generación a su ancestro por hash.
@@ -109,7 +109,7 @@ sorpresa:
 3. **Activación.** `Δ` bloques después del lock-in —no después del disparo, así el aviso es
    exactamente `Δ`— el nodo conmuta.
 
-`Δ` está fijado en Genesis **por clase de transición**: una transición de circulación tolera
+`Δ` está fijado en Geminis **por clase de transición**: una transición de circulación tolera
 ventana larga, una migración criptográfica bajo ataque necesita lo contrario.
 
 El linaje se encadena por hash:
@@ -119,7 +119,7 @@ H0_B = H( H0_A ‖ state_trigger ‖ params_nuevos )
 Verify( H0_B, H0_A, state_trigger, params_nuevos ) → TRUE
 ```
 
-Genesis A **no conoce** el hash de B —no puede, B incorpora información que todavía no
+Geminis A **no conoce** el hash de B —no puede, B incorpora información que todavía no
 existe— pero conoce determinísticamente cómo se calculará. `H0_B` no es el génesis de una
 cadena nueva: es un marcador de checkpoint generacional dentro de la misma cadena.
 
@@ -130,8 +130,8 @@ cadena nueva: es un marcador de checkpoint generacional dentro de la misma caden
 Cada una elimina una forma de reintroducir al humano en el lazo. **Son el marco duro: un
 ataque que las respeta es un ataque contra el diseño; uno que las viola es otro diseño.**
 
-**I1 · El intérprete vive en Genesis y no cambia nunca.** Una transición no introduce código
-de nodo: selecciona un punto de un espacio que el nodo **ya sabe ejecutar**. Lo que Genesis
+**I1 · El intérprete vive en Geminis y no cambia nunca.** Una transición no introduce código
+de nodo: selecciona un punto de un espacio que el nodo **ya sabe ejecutar**. Lo que Geminis
 fija de forma permanente no es una lista de reglas posibles sino la **máquina que las corre**.
 El espacio está partido: los parámetros **internos** —emisión, fees, tamaño de bloque,
 tiempos— cambian en cualquier transición; los **visibles en la interfaz** —primitiva de firma,
@@ -149,7 +149,7 @@ declarada on-chain. Es el canario de §6.6, y su condición es que la instancia 
 **derive** de una semilla pública: si alguien la genera, retiene la trampa y el canario es suyo.
 
 *Ningún nodo puede verificar que la capacidad declarada sea la verdadera; eso se audita en
-Genesis, y por eso la declaración es obligatoria y explícita. Y la distancia es una proyección al
+Geminis, y por eso la declaración es obligatoria y explícita. Y la distancia es una proyección al
 ritmo actual, no una promesa: la promesa es `Δ`.*
 
 **I3 · El estado se conserva íntegro a través de la transición.** No hay migración de saldos,
@@ -183,7 +183,7 @@ En Bitcoin la posición conservadora —no cambiar nada— es el default: quien 
 reglas escribe software nuevo, y la cadena que sigue igual reclama ser la original. Acá es al
 revés: el cliente estándar conmuta solo, así que **para no conmutar hay que modificar
 activamente el software** y desactivar la regla. El que se queda en las reglas viejas no
-preserva la cadena original: se desvía de Genesis, y no puede invocar a Genesis para
+preserva la cadena original: se desvía de Geminis, y no puede invocar a Geminis para
 justificarlo.
 
 *"Cuál es la verdadera"* deja de ser una pregunta social. Un exchange o un light client corren
@@ -314,13 +314,13 @@ Toda primitiva termina cediendo. El problema es que *"la primitiva se rompió"* 
 estado, así que no puede ser trigger (I2); y una **lista** de reemplazos se agota y exige un
 fork humano.
 
-**El canario convierte la rotura en un hecho del estado.** Genesis publica una versión
+**El canario convierte la rotura en un hecho del estado.** Geminis publica una versión
 deliberadamente debilitada con recompensa on-chain. Si alguien la rompe y la reclama, eso sí es
 estado. El trigger no lee *"la criptografía se rompió"* — lee *"el canario fue reclamado"*. Una
 **escalera** de canarios gradúa la respuesta: el débil cede años antes y dispara una migración
 con `Δ` largo.
 
-**El intérprete quita el fondo de la escalera.** Como Genesis fija la máquina y no la lista, una
+**El intérprete quita el fondo de la escalera.** Como Geminis fija la máquina y no la lista, una
 primitiva nueva es **bytecode**, no código de nodo.
 
 **Quién lo escribe: es un pedido de trabajo.** Cuando el canario cae, el protocolo publica el
@@ -349,7 +349,7 @@ corre son las páginas distintas que toca.
 **Convergencia previa.** Justin Drake propuso *cryptographic canaries* en Ethereum Research en
 febrero de 2018: bounty, prueba de amenaza, conmutación automática a un respaldo. Este diseño se
 concibió independientemente. La diferencia es la profundidad: el respaldo de Drake es precableado
-y de **un solo escalón**; acá el sucesor se deriva dentro de un espacio definido en Genesis y el
+y de **un solo escalón**; acá el sucesor se deriva dentro de un espacio definido en Geminis y el
 intérprete permite **encadenar generaciones**. Eso contesta la objeción que dejó aquella idea sin
 avanzar —que calibrar el canario obliga a estimaciones tan conservadoras que la automatización se
 vuelve redundante con la supervisión manual—: con un solo escalón, una transición prematura
@@ -383,7 +383,7 @@ contestan mal, y el motivo es un teorema:
 > acción, o es farmeable.** Si paga menos que el costo, nadie la reclama; si paga más, se
 > farmea. Bitcoin pudo porque hashear tiene costo externo, físico e imposible de fingir.
 
-**La forma elegida toma la tercera, acotada al bloque 0.** Genesis publica pools con tope por
+**La forma elegida toma la tercera, acotada al bloque 0.** Geminis publica pools con tope por
 clase, y **reclamar se paga demostrando la capacidad que se reclama**: la clase de cómputo
 resuelve una tarea de referencia con predicado determinista; la clase PoD verifica un lote de
 referencia dentro del techo de pasos de VM.
@@ -557,12 +557,12 @@ respetados oscila entre casi cero y más del doble del objetivo, con cualquier g
 No son problemas a resolver: son el precio de propiedades que el diseño quiere, y se sostienen a
 sabiendas. Las que más pesan:
 
-- **La adaptación está acotada a lo que Genesis anticipó.** Si la condición que dispara la
+- **La adaptación está acotada a lo que Geminis anticipó.** Si la condición que dispara la
   transición es algo no previsto, no hay ruleset que cargar. **Y el determinismo saca el freno de
   emergencia**: una transición mal anticipada es exactamente el escenario donde los humanos
   querrían negarse, y la respuesta del diseño es *"entonces sos un fork"*.
 - **El conjunto de futuros posibles deja de ser auditable.** Es el precio del intérprete. Con una
-  lista finita, cualquiera podía leer Genesis y saber en qué se puede convertir la cadena.
+  lista finita, cualquiera podía leer Geminis y saber en qué se puede convertir la cadena.
 - **El intérprete es un punto único de falla que no se puede parchear nunca.** Si tiene un bug, no
   hay transición que lo arregle, porque toda transición corre sobre él. Es la única pieza donde la
   verificación formal no es opcional.
@@ -609,7 +609,7 @@ sabiendas. Las que más pesan:
 
 ---
 
-## 9. Los problemas abiertos, y el que se cerró
+## 9. El problema abierto, y los que se cerraron
 
 **Cerrado en agosto de 2026 · el techo de pasos de VM.** Estaba declarado como *un número y dónde
 vive*, con un acople que parecía obligar a elegir entre dos formas malas: congelado hay que elegirlo
@@ -646,7 +646,7 @@ implementación de referencia de ML-DSA-44 y la quinta parte de la lenta que Tes
 > que la primitiva pueda pagar — y las tres primitivas de la familia tocan 26, 40 y 65 páginas, así
 > que el primer número elegido dejaba a la tercera afuera para siempre sin que ninguna cuenta lo
 > señalara. **Se cerró con la misma jugada que había cerrado el primero: congelar la curva en vez
-> del punto.** Genesis fija cuánto ritmo sostiene el hardware de referencia para cada presupuesto de
+> del punto.** Geminis fija cuánto ritmo sostiene el hardware de referencia para cada presupuesto de
 > memoria, el presupuesto pasa a ser un parámetro, y pedir más memoria se paga en capacidad como
 > todo lo demás. La medición está en `genesis/predicado/RESULTADOS.md`.
 
@@ -659,23 +659,35 @@ invalida el techo —se calibra contra el hardware declarado como referencia— 
 el hardware más barato es el peor caso. **Dos máquinas no alcanzan para fijar un piso**, y cerrarlo
 necesita más máquinas, no más análisis.
 
-**Abierto · la regla que mueve la tasa de permanencia, y el nivel del que parte.** Que la tasa no puede
-quedar congelada ya está dicho. La única variable a la que puede indexarse sin violar I2 es la
-**ocupación del estado** — un hecho del estado, no una lectura de mercado. Lo que falta es qué regla
-se escribe.
+**Cerrado en septiembre de 2026 · el nivel inicial de la tasa de permanencia.** Una ley de control
+dice cómo se mueve la tasa, no dónde empieza, y dónde empieza es un precio que la cadena no puede
+leer sin violar I2 — a diferencia del techo de pasos, acá uno de los dos lados de la cuenta es
+monetario y no hay fórmula que lo derive. El replay de §11 lo puso en números: el base fee de
+Ethereum cayó 650× en cuatro años, y hasta el ancla que parecía evitar el problema —el precio
+contra su propia mediana anual— se queda sin noción de *caro* una vez que el nivel absoluto se
+perdió de vista.
 
-Y falta algo más que la forma: **falta el nivel del que parte.** Una ley de control dice cómo se
-mueve la tasa, no dónde empieza, y dónde empieza es un precio —cuánto vale una época de guardado en
-unidades del token— que la cadena no puede leer sin violar I2. O se fija a mano en Genesis, y
-entonces lo único que el diseño promete es que la regla lo corrija si estaba mal, o hay que anclarlo
-a algo que esté en el estado y todavía no aparece qué.
+**La salida fue declararlo, con el mismo argumento que `f*` y `R_declarado`: no sale de una
+medición, pero el margen alrededor de la elección sí se mide.** `r0(0)` se fija en mil veces el
+piso de representabilidad de la época — el punto en que llenar el 100% del estado durante la
+ventana de `L_max` cuesta una fracción no trivial del supply (~1%) sin que un uso normal lo note,
+porque los dos costos escalan igual con el multiplicador.
 
-> **Y se puede decir por qué ésta no cede a la jugada que cerró el techo dos veces.** El techo
-> tenía sus dos lados en el mundo físico —pasos y segundos— y la cadena puede contar los dos. La
-> tasa tiene un lado físico, bytes × épocas, y uno monetario, y **ninguna cuenta cruza esos dos
-> lados sin leer un precio**. No es una cuenta que falta escribir: es una frontera. De ahí salió
-> denominar el piso en épocas de guardado en vez de en unidades del token — con eso **lo que
-> queda abierto es un solo número y no dos**.
+**Cerrado en septiembre de 2026 · la regla que mueve la tasa de permanencia.** Indexar a la
+ocupación parecía la única salida compatible con I2, y tiene una falla que sólo apareció al
+medirla contra un caso real: una vez que un precio ya raciona el recurso, la ocupación deja de
+decir si ese precio tiene sentido —medido en Ethereum, correlación −0,02 contra un precio que se
+movió 650×—. Un lazo que ajusta `r0` mirando ese mismo error hereda la ceguera.
+
+**La regla adoptada no mira ocupación: hace que el precio se descubra solo, contra un cupo fijo
+(§8.6 del paper).** Cada época se admite un cupo fijo de bytes nuevos (`θ*/L_max`, una cuenta, no
+una decisión) y toda entrada admitida vive exactamente `L_max` épocas —sin vida variable que
+comprar con el precio, lo que cierra el canal de arbitraje que tumbó la primera versión de esta
+regla—, con el precio saliendo de una subasta de clearing uniforme. Contra el mismo shock que
+tumbó la ley anterior, la ocupación no se mueve del objetivo en ningún momento, sin el pico de
+hasta 1,48× que la ley indexada a ocupación todavía dejaba pasar. Con pocos postores el precio es
+ruidoso —depende del cupo, no de cuánta gente compite por él— y por eso lleva una reserva de
+arranque que se apaga sola cuando el cupo crece con la red.
 
 ---
 
@@ -694,17 +706,22 @@ alquilada durante la ventana, que se devuelve cuando cierra. El diseño demuestr
 **existió**, no que se **queda** — y como la emisión está desacoplada del trabajo, tener tokens no da
 ninguna razón para seguir trabajando. El claim además es **irrepetible**.
 
-**C · ¿La tarea de referencia es replayable?** Si la instancia es fija y publicada en Genesis, el
+**C · ¿La tarea de referencia es replayable?** Si la instancia es fija y publicada en Geminis, el
 primero que la resuelve publica la solución y el costo del claim colapsa a cero para todos los demás.
 Se arreglaría derivando la instancia de la clave del reclamante — no está escrito.
 
-**D · En `t = 0` todas las defensas están denominadas en una unidad sin precio.** El fee es ad
-valorem, el piso y el depósito son nominales, y el nivel inicial de la tasa es el problema abierto 2.
-En la ventana en que la cadena es más frágil, el antispam vale aproximadamente nada.
+**D · En `t = 0` todas las defensas siguen denominadas en una unidad sin precio real.** El fee es ad
+valorem, el piso y el depósito son nominales, y el nivel inicial de la tasa ya tiene un número
+declarado (§10.3) — pero ningún número puede tener precio real antes de que exista mercado. Lo que
+compra la declaración es que llenar el estado entero cueste una fracción no trivial del supply, no
+que se sepa si esa fracción es mucha o poca plata de verdad.
 
-**E · El escenario peligroso es el éxito, no el fracaso.** Si la moneda se aprecia —que es lo que pasa
-si se adopta— el guardado se vuelve prohibitivo en términos reales y el estado se vacía. Lo que lo
-compensa es la regla que no está escrita, y la primera versión de esa regla ya se cayó.
+**E · El escenario peligroso era el éxito, no el fracaso — y ahora tiene una defensa parcial.** Si la
+moneda se aprecia, un precio nominal fijo vuelve el guardado prohibitivo en términos reales y el
+estado se vacía; la primera versión de la regla que debía evitarlo se cayó. La regla adoptada
+(§8.6 del paper) no lee ningún precio —seguiría violando I2— pero saca el nivel de un precio de
+subasta en vez de un lazo sobre ocupación, y quien puja sí convierte al valor real sin que el
+protocolo tenga que saberlo. No es una garantía, es una defensa que antes no existía.
 
 **F · El guante instala criptografía de consenso escrita por un postor anónimo**, con *"nadie rompió
 una instancia debilitada en una ventana fija"* como único filtro. ¿Alcanza?

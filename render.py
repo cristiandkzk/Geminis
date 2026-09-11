@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Renderiza `Genesis Paper.md` a `genesis-paper.html` conservando el diseno.
+Renderiza `Geminis Paper.md` a `Geminis-paper.html` conservando el diseno.
 
 El HTML se habia quedado ~30% atras del markdown porque se mantenian a mano por
 separado. Este script hace del .md la unica fuente de verdad: el HTML se
@@ -25,8 +25,8 @@ import sys
 from pathlib import Path
 
 RAIZ = Path(__file__).parent
-FUENTE = RAIZ / "Genesis Paper.md"
-SALIDA = RAIZ / "genesis-paper.html"
+FUENTE = RAIZ / "Geminis Paper.md"
+SALIDA = RAIZ / "Geminis-paper.html"
 CSS = RAIZ / "estilo.css"
 
 TITULO = "Sucesión Determinista"
