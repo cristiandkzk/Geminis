@@ -1,0 +1,23 @@
+# C7 — ritmo por mezcla de instrucciones.
+# maquina: arm · techo de paginas: 96
+
+mezcla,ritmo_Mpasos_s,nota
+addi-uniforme,26.9,un solo opcode: el despacho del interprete acierta siempre
+aritmetica-revuelta,27.0,ocho opcodes en orden impredecible: rompe el despacho del interprete
+mul,26.1,multiplicacion de 32x32
+divu,8.1,division sin signo, la instruccion mas larga del ISA
+lw-secuencial,15.6,2 KiB recorridos en orden, todo en L1
+lw-persecucion-96pg,8.2,paginas desparramadas por 64 MiB: el peor caso que SI entra
+lw-persecucion-libre,cortada,la misma sin limite de paginas: 8 MiB. La que el segundo techo frena
+ML-DSA-44-real,21.8,la carga real — 3339364 pasos y 26 paginas por verificacion
+
+# peor mezcla admisible: divu a 8.1 M pasos/s
+# ML-DSA en esta maquina: 21.8 M pasos/s
+# cociente peor/ML-DSA: 0.370
+# ML-DSA endurecido en el telefono: 266 M pasos/s
+# => cota para R_declarado: 98 M pasos/s (trasladada por cociente — correr en aarch64 para medirla directo)
+# R_declarado vigente: 70 M pasos/s
+# a esa cota, con margen 2x sobre ML-DSA-44: 22 tx/bloque (hoy: 15)
+#   y `R_declarado` tiene que quedar POR DEBAJO de la cota, no en ella.
+
+# C7 APROBADO con el techo de paginas puesto: R_declarado esta 29% por debajo de la cota.

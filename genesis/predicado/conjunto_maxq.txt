@@ -1,0 +1,32 @@
+# 1. ritmo de la persecucion segun el tamano de la region
+region_KiB,ritmo_Mpasos_s,cociente_vs_ML_DSA
+16,15.1,0.06
+64,12.3,0.05
+128,11.9,0.05
+192,11.5,0.04
+256,11.2,0.04
+384,10.2,0.04
+512,7.9,0.03
+1024,5.2,0.02
+2048,4.2,0.02
+4096,4.1,0.02
+16384,3.5,0.01
+
+# 2. conjunto de trabajo real de una verificacion ML-DSA-44
+paginas_4KiB,KiB,pasos
+26,104,3339442
+
+# una verificacion toca 104 KiB. El techo declara 64 MiB de memoria.
+
+# 3. ritmo con saltos impredecibles segun el tamano del texto
+texto_KiB,insn,ritmo_Mpasos_s,cociente_vs_ML_DSA
+4,1024,27.3,0.10
+32,8192,27.5,0.11
+128,32768,27.1,0.10
+512,131072,26.1,0.10
+1024,262144,24.1,0.09
+
+# 4. 96 paginas (384 KiB) juntas contra desparramadas por 64 MiB
+disposicion,ritmo_Mpasos_s,cociente_vs_ML_DSA
+juntas,10.0,0.04
+desparramadas,8.0,0.03

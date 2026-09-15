@@ -126,6 +126,27 @@ número elegido (48) dejaba a la tercera afuera para siempre. **En este diseño,
 que elegir suele ser una cuenta que falta escribir** — pasó dos veces con el mismo techo. *(21/8/2026,
 `genesis/predicado/RESULTADOS.md`.)*
 
+**Desafío de cómputo (§6.7).** Una tercera clase de trabajo, distinta del pedido de §6.5: en vez de
+asignarse a un solo nodo antes de computar, varios nodos calculan en paralelo y solo uno cobra por
+ronda. El desperdicio de los que pierden es lo que hace el costo real e infalsificable —el mismo
+argumento que el subsidio de Bitcoin, con inferencia acotada por el protocolo en vez de hasheo como
+recurso escaso—. Existe para que un nodo con una LLM mejor no gane sistemáticamente más que uno con
+una peor: la LLM elige qué intentar, el protocolo fija cuántas veces y en cuánto tiempo.
+
+**Filtro estructural de dominio rotado (§6.7).** La cláusula del predicado del desafío que excluye
+generar bytes al azar en vez de usar una LLM: barato, determinístico, corre en la capa liviana como
+cualquier predicado de §6.2. Su dominio —schema, idioma, vocabulario— se deriva de la semilla de la
+ronda y cambia en cada una, para que no se pueda entrenar un modelo angosto que farmee un examen
+fijo (el equivalente, en modelos, del foso de capital que §6.1 evita en hardware).
+
+**Ronda y ventana `T` (§6.7.1).** El desafío se resuelve en rondas de duración fija en bloques —
+nunca en tiempo de reloj, que sería un oráculo—. Todo envío válido antes del cierre entra a un
+sorteo parejo, así que llegar primero dentro de la ronda no compra nada: es la misma jugada que
+§6.3 usa contra el capital en la cola de impugnaciones, aplicada acá contra la velocidad. La
+duración `T` se sortea dentro de un rango `[X, Y]` con la semilla del bloque que abre la ronda, para
+que nadie pueda ajustar su pipeline a un número fijo y conocido. `X` e `Y` quedan como problema
+abierto en §10.3: la fórmula está cerrada, los dos números todavía no.
+
 **Ventana de impugnación.** Cómo se finaliza: una interacción queda firme cuando pasa la ventana
 sin que nadie presente prueba de conflicto. No hay quórum ni conjunto de validadores. Lo que
 impide que se sature es una asimetría: **llenar es serial —hay que entrar en un bloque— y drenar

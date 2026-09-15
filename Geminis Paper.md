@@ -720,6 +720,124 @@ que la automatización recaía en supervisión humana.
 La segunda objeción de esa misma discusión —que quien puede romper la primitiva gana más
 callándose que cobrando la recompensa— no la resuelve este lazo, y está declarada en §10.2.
 
+### 6.7 El desafío de cómputo: rápido gana, mejor no alcanza
+
+§6.5 asigna cada pedido de trabajo a un solo nodo, antes de que compute — es lo que elimina el
+cómputo duplicado. Pero hay una clase de trabajo que necesita exactamente lo contrario: muchos
+nodos calculando en paralelo, la mayoría perdiendo su cómputo, y solo uno cobrando. No es un
+descuido de §6.5, es un mecanismo distinto: el desperdicio de los que pierden es lo que hace que
+el costo de participar sea real e infalsificable, el mismo argumento que sostiene el subsidio de
+Bitcoin (§9) — con una diferencia: acá el recurso escaso no es hashear, es inferencia de un
+modelo, acotada por el protocolo.
+
+**El riesgo que hay que descartar antes de escribir una línea de mecanismo.** §6.1 declara que la
+elección de modelo es del nodo, no del protocolo — un nodo puede correr cualquier LLM y
+reemplazarla cuando quiera. Si "quién cobra" lo decidiera qué tan buena es la respuesta, un nodo
+con una LLM mejor ganaría sistemáticamente más desafíos que uno con una LLM peor, a igual
+hardware — y eso reconstruye el foso de capital que §6.1 existe para evitar, ahora del lado del
+modelo en vez del lado del silicio: capital compra el mejor modelo, el mejor modelo compra más
+fees, más fees compran más capital. La propiedad que hay que sostener es la contraria a la
+intuición de "gane el mejor": **la LLM decide qué intentar; el protocolo decide cuántas veces y en
+cuánto tiempo puede intentarlo, y ninguna de las dos cosas depende de qué tan buena sea la
+respuesta.**
+
+**El predicado del desafío tiene dos cláusulas independientes, y hacen falta las dos.**
+
+1. **Filtro estructural, barato y determinístico** — corre en la capa liviana igual que cualquier
+   otro predicado de §6.2: la salida tiene que parsear contra un schema fijo y superar un piso de
+   coincidencia contra un diccionario publicado on-chain. No mide calidad: mide "esto lo generó
+   algo que entiende lenguaje". Ruido generado al azar lo falla casi siempre; cualquier LLM que
+   intente de buena fe lo pasa casi siempre, sea cual sea su tamaño. Sin este filtro, la estrategia
+   óptima no usa ninguna LLM — genera bytes al azar más rápido y más barato que cualquier
+   inferencia, y el desafío deja de medir lo que se supone que mide.
+2. **Sorteo por hash** — el nodo elige un `nonce` propio y lo mete *adentro* del prompt, junto con
+   la semilla del desafío; el envío es válido si `hash(salida canónica ‖ nonce)` cae bajo un
+   objetivo de dificultad. Que el `nonce` vaya en el prompt y no pegado después de la salida no es
+   un detalle: es lo que impide computar la respuesta una sola vez y moler nonces aparte sobre un
+   hash barato — cada intento exige una pasada de inferencia nueva de punta a punta, así que
+   "intentos por segundo" es throughput real de inferencia y no throughput de hashing.
+
+Ninguna LLM puede "adivinar" mejor un hash: si la función de hash se comporta como una función
+pseudoaleatoria, ser más inteligente no sube la probabilidad de que una salida particular caiga
+bajo el objetivo. Lo único que sube esa probabilidad acumulada es cuántos intentos por segundo hace
+el nodo — que es hardware y eficiencia de inferencia, no calidad del modelo.
+
+**Queda un canal por donde la calidad se cuela igual, y hay que cerrarlo a propósito: el filtro
+estructural fijo se puede farmear con un modelo angosto, entrenado solo para pasar ese filtro y
+nada más** — no una LLM de propósito general, un atajo de unos pocos megabytes construido para
+vencer un examen que no cambia nunca. Es el mismo foso de capital de §6.1, ahora en forma de "ASIC
+de modelo" en vez de ASIC de silicio.
+
+**La salida es la misma que ya usa §6.6 contra la obsolescencia criptográfica: no fijar el examen,
+derivarlo del estado.** El schema, el idioma y el dominio del filtro estructural se derivan de la
+semilla del desafío — el mismo tipo de valor no elegible por nadie que ya usa el nonce de la
+transición en I2 — y cambian de ronda en ronda. Un modelo angosto entrenado para un dominio fijo se
+cae apenas el dominio rota; una LLM general no nota la diferencia. Especializarse deja de pagar,
+porque no hay un blanco fijo al cual especializarse.
+
+```
+semilla_ronda (estado de la cadena, sin dueño)
+        │
+        ├──► dominio del filtro estructural (schema, idioma, vocabulario)
+        │
+        └──► rango donde cae T (§6.7.1)
+
+nodo elige nonce ──► prompt(semilla_ronda, nonce) ──► salida
+                                                          │
+                                            filtro estructural (capa liviana)
+                                                          │
+                                              hash(salida ‖ nonce) < objetivo?
+                                                    │            │
+                                                   no            sí
+                                                    │            │
+                                            nuevo nonce    entra al sorteo
+                                            (si queda T)    de la ronda
+```
+
+### 6.7.1 · Rondas con ventana impredecible: por qué el reloj no puede ser fijo
+
+Filtro y sorteo por hash resuelven quién puede competir; no resuelven que el más rápido gane
+siempre. Si "primero en entregar" ganara la ronda sin más, un modelo con ventaja de throughput
+sostenida —no un atajo angosto, una LLM de propósito general simplemente más eficiente— se
+llevaría una fracción creciente de las rondas para siempre, exactamente igual que un minero con más
+hashrate en Bitcoin. Ahí no hay trampa que cerrar: es velocidad comprando resultado, y es justo lo
+que se decidió que no debía pasar.
+
+**La solución no es apurar ni frenar a nadie: es que "llegar primero" dentro de la ronda deje de
+importar.** El desafío se resuelve en rondas de duración fija en bloques —nunca en tiempo de
+reloj, que sería un oráculo (misma regla que ya rige los dos techos de §6.6)—, y todo envío válido
+recibido antes del cierre de la ronda entra a un sorteo con una fuente de azar fresca del bloque de
+cierre. El nodo que entrega en el primer bloque de la ronda y el que entrega en el último tienen la
+misma probabilidad de ganar el sorteo. Es la misma jugada que §6.3 ya usa contra el capital en la
+cola de impugnaciones —orden pseudoaleatorio en vez de orden de llegada—, aplicada acá contra la
+velocidad en vez de contra el capital.
+
+**La duración de la ronda no puede ser un número fijo y conocido, por la misma razón que el examen
+no puede ser un dominio fijo:** un valor constante es un blanco para sobreajustar el pipeline
+—tamaños de lote, caché precalentado, exactamente calibrados para ese número—. La ventana `T` se
+sortea, en bloques, dentro de un rango `[X, Y]` fijado por el protocolo, con la semilla del bloque
+que abre la ronda — la misma fuente que ya deriva el dominio del filtro:
+
+```
+T = X + (semilla_apertura mod (Y − X + 1))        [bloques]
+```
+
+Nadie conoce `T` antes de que la ronda empiece, y una vez que empieza lo conocen todos al mismo
+tiempo — nadie tuvo ventaja de información y nadie puede pedir después que se mueva.
+
+**Lo que esto no hace: no baja el piso de velocidad, solo impide sobreajustar a un número.** El
+extremo corto del rango, `X`, termina siendo la exigencia real para cualquiera que quiera calificar
+de forma confiable ronda tras ronda — tarde o temprano el sorteo va a caer ahí. Lo que el rango
+evita es que alguien construya una tubería afinada para un valor único y conocido; no relaja cuánto
+hay que aguantar en el peor caso.
+
+> **Problema abierto — declarado acá, medido en §10.3.** `X` e `Y` no se pueden fijar sin medir, y
+> medirlos requiere antes decidir una cosa que no es una medición: qué cuenta como el modelo de
+> referencia cuyo peor caso legítimo protege `X`. Un piso calibrado sobre un modelo grande en GPU
+> de datacenter excluye a cualquier nodo más modesto desde el diseño; uno calibrado sobre el
+> hardware más chico admisible estira la ronda para todos. La fórmula queda congelada acá; los dos
+> números, no. Ver §10.3.
+
 ---
 
 ## 7. Política monetaria
@@ -1845,7 +1963,7 @@ la capacidad aparece concentrada y en silencio, el canario no dispara y el lazo 
 
 ### 10.3 Problemas abiertos
 
-Queda uno. La regla que mueve la tasa de permanencia de §8.5 se decidió en septiembre de 2026 —el
+Quedan dos. La regla que mueve la tasa de permanencia de §8.5 se decidió en septiembre de 2026 —el
 mecanismo está en §8.6— y con eso el primer problema de esta lista queda cerrado del todo: el
 techo de pasos, el nivel inicial de la tasa y la regla que la mueve están los tres al final de la
 sección, entre los resueltos. Lo que queda es una pregunta empírica, no una decisión, y la abrió
@@ -1868,6 +1986,31 @@ aparecía como obvia. Y no se cierra pensando: **dos máquinas no alcanzan para 
 hardware**, y menos cuando una de las dos tiene una dispersión del 80% entre corridas de la misma
 medición contra el 1,6% de la otra. Necesita más máquinas, que es trabajo de otra clase que el resto
 de esta sección.
+
+**Una tercera máquina, y la primera que no entra.** Un Amlogic S805 (Cortex-A5, ARMv7 de 32 bits,
+2015) —el núcleo más simple de los tres medidos, sin pipeline de división ni prefetch agresivo—
+corre el bloque completo de referencia (quince verificaciones ML-DSA-44) en 2.499 ms contra un
+presupuesto de 1.500: **1,67× por encima, reprobado**, contra el margen de 4,24× del teléfono. Y el
+mecanismo que lo rompe tampoco es el mismo que separaba a las dos primeras máquinas: ahí competían
+dos patrones de memoria; acá la división entera (`divu`, sin costo especial en las otras dos) empata
+con la persecución de punteros como la mezcla más cara, así que el segundo techo de §6.6.1 —pensado
+para el patrón de memoria— no la ve ni la cobra. Tablas en `genesis/predicado/RESULTADOS.md`.
+
+Esto no cierra la pregunta —sigue haciendo falta más hardware, y esta vez además de máquinas más
+débiles hace falta variar qué recurso ata— pero fija un punto: bajo los parámetros vigentes, un
+núcleo de esa clase queda **fuera de spec** para correr la capa liviana, y la entrada barata de
+nodos de §6.1 tiene, por ahora, ese piso conocido y no otro declarado.
+
+**El segundo, y lo abrió §6.7: los bordes `X` e `Y` de la ventana de ronda del desafío de
+cómputo.** La fórmula que sortea `T` dentro del rango ya está cerrada; lo que falta es el rango
+mismo, y no es solo una medición de latencia — es, antes, una decisión que ninguna medición puede
+tomar por sí sola: qué cuenta como el nodo de referencia cuyo peor caso legítimo protege `X`. Un
+piso calibrado sobre un modelo grande en GPU de datacenter excluye por diseño a cualquier nodo más
+modesto; uno calibrado sobre el hardware más chico admisible estira la ronda para todos, y no hay
+una tercera opción que evite decidirlo. A diferencia del piso de hardware de arriba —que pregunta
+qué existe—, ésta pregunta qué se quiere admitir. Y a diferencia de `R_declarado`, todavía no hay
+un nodo de cómputo real corriendo un desafío para benchmarquear: es una medición pendiente de que
+exista qué medir.
 
 > **Resuelto:** *el techo de pasos de §6.6*. Estuvo declarado acá como **un número y dónde vive**,
 > con un acople que parecía obligar a elegir entre dos formas malas: congelado en la máquina hay que

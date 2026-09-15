@@ -47,3 +47,20 @@ genesis-paper.html.bak
 
 # El paquete para el telefono: se regenera con herramientas/empaquetar_vm.py
 genesis/vm-telefono.tar.gz
+
+# ─── Correspondencia privada ───────────────────────────────────────────────────
+# Borradores de mensajes a personas puntuales, no documentacion del proyecto.
+# RESPUESTA-DANGUO-PRIVADO.md en particular tiene notas explicitas de que
+# revelarle y que no a esa misma persona -- publicarlo expondria la estrategia
+# de disclosure a quien esta del otro lado de esa conversacion. Decidido el
+# 14/9/2026.
+RESPUESTA-DANGUO-PRIVADO.md
+MENSAJE-AMIGO-SOLANA.md
+RESPUESTA-TEMPORAL-LIQUIDITY.md
+
+# Borradores de posts de foro, todavia no listos para el repo publico.
+# Decidido el 14/9/2026, antes de pasar el repo a publico.
+POST-ETHRESEARCH.md
+POST-VM.md
+POST-VM2.md
+RESPUESTA-EIP-8368.md

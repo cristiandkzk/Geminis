@@ -318,6 +318,83 @@ máquinas, no más análisis.
 
 ---
 
+## Actualización 12/9/2026 — un tercer punto, y esta vez rompe C1
+
+**Máquina:** Amlogic S805 (Cortex-A5, ARMv7 de 32 bits), placa MXQ genérica, DDR3, Android
+4.4.2. Compilado cruzado (`armv7-unknown-linux-musleabihf`, estático) desde una PC con `cross`,
+corrido directo sobre la placa sin Termux (Android 4.4 no lo soporta).
+
+### C1 — ya no es cuestión de margen, se rompe
+
+| corrida | admisión + verificación | % del presupuesto |
+|---|---:|---:|
+| 1 | 2.499 ms | 167% |
+| 2 | 2.486 ms | 166% |
+| 3 | 2.479 ms | 165% |
+
+**Peor de tres: 2.499 ms de 1.500 (1,67× por encima). REPROBADO.**
+
+Contra el margen de 4,24× del teléfono (353,6 ms), esta es la primera máquina donde el
+presupuesto **no entra en absoluto** — no un margen más chico, un incumplimiento real. Los pasos
+por verificación (3.339.442) coinciden con los ya medidos en otra arquitectura: el intérprete
+sigue siendo determinista, lo único que cambió es el reloj.
+
+### C7 (`mezclas`) — cambia cuál es la mezcla peor
+
+| mezcla | teléfono (M pasos/s) | MXQ (M pasos/s) | cociente MXQ/teléfono |
+|---|---:|---:|---:|
+| addi-uniforme | 322,7 | 26,9 | 0,083 |
+| aritmética-revuelta | 325,4 | 27,0 | 0,083 |
+| mul | 326,6 | 26,1 | 0,080 |
+| divu | 197,7 | **8,1** | 0,041 |
+| lw-secuencial | 186,3 | 15,6 | 0,084 |
+| lw-persecución (96 pág.) | 82,1 | **8,2** | 0,100 |
+| ML-DSA-44 (real) | 266,0 | 21,8 | 0,082 |
+
+En el teléfono la peor mezcla admisible es `lw-persecución` por buen margen (82,1 contra 197,7
+de la segunda peor). En la MXQ, `divu` (8,1) queda **por debajo** de `lw-persecución` (8,2) —
+casi empatadas, y con `divu` al frente. El techo de páginas de la Fase 4 se diseñó para
+encarecer el patrón de memoria; no toca la división, que no pisa una página de más. Es un
+candidato a segundo cuello de botella que el diseño actual no cobra, en núcleos in-order sin
+pipeline de división. **Margen chico (1,2% entre las dos): confirmar con más corridas antes de
+tratarlo como establecido — no se repitió tres veces como pide §4 del roadmap.**
+
+El propio binario computa además un C7 "traducido" —el cociente peor/ML-DSA de esta máquina
+(0,370) aplicado al ritmo real del teléfono (266)— y da "aprobado" con 29% de margen. **Esa
+cuenta no es una segunda opinión sobre si la MXQ sirve: contesta una pregunta distinta** (si el
+riesgo relativo seguiría acotado corriendo en el teléfono) y no contradice que C1 ya reprobó acá
+en términos absolutos.
+
+### `conjunto` — no hay acantilado
+
+En el teléfono, entre 2 y 4 MiB de región la máquina cae 86% (77,6 → 10,9 M pasos/s): el límite
+de su TLB. En la MXQ, el mismo rango cae apenas 2% (4,2 → 4,1) — porque ya viene chata desde
+regiones mucho más chicas (16 KiB: 15,1 M pasos/s, ya un orden de magnitud por debajo del pico
+del teléfono). **El peor caso no es una versión más lenta del mismo patrón: la forma de la curva
+cambia con la clase de hardware**, no sólo la escala.
+
+### `paginas` — el conteo se sostiene
+
+| primitiva | pasos | páginas | KiB |
+|---|---:|---:|---:|
+| ML-DSA-44 | 3.339.442 | 26 | 104 |
+| ML-DSA-65 | 5.379.293 | 40 | 160 |
+| ML-DSA-87 | 9.111.768 | 65 | 260 |
+
+Coincide entre las corridas hechas en esta misma máquina; el determinismo de pasos y páginas no
+está en discusión, sólo la velocidad de reloj.
+
+### Lo que esto deja
+
+Tres máquinas y ya una rompe el presupuesto. El problema declarado al cerrar la Fase 4 —*"no se
+sabe cuál hardware es el peor caso... cerrarlo necesita más máquinas, no más análisis"*— sigue
+abierto, pero ahora con un punto concreto: **un Amlogic S805 queda fuera de spec** bajo los
+parámetros vigentes, y el mecanismo que lo delata (división, no memoria) es distinto del que
+motivó el segundo techo. Sigue sin absorberse dentro de `R_DECLARADO` — es frontera, y la
+frontera se movió.
+
+---
+
 ## Cómo reproducir
 
 ```
