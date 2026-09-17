@@ -1,0 +1,17 @@
+[package]
+name = "guest"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+ml-dsa = { version = "0.1.1", default-features = false, features = ["alloc"] }
+slh-dsa = { version = "0.1", default-features = false, features = ["alloc"] }
+signature = "=2.3.0-pre.4"
+
+[profile.release]
+opt-level = 3
+lto = true
+panic = "abort"

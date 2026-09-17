@@ -1,0 +1,93 @@
+# Test 7 · El presupuesto de una firma compuesta
+
+> Estado: **parcial.** Escritorio (x86-64) corrido en los tres motores. Falta
+> la pata de teléfono (ARM64) — no hay dispositivo a mano para esta corrida —
+> y falta toda la Parte A del problema que motiva este test. Ver RESULTADOS.md.
+
+## De dónde sale esto
+
+No lo pide ninguna sección numerada del paper todavía. Sale de una discusión
+sobre §10.2 (el canario paga por delatar, y quien puede romper la primitiva
+gana más callándose): un atacante que rompe **una** primitiva puede vaciar
+cualquier cuenta con esa sola ruptura. La mitigación que se evaluó —un techo
+de velocidad sobre valor dormiente (§8.5, `permanencia.py`/`desalojo.py`) que
+exige una **segunda firma, de una familia criptográfica independiente**, para
+cualquier transacción que dispare ese techo— solo tiene sentido si esa segunda
+verificación es barata en el caso raro que la paga. Este test mide eso.
+
+**Por qué SLH-DSA y no otra cosa.** Tiene que ser una familia sin núcleo
+compartido con ML-DSA (la misma condición que ya impone §10.1 para el hash de
+linaje: "el linaje y la firma no pueden compartir núcleo criptográfico"). SLH-DSA
+(FIPS-205 / SPHINCS+) es hash-based — SHA-2 puro en la variante `Sha2_128s` —
+mientras que ML-DSA es reticulado (Module-LWE). No comparten primitiva de base,
+así que romper una no dice nada sobre la otra.
+
+## Qué mide exactamente
+
+El mismo patrón que `pqcore` de Test 2: un módulo wasm único con `decode+verify`
+de las dos primitivas (`run_ml_dsa44`, `run_slh_dsa128s`), medido con la misma
+función `measure` (escala iteraciones hasta 1,2 s, mediana de 5 corridas) bajo
+dos motores — `wasmi` (intérprete puro, el perfil "VM de cadena") y
+`wasmtime`/Cranelift (JIT, el motor que de hecho entró en el presupuesto de
+Test 2, con "391 µs · ~640 tx/s" en el teléfono real). Más un binario nativo
+(`host/src/bin/nativo.rs`) para tener la fila `native` de referencia.
+
+ML-DSA-44 usa una semilla fija (igual que `pqcore::fixture`, determinista, sin
+RNG dentro del guest). SLH-DSA-128s no tiene ese camino en esta versión del
+crate (`slh-dsa` 0.1.0), así que su clave y firma se generaron una vez fuera
+del guest y viajan como bytes fijos en `codigo/guest/src/fixture.rs` — el guest
+solo decodifica y verifica, que es exactamente lo que hace un nodo real con
+una firma que le llega en una transacción.
+
+## Cómo correrlo
+
+`codigo/guest/guest.wasm` ya está versionado — la misma decisión que Test 2
+para sus guests: el binario compilado se ignora (`target/` está en
+`.gitignore`), pero **este** wasm es la entrada del benchmark, no un
+artefacto de build descartable, así que va al repo. No hace falta recompilar
+el guest para correr las mediciones:
+
+```
+cd codigo/host
+cargo run --release --bin nativo    # fila `native`
+cargo run --release                 # filas wasmi + cranelift
+```
+
+Para regenerar `guest.wasm` después de tocar `codigo/guest/src/`:
+
+```
+cd codigo/guest
+cargo build --release --target wasm32-unknown-unknown
+cp target/wasm32-unknown-unknown/release/guest.wasm guest.wasm
+```
+
+Sin dependencias fuera de `crates.io`: `ml-dsa` y `slh-dsa` son las mismas
+crates de RustCrypto que ya usa `pqcore` (Test 2), más `wasmi` y `wasmtime` en
+las mismas versiones que ya fija `test2-interprete/telefono/host/Cargo.toml`.
+`signature` queda pineado a `=2.3.0-pre.4` a propósito: es la versión exacta
+contra la que está compilado `slh-dsa` 0.1.0 — una versión más nueva
+(`2.3.0-pre.7`, la que resuelve por defecto) rompe la compilación del crate
+por un cambio de API entre pre-releases. Si `slh-dsa` sube de versión, esto
+hay que revisarlo.
+
+## Lo que falta antes de que el número signifique algo para el paper
+
+1. **El teléfono real.** Igual que Test 2 y Test 5, el hardware de referencia
+   de los nodos PoD es un teléfono de gama media, no un escritorio x86. Todo lo
+   de este test corrió en una máquina de escritorio — el ratio nativo/wasmi
+   podría no trasladarse igual a ARM (§10.3 ya midió que ARM y x86 se rompen
+   por lugares distintos para ML-DSA).
+2. **La Parte A del problema que motiva esto:** el umbral de velocidad sobre
+   valor dormiente en sí — qué techo no roza actividad legítima — no está
+   medido. `herramientas/traer_datos.py` solo trae series a nivel de bloque
+   (blobs, gas, dificultad); hace falta una fuente de datos por dirección que
+   hoy no existe en el repo. Sin eso, saber que la segunda firma es barata no
+   alcanza para decidir si el mecanismo completo tiene sentido.
+3. **Costo de tamaño, no solo de tiempo.** SLH-DSA-128s pesa ~7,9 KB por firma
+   contra los 2,4 KB de ML-DSA-44 — un costo de ancho de banda/almacenamiento
+   real que este test no cuantifica en esos términos (bytes por bloque,
+   presupuesto de estado de §10.1).
+
+Sin las tres, esto es una señal de orden de magnitud — útil para decidir si
+vale la pena seguir por esta rama — no un resultado que se pueda citar como
+cerrado en el paper.

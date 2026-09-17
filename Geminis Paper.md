@@ -1719,6 +1719,20 @@ migración tendría que correr sobre una cadena cuya verificación de linaje ya 
 Geminis elige `H` de una familia distinta de la que usa la primitiva de firma inicial. Es barato el
 día uno e imposible después.
 
+**Elegir la primitiva más escrutinada, no la más rara, y sostener a sabiendas el riesgo de
+monocultura que eso trae.** Casi toda la industria cripto hoy comparte núcleo — secp256k1 para
+Bitcoin y para las cuentas de Ethereum —, así que una ruptura matemática real del problema de base
+no amenaza una cadena: amenaza casi todo lo que existe a la vez, y eso agranda el premio de
+quedarse callado que ya declara §10.2. La tentación es esquivarlo con una primitiva que nadie más
+use. No se toma: un esquema sin escrutinio público no es más seguro por ser raro, es más
+probable que ya esté roto y todavía nadie lo haya intentado en serio. Rainbow y SIKE —candidatos
+serios de la misma competencia de NIST, con años de escrutinio encima— cayeron por completo en
+2022 frente a un solo investigador con una laptop; ninguna primitiva, escrutinada o no, está exenta
+de esto, pero la escrutinada es la que tiene la mejor evidencia disponible de no estarlo ya. Geminis
+elige ML-DSA-44 por esa razón —el mejor candidato con años de intentos públicos de romperlo
+encima— y no por evitar la monocultura que viene. Lo que sí resuelve la monocultura futura no es
+la elección de hoy: es no depender de que dure para siempre, que es lo que compra §6.6.
+
 **El lock-in espera a la finalidad, y eso abre una demora que se puede forzar.** La separación
 entre disparo y lock-in (§3) no es ceremonia: sin ella, una reorganización dejaría a `H0_B`
 comprometido con un `state_trigger` que la cadena canónica ya no contiene, e I4 dejaría de
@@ -1960,6 +1974,60 @@ supuesto es que la capacidad de romper una primitiva no aparece en un solo lugar
 perfecto, que es lo que históricamente pasó con DES, MD5 y SHA-1. Es un supuesto empírico sobre
 cómo se difunde el criptoanálisis, no una propiedad del diseño, y hay que declararlo como tal: si
 la capacidad aparece concentrada y en silencio, el canario no dispara y el lazo de §6.6 no arranca.
+
+**La frescura ata la explotación al presente; no la impide.** Nada de lo anterior exige que la
+validez de una firma o de una transición dependa solo de un secreto fijo. Si además depende de un
+valor que no existe hasta el momento de uso —un beacon de aleatoriedad público, revelado recién en
+el bloque que lo consume—, el atacante pierde la opción de romper la primitiva una vez, en
+privado, y acumular falsificaciones precomputadas para gastarlas en silencio durante años: cada uso
+pasa a exigir cómputo en vivo, expuesto en el instante en que ocurre. Es una reducción de
+superficie —le saca al adversario el modo *romper hoy, cobrar en secreto después*—, no un cierre.
+Contra quien rompe la primitiva en tiempo real, tan rápido como firma el dueño legítimo, la
+frescura no aporta nada: no hay nada que precomputar de por medio, y el límite de este apartado
+sigue intacto para ese caso.
+
+**No es un problema criptográfico ni económico por separado — es uno solo, y la economía depende
+del que falla primero.** Un mecanismo de incentivos —el canario, cualquier recompensa, cualquier
+castigo— solo puede condicionarse sobre lo que el estado puede observar. Lo que tendría que proveer
+esa observabilidad es la criptografía, y no puede: una falsificación indistinguible no deja, por
+definición, ninguna diferencia que un predicado pueda leer. El mecanismo económico nunca falló por
+mal diseñado — nunca tuvo con qué trabajar. En la forma que tiene esto en teoría de mecanismos, es
+un problema de **acción oculta con tipo no observable**, la misma familia que el riesgo moral de la
+economía de la información: cuando el diseñador no puede observar la acción del agente, no existe
+contrato que garantice el resultado deseado para todo tipo de agente, si la opción de afuera —acá,
+explotar en silencio— puede valer más que cualquier cosa que el contrato ofrezca.
+
+**Y la propiedad de "no dejar rastro" no es un hueco del diseño: es lo que significa una ruptura
+completa.** Quien recupera la clave privada —o su equivalente computacional— no produce una firma
+parecida a la legítima: corre exactamente la misma ecuación que correría el dueño. No hay dos
+procesos generando dos resultados distinguibles; hay uno solo, y el atacante ahora también lo puede
+correr. Pedirle a esa firma que delate cómo se obtuvo es pedir que una llave duplicada perfecta se
+sienta distinta en la cerradura. Por eso una ruptura **parcial** —un sesgo estadístico, una fuga que
+acerca sin completar, el patrón histórico de DES, MD5 y SHA-1— sí puede dejar huella, y por eso la
+escalera de canarios existe para atrapar exactamente ese tramo, con años de anticipación (arriba en
+esta sección). Lo que la escalera no puede tocar es el salto directo a ruptura completa sin pasar
+por una versión pública del tramo intermedio — no por falta de un mecanismo mejor, sino porque en
+ese punto ya no queda ninguna diferencia que ningún mecanismo, criptográfico o económico, pueda leer.
+
+**Lo que sí queda cubierto, dicho en una sola lista y sin exagerarlo:** la escalera de canarios
+acota cuándo una capacidad que se difunde madura en un ataque de producción; que el linaje y la
+firma no compartan núcleo acota qué cae junto con qué cuando algo se rompe; elegir la primitiva más
+escrutinada en vez de la más rara (arriba, §10.1) acota la probabilidad de que la ruptura ya exista
+sin que nadie la haya buscado en serio; y una firma compuesta de una segunda familia sin núcleo
+compartido, exigida solo para transacciones que muevan valor dormiente por encima de un umbral,
+es una mitigación candidata —medida en `test7-firma-compuesta/` (~4,2× el costo de una verificación
+simple bajo el motor que de hecho entró en el presupuesto de Test 2), todavía sin la corrida en
+teléfono ni el umbral de velocidad que la haría adoptable— que reduciría el valor de callarse
+justo para las cuentas que más vale la pena vaciar. Lo que ninguna de las cuatro cubre es el
+adversario solitario que llega a la ruptura completa sin pasar por ninguna fase intermedia pública:
+ese caso no se cubre porque no hay información en el estado con la que cubrirlo.
+
+**Declarar esto es más fuerte que prometer lo contrario.** Un diseño que dijera "esta cadena es
+irrompible" estaría prometiendo algo que ningún sistema criptográfico puede prometer — la sección
+6.6 ya lo dice para la primitiva ("nadie puede decir que es segura, así que se prueba a los
+golpes"), y vale exactamente igual para el mecanismo de sucesión que la reemplaza. La alternativa a
+un límite declarado no es un límite resuelto: es un límite sin declarar, que igual está ahí, solo
+que nadie lo escribió antes de que hiciera falta.
 
 ### 10.3 Problemas abiertos
 
