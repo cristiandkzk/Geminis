@@ -166,11 +166,28 @@ class NodoPoD:
         clase, sin que este método tenga que saber de qué clase es cada disparo:
         `altura_de_lockin` ya hace `min(ventana, tope_de_la_clase)`.
 
-        Que no haya interpolación es deliberado. Una ventana que crece de a poco
-        con el backlog sería un número que cada nodo computa sobre lo que *él*
-        vio en su cola, y dos nodos con colas distintas madurarían en alturas
-        distintas: un fork por congestión. Acá el único insumo que decide es
-        cuántos bloques seguidos estuvo calmo, que es un hecho de la cadena.
+        Que no haya interpolación es deliberado, y **acota el daño sin cerrarlo.**
+        Una ventana que crece de a poco con el backlog haría que cualquier
+        diferencia de un bloque entre dos colas moviera la maduración. Con el
+        umbral y la racha hace falta un desacuerdo *sostenido* —cruzar
+        `BACKLOG_SEGURO` y mantenerse, o no, durante `ventana_finalidad` bloques—
+        para que dos nodos maduren en alturas distintas. Es más angosto, no es
+        cero.
+
+        **Y no está cerrado, hay que decirlo acá:** `backlog_impugnaciones` llega
+        por parámetro desde el llamador, no se lee de `self.estado`. La racha es
+        un hecho de *lo que a este nodo le dijeron*, no de la cadena. Así que
+        `_ventana_efectiva` es el segundo caso de lo mismo que ya pasa con
+        `ventana_finalidad`: mueve `altura_lockin` y `altura_activacion`, que son
+        campos del evento on-chain pero **no insumos de `h0`**, así que dos nodos
+        que maduran en alturas distintas presentan linajes idénticos y `Verify`
+        no los distingue.
+
+        Hoy no muerde porque nada alimenta el backlog y vale 0 en todos los
+        nodos. Se cierra de una de dos formas, las dos fuera de este método: que
+        el backlog salga del estado on-chain de la cola de impugnaciones (Fase 3,
+        y entonces sí es un hecho de la cadena), o que las alturas del cronograma
+        entren en `h0`.
         """
         if self._racha_calma >= self.ventana_finalidad:
             return self.ventana_finalidad
