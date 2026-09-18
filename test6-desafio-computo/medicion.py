@@ -10,7 +10,7 @@ y qué tan sensible es esa latencia al dominio del filtro estructural.
 Existe para derivar X, el piso de la ventana de ronda T de §6.7.1 (problema
 abierto en §10.3). No corre en teléfono a propósito: el desafío lo compiten nodos
 de cómputo (GPU y RAM, §6.1), no nodos PoD — medir sobre la clase de hardware
-equivocada mide la pregunta equivocada. Ver LEEME.md.
+equivocada mide la pregunta equivocada. Ver README.es.md.
 
 El filtro estructural de este script es un placeholder de referencia (JSON válido
 + nonce repetido + longitud mínima + proporción de palabras alfabéticas + sin
@@ -261,7 +261,7 @@ def reportar(resultados: list[Resultado], tiempo_de_bloque_s: float) -> None:
     )
     print("Si los intentos son secuenciales (no en paralelo), el tiempo esperado hasta")
     print("el primero válido es aproximadamente p50 / tasa_de_éxito, no p50 solo.")
-    print("Esto es un solo modelo en una sola corrida — no alcanza para fijar X (ver LEEME.md).")
+    print("Esto es un solo modelo en una sola corrida — no alcanza para fijar X (ver README.es.md).")
 
 
 # -------------------------------------------------------------------------- main

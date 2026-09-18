@@ -6,7 +6,7 @@
 //! bajo presupuesto. Reutiliza el interprete RV32IM del arnes de Test 2, que ya
 //! tenia medido lo que importa —el conteo de pasos, identico entre x86 y ARM—.
 //!
-//! Los criterios de aprobado estan en `../CRITERIOS.md`, escritos antes de esto.
+//! Los criterios de aprobado estan en `../CRITERIA.es.md`, escritos antes de esto.
 
 // **Acá no hay un solo numero de tiempo de reloj, y es una condicion y no un
 // descuido.** El presupuesto en milisegundos vive en los binarios de medicion:

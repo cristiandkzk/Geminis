@@ -1,4 +1,4 @@
-"""Fase 6 — los criterios de `devnet/CRITERIOS.md`, escritos antes del devnet.
+"""Fase 6 — los criterios de `devnet/CRITERIA.es.md`, escritos antes del devnet.
 
 **Lo que esta fase agrega es que las piezas corren juntas.** Cada fase suelta probó su
 mecanismo contra un mundo quieto; acá el mundo se mueve mientras el mecanismo corre. El

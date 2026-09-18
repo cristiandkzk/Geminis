@@ -1,1 +1,1 @@
-"""`red/` — validacion y sincronizacion. Ver CRITERIOS.md."""
+"""`red/` — validacion y sincronizacion. Ver CRITERIA.es.md."""

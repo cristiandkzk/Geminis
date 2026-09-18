@@ -1,6 +1,6 @@
-"""Fase 5 — los criterios de `estado/CRITERIOS.md`, escritos antes del mecanismo.
+"""Fase 5 — los criterios de `estado/CRITERIA.es.md`, escritos antes del mecanismo.
 
-Lo que se mide —A3, A8, A9— va a `estado/RESULTADOS.md`; acá quedan las propiedades.
+Lo que se mide —A3, A8, A9— va a `estado/RESULTS.es.md`; acá quedan las propiedades.
 """
 
 from __future__ import annotations

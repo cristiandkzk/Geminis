@@ -49,25 +49,5 @@ geminis-paper.html.bak
 geminis/vm-telefono.tar.gz
 
 # ─── Correspondencia privada ───────────────────────────────────────────────────
-# Borradores de mensajes a personas puntuales, no documentacion del proyecto.
-# RESPUESTA-DANGUO-PRIVADO.md en particular tiene notas explicitas de que
-# revelarle y que no a esa misma persona -- publicarlo expondria la estrategia
-# de disclosure a quien esta del otro lado de esa conversacion. Decidido el
-# 14/9/2026.
-RESPUESTA-DANGUO-PRIVADO.md
-MENSAJE-AMIGO-SOLANA.md
-RESPUESTA-TEMPORAL-LIQUIDITY.md
+/docs privados
 
-# Borradores de posts de foro, todavia no listos para el repo publico.
-# Decidido el 14/9/2026, antes de pasar el repo a publico.
-POST-ETHRESEARCH.md
-POST-VM.md
-POST-VM2.md
-RESPUESTA-EIP-8368.md
-
-# Estrategia de la aplicacion a la Ethereum Foundation: que se omite y por que,
-# el monto pedido, y que hay otra aplicacion en revision. Es material previo a
-# mandarla, no documentacion del proyecto -- el evaluador puede llegar aca
-# buscando el repo. Estuvo versionado hasta el 17/9/2026 y se purgo del
-# historial ese dia.
-APLICACION-ESP.md

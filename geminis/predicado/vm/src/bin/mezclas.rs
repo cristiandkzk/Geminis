@@ -6,7 +6,7 @@
 //! promete un presupuesto que no cumple, la cadena se atrasa de forma
 //! determinista, y ninguna invariante lo ve.
 //!
-//! El criterio esta en `../CRITERIOS.md`, escrito antes de correr esto.
+//! El criterio esta en `../CRITERIA.es.md`, escrito antes de correr esto.
 //!
 //! ## Lo que se compara es un cociente, no un ritmo
 //!

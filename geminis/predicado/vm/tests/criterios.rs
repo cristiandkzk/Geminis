@@ -1,4 +1,4 @@
-//! Los criterios de `../CRITERIOS.md` que no son mediciones, como pruebas.
+//! Los criterios de `../CRITERIA.es.md` que no son mediciones, como pruebas.
 //!
 //! C1 y C7 son mediciones y viven en `src/bin/`: no se pueden afirmar, se corren y
 //! se informa el numero. Los otros cinco son propiedades, y una propiedad se fija.

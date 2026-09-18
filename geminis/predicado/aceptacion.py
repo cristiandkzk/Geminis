@@ -7,7 +7,7 @@ de §10.1, no un defecto a arreglar.
 
 Este módulo es la **parte de protocolo** del predicado: qué se declara, qué se
 publica y qué se compara. La máquina que lo ejecuta está en `vm/`, en Rust, y no
-acá — ver `vm/LEEME.md` para por qué cambia el lenguaje justo en esa pieza.
+acá — ver `vm/README.es.md` para por qué cambia el lenguaje justo en esa pieza.
 
 ## Los dos filtros, y por qué son dos
 

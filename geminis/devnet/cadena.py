@@ -17,7 +17,7 @@ cuando las piezas corren juntas.
 Cada fase suelta probó su mecanismo contra un mundo quieto. Acá el mundo se mueve mientras el
 mecanismo corre, y aparecen los acoples que ninguna prueba de módulo puede ver — el más caro es
 que **el depósito se compra en una unidad que un parámetro del ruleset puede reinterpretar**
-(ver `RESULTADOS.md`, B3).
+(ver `RESULTS.es.md`, B3).
 """
 
 from __future__ import annotations

@@ -22,7 +22,7 @@ por eso sirve para probar la cañería sin probar la máquina, que ya está prob
 
 ## Lo que se descubrió al conectarlos
 
-Ver `RESULTADOS-PREDICADO.md`, P4: **un pedido publicado bajo una generación y aceptado bajo otra
+Ver `RESULTS-PREDICATE.es.md`, P4: **un pedido publicado bajo una generación y aceptado bajo otra
 se juzga con un techo distinto**, y nadie lo tocó. Es la misma forma que B3.
 """
 

@@ -5,7 +5,7 @@
 //! de hecho entro en el presupuesto de Test 2)— sobre el mismo modulo wasm,
 //! con la misma funcion `measure` que us el host de Test 2.
 //!
-//! No corre en el telefono: falta esa pata (§10.3 de este test). Ver LEEME.md.
+//! No corre en el telefono: falta esa pata (§10.3 de este test). Ver README.es.md.
 
 use std::time::{Duration, Instant};
 

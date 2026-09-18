@@ -1,4 +1,4 @@
-"""Los criterios de `red/CRITERIOS.md` — el primer nodo que no produce.
+"""Los criterios de `red/CRITERIA.es.md` — el primer nodo que no produce.
 
 **Hasta acá el proyecto nunca validó nada.** `NodoPoD` sólo producía, así que cada transición
 de estado ocurrió por construcción y ningún bloque podía ser inválido jamás.

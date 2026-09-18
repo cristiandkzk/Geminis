@@ -1,435 +1,440 @@
 # Roadmap — Geminis
 
-**Para quien se suma al proyecto.** Esto dice dónde está parado el proyecto, qué significan las
-palabras que vas a ver en los nombres de archivo, y en qué orden se construye. Leelo antes de
-abrir código.
+**English** · [Español](ROADMAP.es.md)
 
-> **Convención de citas.** `§X.Y` se refiere siempre a **`Geminis Paper.md`**, que es la fuente
-> de verdad. El `README.md` es un resumen con **numeración propia** —tiene 10 secciones y el
-> paper 12—, así que los números no coinciden entre los dos documentos. Si un `§` no cierra,
-> estás mirando el archivo equivocado.
+**For whoever joins the project.** This says where the project stands, what the words you are going
+to see in the file names mean, and in what order things get built. Read it before opening any code.
+
+> **Citation convention.** `§X.Y` always refers to **`Geminis Paper.md`**, the translation of
+> `Geminis Paper.es.md`, which is the source of truth. `README.md` is a summary with **its own
+> numbering** —it has 10 sections and the paper has 12—, so the numbers do not line up between the
+> two documents. If a `§` does not add up, you are looking at the wrong file.
 
 ---
 
-## 0. Dónde está parado el proyecto
+## 0. Where the project stands
 
-**Hay un diseño completo y no hay una línea de código.** El paper tiene ~19.500 palabras, cuatro
-tests de falsación corridos y cinco mediciones con scripts reproducibles. Nada de eso es un
-protocolo corriendo: **§3 —el mecanismo central— nunca se ejecutó ni una vez.**
+**There is a complete design and there is not a line of code.** The paper has ~19,500 words, four
+falsification tests run and five measurements with reproducible scripts. None of that is a protocol
+running: **§3 —the central mechanism— never executed even once.**
 
-Y el proyecto está partido en dos mitades con **evidencia de distinta clase**, que es lo primero
-que hay que entender para no construir lo que no toca:
+And the project is split into two halves with **different classes of evidence**, which is the first
+thing to understand so as not to build the wrong thing:
 
-| mitad | qué es | evidencia |
+| half | what it is | evidence |
 |---|---|---|
-| **sucesión de parámetros** (§3 + I2 sobre espacio finito) | la cadena cambia sus propios parámetros internos sin voto | **cliente encontrado afuera**: Ethereum recalibra `blobSchedule` a mano (EIP-7892), el gas limit por cronograma (EIP-8261), la bomba de dificultad se retrasó por fork seis veces |
-| **la moneda + el intérprete + §6.6** | economía propia, VM determinista, evolución criptográfica encadenable | **sólo evidencia propia**: sobrevivió a todos los ataques que se le corrieron, y todos los corrió quien escribió el diseño |
+| **parameter succession** (§3 + I2 over a finite space) | the chain changes its own internal parameters with no vote | **customer found outside**: Ethereum recalibrates `blobSchedule` by hand (EIP-7892), the gas limit by schedule (EIP-8261), the difficulty bomb was delayed by fork six times |
+| **the currency + the interpreter + §6.6** | its own economy, a deterministic VM, chainable cryptographic evolution | **own evidence only**: it survived every attack run against it, and every one of them was run by the person who wrote the design |
 
-> **Se construye primero la mitad de arriba, y no es una preferencia: es dónde está la evidencia.**
-> La mitad de abajo paga las fronteras más caras de §10.1 y todavía no tiene un caso encontrado
-> afuera.
+> **The top half gets built first, and it is not a preference: it is where the evidence is.** The
+> bottom half pays the most expensive boundaries of §10.1 and still has no case found outside.
 
-**Lo que este roadmap no cubre, a propósito:** el lanzamiento del bloque 0. Depende de dos cosas
-que no son código —encontrar comprador para el trabajo verificable de §6.2, y cerrar los dos
-problemas abiertos de §10.3— y el claim es **irrepetible**, así que lanzar antes de tiempo gasta el
-único evento de distribución que existe.
-
----
-
-## 1. Glosario: las palabras que hay que tener antes de abrir un archivo
-
-Están en el orden en que se necesitan, no alfabético.
-
-**Generación.** Una versión del ruleset. La cadena no se bifurca en generaciones: **es una sola
-cadena que cambia de reglas**. La generación 3 es la misma cadena que la 1, con otros parámetros.
-
-**Ruleset.** El conjunto de parámetros vigente en una generación: emisión, fees, tamaño de
-bloque, tiempos, formatos. Es *datos*, no código — ésa es toda la diferencia con un hard fork.
-
-**Conmutación.** El acto de cambiar de ruleset. **El mismo proceso, con el mismo estado en
-memoria, ejecutando reglas distintas a partir de un bloque.** No hay reinicio, no hay migración,
-no hay snapshot, no hay bridge. Si tu implementación necesita reiniciar el nodo, no es
-conmutación: es un fork con otro nombre.
-
-**`TRANSITION_RULE`.** La condición de disparo. Se computa **sólo desde el estado de la cadena**
-(I2). No lee precios, no lee oráculos, no lee votos, no lee el reloj de nadie.
-
-**Los tres tiempos.** No confundirlos nunca, y son tres y no dos:
-
-1. **Disparo** — `TRANSITION_RULE` da TRUE en el bloque `N`. **No compromete nada**: es advisorio
-   y una reorganización lo deshace.
-2. **Lock-in** — cuando `N` es final, el disparo se vuelve **irrevocable** y se emite on-chain el
-   ruleset nuevo completo con la altura de activación. Esperar la finalidad no es ceremonia:
-   `H0_B` compromete el estado que disparó, y comprometerlo antes dejaría el checkpoint apuntando
-   a un estado que una reorganización puede sacar de la cadena.
-3. **Activación** — `Δ` bloques **después del lock-in**, no después del disparo. Así el aviso al
-   integrador es exactamente `Δ` y no depende de cuánto tardó la finalidad.
-
-**`Δ` (delta).** La ventana de aviso, fijada en Geminis **por clase de transición**. Una
-transición de circulación tolera `Δ` largo; una migración criptográfica de urgencia necesita
-`Δ` corto.
-
-**Linaje / `H0_B`.** `H0_B = H( H0_A ‖ state_trigger ‖ params_nuevos )`. No es el génesis de una
-cadena nueva: es un **marcador de checkpoint generacional** dentro de la misma cadena. Hace el
-linaje verificable con un hash desde cualquier generación hacia atrás. Geminis A no conoce el
-hash de B —no puede— pero conoce cómo se calculará.
-
-**Las cinco invariantes (I1–I5).** El marco duro. Cada una elimina una forma de reintroducir al
-humano en el lazo. **En este repo no son documentación: son aserciones ejecutables que toda fase
-tiene que seguir pasando** (ver Fase 0).
-
-- **I1** — el intérprete vive en Geminis y **no cambia nunca**. Una transición selecciona un
-  punto de un espacio que el nodo ya sabe ejecutar; no introduce código de nodo.
-- **I2** — el trigger se computa sólo desde el estado, **y nadie elige el momento**. Computable no
-  alcanza: *"la dirección X recibió 1 wei"* se computa desde el estado y es una compuerta con
-  dueño. Se cumple de dos formas y toda regla declara en cuál está: por **aproximación
-  observable** —publica *cuántos bloques faltan al ritmo actual* y no puede disparar desde el
-  reposo— o por **capacidad demostrada** —no hay aproximación y no puede haberla, y producir el
-  hecho exige exactamente la capacidad ante la que la transición reacciona: el canario de §6.6—.
-  *(Reformulada el 19/8/2026: la letra anterior dejaba fuera al propio canario. Ver C9–C11.)*
-- **I3** — el estado cruza la transición **íntegro**. Sin migración, sin reasignación.
-- **I4** — cada generación commitea a su ancestro.
-- **I5** — las transiciones son **aditivas en la interfaz**. Se pueden agregar formatos, nunca
-  quitarlos, y todo objeto lleva etiqueta de generación desde el bloque 0.
-
-**Nodo PoD.** Verifica y liquida, cobra fee cuando dos contratos interactúan. Corre en cualquier
-hardware —la verificación reproduce bit a bit en x86-64, ARM64 y un teléfono—. **Es la capa de
-consenso.**
-
-**Nodo de cómputo.** GPU y RAM, hostea los modelos que hacen el trabajo pedido. **No participa
-del consenso.** Su ingreso es el pago del pedido que ejecutó.
-
-**Predicado de aceptación.** Todo pedido de trabajo lleva uno: determinista y barato de correr en
-la capa liviana. La inferencia **no se verifica** — se verifica que la salida satisfaga el
-predicado. Lo que no se puede expresar así, la red no lo puede liquidar.
-
-**Los dos techos del predicado.** Además de pasar los vectores, hay que verificar por debajo de un
-tope de **pasos ejecutados** y tocando menos de un tope de **páginas de 4 KiB** (nunca tiempo de
-reloj — el reloj sería un oráculo). **Son condiciones de seguridad, no de rendimiento:** son lo que
-impide que exista una impugnación más cara de verificar que de crear.
-
-El de pasos **no es un número elegido: es una cuenta** —`f* × tiempo_de_bloque × R_declarado /
-tx_por_bloque`—, y lo que Geminis congela es la fórmula, no el valor. *(Cerrado el 20/8/2026; era
-el primer problema abierto de §10.3.)*
-
-El de páginas **también se deriva**, desde el 21/8/2026: es un parámetro del ruleset —96 páginas de
-4 KiB en Geminis— y lo que Geminis congela es la **curva** de ritmo contra memoria. **Lo agregó la Fase 4 y no estaba en
-el diseño:** un techo de pasos solo supone que un paso vale un paso, y la peor mezcla de
-instrucciones corre 23× más lento que la carga real. No se arregla pesando instrucciones —`lw`
-cuesta lo mismo que `addi` con el dato en caché y 23× más sin él, **es el mismo opcode**—, así que
-hay que contar lo único que se ve mientras corre: las páginas distintas que toca.
-
-**Y ésa fue la corrección más importante de la fase, porque tocaba el núcleo:** un techo derivado
-*encarece* —una primitiva cara entra bajando `tx_por_bloque`— y uno constante **sólo puede
-excluir**. Las tres primitivas de la familia ML-DSA tocan 26, 40 y 65 páginas, así que el primer
-número elegido (48) dejaba a la tercera afuera para siempre. **En este diseño, un número que hay
-que elegir suele ser una cuenta que falta escribir** — pasó dos veces con el mismo techo. *(21/8/2026,
-`geminis/predicado/RESULTADOS.md`.)*
-
-**Desafío de cómputo (§6.7).** Una tercera clase de trabajo, distinta del pedido de §6.5: en vez de
-asignarse a un solo nodo antes de computar, varios nodos calculan en paralelo y solo uno cobra por
-ronda. El desperdicio de los que pierden es lo que hace el costo real e infalsificable —el mismo
-argumento que el subsidio de Bitcoin, con inferencia acotada por el protocolo en vez de hasheo como
-recurso escaso—. Existe para que un nodo con una LLM mejor no gane sistemáticamente más que uno con
-una peor: la LLM elige qué intentar, el protocolo fija cuántas veces y en cuánto tiempo.
-
-**Filtro estructural de dominio rotado (§6.7).** La cláusula del predicado del desafío que excluye
-generar bytes al azar en vez de usar una LLM: barato, determinístico, corre en la capa liviana como
-cualquier predicado de §6.2. Su dominio —schema, idioma, vocabulario— se deriva de la semilla de la
-ronda y cambia en cada una, para que no se pueda entrenar un modelo angosto que farmee un examen
-fijo (el equivalente, en modelos, del foso de capital que §6.1 evita en hardware).
-
-**Ronda y ventana `T` (§6.7.1).** El desafío se resuelve en rondas de duración fija en bloques —
-nunca en tiempo de reloj, que sería un oráculo—. Todo envío válido antes del cierre entra a un
-sorteo parejo, así que llegar primero dentro de la ronda no compra nada: es la misma jugada que
-§6.3 usa contra el capital en la cola de impugnaciones, aplicada acá contra la velocidad. La
-duración `T` se sortea dentro de un rango `[X, Y]` con la semilla del bloque que abre la ronda, para
-que nadie pueda ajustar su pipeline a un número fijo y conocido. `X` e `Y` quedan como problema
-abierto en §10.3: la fórmula está cerrada, los dos números todavía no.
-
-**Ventana de impugnación.** Cómo se finaliza: una interacción queda firme cuando pasa la ventana
-sin que nadie presente prueba de conflicto. No hay quórum ni conjunto de validadores. Lo que
-impide que se sature es una asimetría: **llenar es serial —hay que entrar en un bloque— y drenar
-es paralelo —lo hacen todos los nodos PoD a la vez—.**
-
-**Lock.** Comprometer fondos en un contrato los saca del saldo disponible. Es lo que elimina la
-contienda: no se pueden comprometer dos veces.
-
-**Oferta dirigida vs. abierta.** Toda transferencia es **bilateral** (Alice ofrece, Bob acepta).
-Una transferencia común nombra al receptor; **un pedido de trabajo no nombra a nadie** y lo toma
-el nodo que pueda cumplirlo. Es *pull*, no *push*: **nadie asigna pedidos.**
-
-**Época.** La unidad de tiempo del cobro de permanencia (§8.5). No confundir con generación, que
-corre en años.
-
-**Permanencia / desalojo.** Toda entrada de estado paga por seguir existiendo: un **piso** que se
-quema al crear, más un **depósito** que se consume quemándose, lineal en tamaño × tiempo. Cuando
-se agota, la entrada se **desaloja** —sale del conjunto activo, no se destruye— y se revive con
-una prueba. **Tener un saldo deja de ser gratis**, y eso incluye las cuentas del token nativo.
-
-**Claim.** La distribución del día 1: reclamar tokens **se paga demostrando la capacidad que se
-reclama**. Ocurre una sola vez, en el bloque 0, y después ninguna acción crea unidades.
+**What this roadmap deliberately does not cover:** the launch of block 0. It depends on two things
+that are not code —finding a buyer for the verifiable work of §6.2, and closing the two open
+problems of §10.3— and the claim is **unrepeatable**, so launching early spends the only
+distribution event there is.
 
 ---
 
-## 2. Si venís de Bitcoin o Ethereum, esto es distinto en cinco puntos
+## 1. Glossary: the words you need before opening a file
 
-Es la sección que más tiempo ahorra, porque son cinco supuestos que traés puestos y acá no valen.
+They are in the order in which they are needed, not alphabetical.
 
-1. **No hay prueba de trabajo en el consenso.** No hay minería, no hay dificultad, no hay nonce
-   de bloque, no hay hashrate. El único cómputo con costo externo aparece **una vez**, en el claim
-   del bloque 0, y no es hashing sino la tarea de referencia. **Si escribís un `proof_of_work.py`
-   dentro de `consenso/`, estás construyendo otro protocolo.**
-2. **No hay orden global.** Cada cuenta lleva su propia secuencia. Dos interacciones que no
-   comparten colateral **no tienen orden relativo**, y eso es distinto de tenerlo indefinido. La
-   "cadena más larga" no es el criterio de nada.
-3. **La finalidad es por ventana de impugnación**, no por quórum ni por confirmaciones. Se mide
-   en minutos u horas, y es una frontera declarada, no un defecto a optimizar.
-4. **No hay envío unilateral.** No se le puede pagar a alguien que está offline. El receptor firma
-   para aceptar, y por eso *"esperar la finalidad"* deja de ser una disciplina y pasa a ser
-   estructura: no hay transacción hasta que firmó.
-5. **La bifurcación no se resuelve, se previene por construcción.** El cliente estándar conmuta
-   solo, así que **para no conmutar hay que modificar activamente el software**. El que se queda
-   en las reglas viejas no preserva la cadena original: se desvía de Geminis, y eso se verifica
-   con un hash. No hace falta lógica de "elegir la rama buena".
+**Generation.** A version of the ruleset. The chain does not branch into generations: **it is a
+single chain that changes rules**. Generation 3 is the same chain as generation 1, with other
+parameters.
+
+**Ruleset.** The set of parameters in force in a generation: issuance, fees, block size, timings,
+formats. It is *data*, not code — that is the whole difference from a hard fork.
+
+**Commutation.** The act of changing ruleset. **The same process, with the same state in memory,
+executing different rules from one block onward.** There is no restart, no migration, no snapshot,
+no bridge. If your implementation needs to restart the node, it is not commutation: it is a fork by
+another name.
+
+**`TRANSITION_RULE`.** The trigger condition. It is computed **only from the state of the chain**
+(I2). It does not read prices, does not read oracles, does not read votes, does not read anybody's
+clock.
+
+**The three times.** Never confuse them, and there are three and not two:
+
+1. **Trigger** — `TRANSITION_RULE` returns TRUE at block `N`. **It commits nothing**: it is advisory
+   and a reorganization undoes it.
+2. **Lock-in** — when `N` is final, the trigger becomes **irrevocable** and the complete new ruleset
+   is emitted on-chain with the activation height. Waiting for finality is not ceremony: `H0_B`
+   commits the state that triggered, and committing it earlier would leave the checkpoint pointing
+   at a state a reorganization can take out of the chain.
+3. **Activation** — `Δ` blocks **after lock-in**, not after the trigger. That way the notice to the
+   integrator is exactly `Δ` and does not depend on how long finality took.
+
+**`Δ` (delta).** The notice window, fixed in Geminis **per transition class**. A circulation
+transition tolerates a long `Δ`; an urgent cryptographic migration needs a short `Δ`.
+
+**Lineage / `H0_B`.** `H0_B = H( H0_A ‖ state_trigger ‖ params_nuevos )`. It is not the genesis of a
+new chain: it is a **generational checkpoint marker** within the same chain. It makes the lineage
+verifiable with one hash from any generation backwards. Geminis A does not know B's hash —it
+cannot— but it knows how it will be computed.
+
+**The five invariants (I1–I5).** The hard frame. Each one eliminates a way of reintroducing the
+human into the loop. **In this repo they are not documentation: they are executable assertions that
+every phase has to keep passing** (see Phase 0).
+
+- **I1** — the interpreter lives in Geminis and **never changes**. A transition selects a point of a
+  space the node already knows how to execute; it does not introduce node code.
+- **I2** — the trigger is computed only from the state, **and nobody chooses the moment**.
+  Computable is not enough: *"address X received 1 wei"* is computed from the state and it is a gate
+  with an owner. It is met in two ways and every rule declares which one it is in: by **observable
+  approach** —it publishes *how many blocks are left at the current rate* and cannot trigger from
+  rest— or by **demonstrated capability** —there is no approach and there cannot be one, and
+  producing the fact requires exactly the capability the transition reacts to: the canary of §6.6—.
+  *(Reformulated on 19/8/2026: the previous wording left out the canary itself. See C9–C11.)*
+- **I3** — the state crosses the transition **intact**. No migration, no reassignment.
+- **I4** — every generation commits to its ancestor.
+- **I5** — transitions are **additive in the interface**. Formats can be added, never removed, and
+  every object carries a generation tag from block 0.
+
+**PoD node.** It verifies and settles, and charges a fee when two contracts interact. It runs on any
+hardware —verification reproduces bit for bit on x86-64, ARM64 and a phone—. **It is the consensus
+layer.**
+
+**Compute node.** GPU and RAM, it hosts the models that do the requested work. **It does not take
+part in consensus.** Its income is the payment for the request it executed.
+
+**Acceptance predicate.** Every work request carries one: deterministic and cheap to run on the
+light layer. Inference is **not verified** — what is verified is that the output satisfies the
+predicate. Whatever cannot be expressed that way, the network cannot settle.
+
+**The predicate's two ceilings.** Besides passing the vectors, it has to verify below a cap on
+**executed steps** and touching fewer than a cap of **4 KiB pages** (never wall-clock time — the
+clock would be an oracle). **They are security conditions, not performance ones:** they are what
+prevents a challenge from existing that is more expensive to verify than to create.
+
+The step one **is not a chosen number: it is a sum** —`f* × tiempo_de_bloque × R_declarado /
+tx_por_bloque`—, and what Geminis freezes is the formula, not the value. *(Closed on 20/8/2026; it
+was the first open problem of §10.3.)*
+
+The page one **is also derived**, since 21/8/2026: it is a ruleset parameter —96 pages of 4 KiB in
+Geminis— and what Geminis freezes is the **curve** of rate against memory. **Phase 4 added it and it
+was not in the design:** a step ceiling alone assumes that one step is worth one step, and the worst
+instruction mix runs 23× slower than the real workload. It is not fixed by weighting instructions
+—`lw` costs the same as `addi` with the data in cache and 23× more without it, **it is the same
+opcode**—, so what has to be counted is the only thing visible while it runs: the distinct pages it
+touches.
+
+**And that was the most important correction of the phase, because it touched the core:** a derived
+ceiling *raises the price* —an expensive primitive gets in by lowering `tx_por_bloque`— and a
+constant one **can only exclude**. The three primitives of the ML-DSA family touch 26, 40 and 65
+pages, so the first number chosen (48) left the third one out forever. **In this design, a number
+that has to be chosen is usually a sum that has yet to be written** — it happened twice with the
+same ceiling. *(21/8/2026, `geminis/predicado/RESULTS.md`.)*
+
+**Compute challenge (§6.7).** A third class of work, different from the request of §6.5: instead of
+being assigned to a single node before computing, several nodes compute in parallel and only one
+gets paid per round. The waste of those who lose is what makes the cost real and unfalsifiable —the
+same argument as Bitcoin's subsidy, with inference bounded by the protocol instead of hashing as the
+scarce resource—. It exists so that a node with a better LLM does not systematically earn more than
+one with a worse LLM: the LLM chooses what to attempt, the protocol sets how many times and in how
+much time.
+
+**Rotated-domain structural filter (§6.7).** The clause of the challenge predicate that rules out
+generating random bytes instead of using an LLM: cheap, deterministic, it runs on the light layer
+like any predicate of §6.2. Its domain —schema, language, vocabulary— is derived from the round's
+seed and changes in every round, so that a narrow model cannot be trained to farm a fixed exam (the
+model-side equivalent of the capital moat §6.1 avoids in hardware).
+
+**Round and window `T` (§6.7.1).** The challenge is resolved in rounds of fixed duration in blocks —
+never in wall-clock time, which would be an oracle—. Every valid submission before the close enters
+an even lottery, so arriving first within the round buys nothing: it is the same play §6.3 uses
+against capital in the challenge queue, applied here against speed. The duration `T` is drawn within
+a range `[X, Y]` with the seed of the block that opens the round, so that nobody can tune their
+pipeline to a fixed and known number. `X` and `Y` remain an open problem in §10.3: the formula is
+closed, the two numbers are not yet.
+
+**Challenge window.** How finality happens: an interaction becomes firm when the window passes
+without anyone presenting proof of conflict. There is no quorum and no validator set. What prevents
+it from saturating is an asymmetry: **filling is serial —you have to get into a block— and draining
+is parallel —all PoD nodes do it at once—.**
+
+**Lock.** Committing funds into a contract takes them out of the available balance. It is what
+eliminates contention: they cannot be committed twice.
+
+**Directed vs. open offer.** Every transfer is **bilateral** (Alice offers, Bob accepts). An
+ordinary transfer names the receiver; **a work request names nobody** and is taken by whichever node
+can fulfil it. It is *pull*, not *push*: **nobody assigns requests.**
+
+**Epoch.** The unit of time of the permanence charge (§8.5). Not to be confused with generation,
+which runs in years.
+
+**Permanence / eviction.** Every state entry pays to keep existing: a **floor** that is burned at
+creation, plus a **deposit** that is consumed by being burned, linear in size × time. When it runs
+out, the entry is **evicted** —it leaves the active set, it is not destroyed— and it is revived with
+a proof. **Holding a balance stops being free**, and that includes native token accounts.
+
+**Claim.** The day-1 distribution: claiming tokens **is paid for by demonstrating the capability
+being claimed**. It happens only once, at block 0, and after that no action creates units.
 
 ---
 
-## 3. La estructura
+## 2. If you come from Bitcoin or Ethereum, this is different in five points
 
-**Por qué no sirve la propuesta genérica.** La que circula en los tutoriales
-(`core/ consensus/ network/ api/` con PoW y mempool) modela un protocolo distinto: pone la
-minería en el centro, la resolución de bifurcaciones en `blockchain.py` y no tiene lugar para
-**lo único que hace a este proyecto** — la sucesión. Un dev que abre `consensus/proof_of_work.py`
-ya entendió mal el sistema.
+It is the section that saves the most time, because these are five assumptions you arrive with and
+here they do not hold.
 
-La estructura sigue las piezas del paper, para que el mapeo documento ↔ código sea directo:
+1. **There is no proof of work in consensus.** There is no mining, no difficulty, no block nonce, no
+   hashrate. The only computation with an external cost appears **once**, in the block 0 claim, and
+   it is not hashing but the reference task. **If you write a `proof_of_work.py` inside
+   `consenso/`, you are building a different protocol.**
+2. **There is no global order.** Each account carries its own sequence. Two interactions that do not
+   share collateral **have no relative order**, and that is different from having it undefined. The
+   "longest chain" is not the criterion for anything.
+3. **Finality is by challenge window**, not by quorum and not by confirmations. It is measured in
+   minutes or hours, and it is a declared boundary, not a defect to be optimized.
+4. **There is no unilateral sending.** You cannot pay someone who is offline. The receiver signs to
+   accept, and that is why *"wait for finality"* stops being a discipline and becomes structure:
+   there is no transaction until they signed.
+5. **The fork is not resolved, it is prevented by construction.** The standard client commutes on
+   its own, so **not commuting requires actively modifying the software**. Whoever stays on the old
+   rules does not preserve the original chain: they deviate from Geminis, and that is verified with
+   a hash. No "pick the good branch" logic is needed.
+
+---
+
+## 3. The structure
+
+**Why the generic proposal is no good.** The one that circulates in the tutorials
+(`core/ consensus/ network/ api/` with PoW and a mempool) models a different protocol: it puts
+mining at the centre, fork resolution in `blockchain.py` and has no place for **the one thing that
+makes this project what it is** — the succession. A dev who opens `consensus/proof_of_work.py` has
+already misunderstood the system.
+
+The structure follows the pieces of the paper, so that the document ↔ code mapping is direct:
 
 ```
 geminis/
-├── protocolo/            # lo que Geminis congela y no cambia nunca (I1)
-│   ├── genesis.py          # el bloque 0: ruleset inicial, espacio de descendientes,
-│   │                       #   Δ por clase de transición, θ*, L_max
-│   ├── invariantes.py      # I1–I5 como aserciones ejecutables — no comentarios
-│   ├── generacion.py       # etiqueta de generación en cada objeto (I5), ruleset vigente
-│   └── linaje.py           # H0_B = H(H0_A ‖ state_trigger ‖ params) y su Verify (I4)
+├── protocolo/            # what Geminis freezes and never changes (I1)
+│   ├── genesis.py          # block 0: initial ruleset, space of descendants,
+│   │                       #   Δ per transition class, θ*, L_max
+│   ├── invariantes.py      # I1–I5 as executable assertions — not comments
+│   ├── generacion.py       # generation tag on every object (I5), ruleset in force
+│   └── linaje.py           # H0_B = H(H0_A ‖ state_trigger ‖ params) and its Verify (I4)
 │
-├── sucesion/             # §3 — el corazón, y lo primero que se construye
-│   ├── regla.py            # TRANSITION_RULE evaluada contra el estado (I2)
-│   ├── distancia.py        # "cuántos bloques faltan al ritmo actual" — I2 lo exige
-│   ├── cronograma.py       # disparo → lock-in (espera finalidad) → activación (+Δ)
-│   └── conmutador.py       # el cambio de ruleset en caliente: mismo proceso, mismo estado
+├── sucesion/             # §3 — the heart, and the first thing built
+│   ├── regla.py            # TRANSITION_RULE evaluated against the state (I2)
+│   ├── distancia.py        # "how many blocks are left at the current rate" — I2 demands it
+│   ├── cronograma.py       # trigger → lock-in (waits for finality) → activation (+Δ)
+│   └── conmutador.py       # the hot ruleset change: same process, same state
 │
-├── estado/               # I3: lo que cruza intacto
-│   ├── cuentas.py          # cola por cuenta, índice, saldo
-│   ├── entradas.py         # toda entrada paga permanencia: objetos y saldos por igual
-│   ├── arbol.py            # árbol con corte d; el tope que muerde es actualizar, no probar
-│   ├── permanencia.py      # piso, depósito, tasa, L_max, época
-│   └── desalojo.py         # acumulador append-only y reactivación con prueba
+├── estado/               # I3: what crosses over intact
+│   ├── cuentas.py          # queue per account, index, balance
+│   ├── entradas.py         # every entry pays permanence: objects and balances alike
+│   ├── arbol.py            # tree with cut d; the binding cap is updating, not proving
+│   ├── permanencia.py      # floor, deposit, rate, L_max, epoch
+│   └── desalojo.py         # append-only accumulator and reactivation with a proof
 │
-├── liquidacion/          # §6.3–6.5: cómo se cierra una interacción
-│   ├── oferta.py           # bilateral; dirigida vs. abierta (pull); timeout declarado
-│   ├── lock.py             # comprometer saca del disponible — elimina la contienda
-│   ├── impugnacion.py      # ventana, bono plano, orden de llegada, drenado paralelo
-│   └── doble_firma.py      # nonce = f(índice): firmar dos veces publica la clave privada
+├── liquidacion/          # §6.3–6.5: how an interaction is closed
+│   ├── oferta.py           # bilateral; directed vs. open (pull); declared timeout
+│   ├── lock.py             # committing takes it out of available — eliminates contention
+│   ├── impugnacion.py      # window, flat bond, arrival order, parallel draining
+│   └── doble_firma.py      # nonce = f(index): signing twice publishes the private key
 │
-├── predicado/            # §6.2 — qué puede pagar la red
-│   ├── aceptacion.py       # vectores + techo de pasos
-│   └── vm/                 # la máquina determinista. Rust, no Python — ver §5
+├── predicado/            # §6.2 — what the network can pay for
+│   ├── aceptacion.py       # vectors + step ceiling
+│   └── vm/                 # the deterministic machine. Rust, not Python — see §5
 │
 ├── nodo/
-│   ├── pod.py              # verifica, liquida, cobra fee. Es la capa de consenso
-│   └── computo.py          # acepta pedidos, ejecuta, entrega. Fuera del consenso
+│   ├── pod.py              # verifies, settles, charges a fee. It is the consensus layer
+│   └── computo.py          # accepts requests, executes, delivers. Outside consensus
 │
 ├── red/
-│   ├── p2p.py              # transporte entre nodos — NO EXISTE, y es ingeniería
-│   └── sync.py             # ✅ validación y sincronización: el primer nodo que no produce
+│   ├── p2p.py              # transport between nodes — DOES NOT EXIST, and it is engineering
+│   └── sync.py             # ✅ validation and synchronization: the first node that does not produce
 │
 ├── api/
-│   └── server.py           # HTTP: consultar estado, publicar pedidos, ver la distancia al disparo
+│   └── server.py           # HTTP: query state, publish requests, see the distance to the trigger
 │
 └── herramientas/
-    └── replay.py           # el harness contra el historial real de Ethereum (Fase 2)
+    └── replay.py           # the harness against Ethereum's real history (Phase 2)
 ```
 
-**Dos decisiones que conviene saber que son decisiones:**
+**Two decisions worth knowing are decisions:**
 
-- **Los nombres de módulo van en castellano** porque cada uno mapea a un concepto definido en un
-  paper en castellano, y el costo de onboarding acá es el mapeo doc ↔ código, no el idioma. **Si
-  en algún momento esto se abre al público, conviene traducirlo** — y cuanto antes, más barato.
-- **`api/` es una comodidad de desarrollo, no una pieza del protocolo.** Un nodo real habla p2p.
-  No metas lógica de protocolo ahí adentro.
-
----
-
-## 4. El principio que gobierna todas las fases
-
-> **Cada fase declara su criterio de aprobado y reprobado ANTES de correrla.**
-
-No es burocracia, es la lección más cara que ya se pagó en este proyecto: la primera ley de
-control de la tasa de permanencia parecía estable y absorbía un shock de 3×. Lo que la tumbó no
-fue un ataque — fue **corregir un detalle del modelo con que se la había probado**. Un criterio
-escrito después de ver el resultado se acomoda al resultado.
-
-Y su corolario, que aplica a todo lo que sigue:
-
-> **Un devnet con tokens gratis contesta preguntas de software, no de economía.** Con tokens sin
-> valor no hay ingreso, no hay atesoramiento, no se mide la elasticidad de la demanda de guardado
-> y el antispam no se prueba. Peor: la actividad fabricada es indistinguible de la demanda real
-> —y ahí, además, es gratis—. **Todo lo que se construya acá es desechable por declaración**, y
-> hay que reescribirlo cuando se sepa qué espacio de parámetros tiene que anticipar Geminis.
+- **The module names are in Spanish** because each one maps to a concept defined in a paper in
+  Spanish, and the onboarding cost here is the doc ↔ code mapping, not the language. **If at some
+  point this opens to the public, it is worth translating them** — and the sooner, the cheaper.
+- **`api/` is a development convenience, not a piece of the protocol.** A real node speaks p2p. Do
+  not put protocol logic in there.
 
 ---
 
-## 5. Las fases
+## 4. The principle that governs every phase
 
-### Fase 0 · El andamio y las invariantes ejecutables
+> **Every phase declares its pass and fail criteria BEFORE running it.**
 
-**Objetivo.** Que I1–I5 dejen de ser prosa. Antes de la primera línea de mecanismo.
+It is not bureaucracy, it is the most expensive lesson already paid for in this project: the first
+control law for the permanence rate looked stable and absorbed a 3× shock. What brought it down was
+not an attack — it was **correcting a detail of the model it had been tested with**. A criterion
+written after seeing the result accommodates itself to the result.
 
-Se construye `protocolo/invariantes.py` con las cinco como predicados que se corren contra
-cualquier estado y cualquier transición, más el arnés de tests y CI que las ejecuta en cada
-commit.
+And its corollary, which applies to everything that follows:
 
-**Aprobado:** toda fase posterior las sigue pasando sin excepciones ni *skips*. El día que haya
-que marcar una como excepción, se para y se discute el diseño, no el test.
-
-### Fase 1 · El motor de sucesión
-
-**Es la mitad con cliente encontrado, no necesita token ni VM ni economía, y no depende de
-ninguno de los dos problemas abiertos de §10.3.**
-
-Se construye `protocolo/` y `sucesion/` completos, sobre un estado sintético mínimo. Una cadena
-de juguete con parámetros de juguete, pero **la conmutación de verdad**.
-
-**Aprobado —escrito antes de correr—:**
-
-- una cadena con estado sintético conmuta y **el estado cruza bit a bit idéntico** (I3);
-- `Verify(H0_B, H0_A, state_trigger, params)` da TRUE para toda la cadena de generaciones, y
-  falla si se altera cualquiera de los tres insumos (I4);
-- una reorganización **antes** del lock-in deshace el disparo; **después**, no lo deshace;
-- el aviso entre lock-in y activación es exactamente `Δ`, **independiente** de cuánto tardó la
-  finalidad;
-- la distancia al disparo es consultable y **monótona** en la aproximación (I2);
-- **el nodo no se reinicia.** Si hace falta reiniciar, la fase no está aprobada.
-
-### Fase 2 · El harness de replay — la única evidencia externa que produce código
-
-**Objetivo.** Contestar con datos de terceros: *si `blobSchedule` hubiera sido una
-`TRANSITION_RULE` escrita de antemano, ¿qué habría pasado?*
-
-Se reproduce el historial real: los parámetros de blobs de Ethereum, el gas limit de EIP-8261 y
-la bomba de dificultad con sus seis retrasos. Se corre la regla determinista contra el estado
-histórico y se compara con lo que los humanos efectivamente decidieron.
-
-**Aprobado:** para cada caso, o la regla reproduce la decisión humana, o queda escrito
-**exactamente dónde difiere y si esa diferencia era mejor o peor**. Un empate cuenta como
-aprobado; lo que no cuenta es no poder explicar la diferencia.
-
-> **Esta fase es la que más vale por unidad de trabajo de todo el roadmap**, porque es la única
-> que produce evidencia que no escribió el autor del diseño. También es la que se puede mostrar
-> afuera sin pedirle a nadie que crea nada.
-
-### Fase 3 · Orden y liquidación
-
-Se construye `estado/cuentas.py`, `liquidacion/` completo y `nodo/pod.py`. Sin economía todavía:
-los fees en unidades abstractas.
-
-**Aprobado:**
-
-- doble gasto imposible por el lock, sin orden global;
-- **la doble firma publica la clave privada** y cualquiera puede barrer el saldo — verificado con
-  dos firmas y una resta;
-- bajo carga adversarial con `N` nodos, la cola **drena más rápido de lo que se llena**, y el
-  margen medido se compara contra los diez nodos PoD que predice §6.3. Si hacen falta cien, la
-  predicción del paper está mal y hay que decirlo.
-
-### Fase 4 · La VM y el predicado — ✅ cerrada
-
-**Acá cambia el lenguaje, y es a propósito.** La máquina determinista **no se escribe en
-Python**: ya existe el arnés de seis motores de `test2-interprete/telefono` en Rust, con
-`steps_per_verify` idéntico entre arquitecturas medido. Se reutiliza.
-
-**Aprobado:**
-
-- el presupuesto del intérprete entra **bajo carga de bloque real**, no en benchmark aislado;
-- el flotante está prohibido o canonicalizado **antes de que el guante corra por primera vez** —
-  es condición sobre Geminis y después no se levanta;
-- el conteo de pasos reproduce bit a bit entre x86-64 y ARM64.
-
-**Corrida el 20/8/2026, con seis criterios aprobados y el séptimo reprobado** —y el reprobado es
-lo que valió la fase—. Se agregaron cuatro criterios a los tres del roadmap al leer el intérprete
-que se iba a reutilizar: el arnés de Test 2 corre un guest de confianza y esto corre el programa de
-un adversario. Agregar criterios está permitido; ablandarlos no.
-
-> **El hallazgo:** el techo de pasos prometía un presupuesto que no cumplía **por 23×**, porque un
-> paso no vale un paso. Salieron de ahí un segundo techo sobre páginas tocadas, `R_declarado` de
-> 300 a 70 M pasos/s, y la capacidad inicial de 67 a 15 tx por bloque. Más dos agujeros de
-> amplificación en el cargador que ningún test de corrección habría encontrado —los encontró que un
-> barrido tardara minutos—. Todo en `geminis/predicado/RESULTADOS.md`.
-
-**Cerrada el 21/8/2026**, con los siete criterios resueltos: los vectores reproducen bit a bit entre
-x86-64 y aarch64, y C1 está medido sobre el hardware de referencia (354 ms de 1.500, margen 4,24×).
-
-> **Y dejó un problema abierto que el paper no tenía:** cuál hardware es el peor caso. El diseño
-> supone que la capa liviana es la que ata, y medido eso es falso para los patrones adversariales de
-> memoria. **Dos máquinas no alcanzan para fijar un piso de hardware** — cerrarlo necesita más
-> máquinas, no más análisis.
-
-### Fase 5 · Estado con costo — ✅ corrida
-
-Se construye `estado/permanencia.py`, `arbol.py` y `desalojo.py`.
-
-**Aprobado:** el ciclo crear → pagar → agotar → desalojar → reactivar cierra completo; el
-acumulador se mantiene en el orden de los cientos de bytes **totales** y no por objeto; y se mide
-qué cuesta de verdad mantener una prueba de reactivación al día, que es la dependencia de archivo
-que §10.2 declara y no puede garantizar.
-
-**Corrida el 21/8/2026**, con ocho criterios aprobados y uno reprobado — y el que reprobó lo hizo
-**contra el paper**: §8.5 afirmaba que el piso salía dieciséis horas de guardado, y la cuenta, ya
-escrita, da otro orden. Desarrollo en `geminis/estado/RESULTADOS.md`.
-
-**Sigue bloqueada donde estaba:** la regla que mueve la tasa no está elegida y no hay con qué
-calibrarla. Lo que sí se cerró es **por qué ésa no es una cuenta que falta escribir sino una
-frontera** —el techo tenía sus dos lados físicos y la tasa tiene uno monetario, y ninguna cuenta
-cruza eso sin leer un precio—. De ahí salió denominar el piso en épocas de guardado, con lo cual
-**el problema abierto pasó a ser un número en vez de dos**.
-
-### Fase 6 · El devnet desechable — ✅ corrida
-
-Recién acá se junta todo y aparece un token — **con la advertencia de la sección 4 puesta por
-escrito y con fecha de reset declarada de antemano.**
-
-**Para qué sirve:** cerrar las cuatro preguntas de mecanismo que ninguna otra cosa contesta —la
-conmutación real bajo carga, la cola con `N` real, el presupuesto bajo bloques reales, el ciclo
-de desalojo—.
-
-**Para qué no sirve, y no hay que confundirse:** para saber si alguien deja la GPU prendida, cuál
-es la elasticidad de la demanda de guardado, si la moneda se atesora, o si el antispam aguanta.
-**Eso necesita plata real o revisión externa, y va por otro carril.**
-
-**Corrida el 21/8/2026, acotada a dos de las cuatro preguntas** — la cola con `N` real la contestó
-la Fase 3 y el presupuesto bajo bloques reales la Fase 4, y correr de nuevo lo ya medido no agrega
-evidencia pero sí agrega la tentación de mirar el número hasta que dé.
-
-> **El hallazgo (B3):** el depósito de permanencia se compraba en byte-**épocas**, la época se
-> cuenta en bloques y el tiempo de bloque es un parámetro interno — así que una conmutación que lo
-> moviera hacía que **un depósito ya pagado comprara el doble de guardado**. I3 se cumplía: los
-> bytes cruzaban idénticos. Lo que cambiaba era lo que valían, y **eso no lo mira ninguna de las
-> cinco invariantes**. Corregido denominando en byte-segundos declarados. Desarrollo en
-> `geminis/devnet/RESULTADOS.md`.
+> **A devnet with free tokens answers software questions, not economic ones.** With worthless tokens
+> there is no income, there is no hoarding, the elasticity of storage demand is not measured and the
+> antispam is not tested. Worse: manufactured activity is indistinguishable from real demand —and
+> there, on top of that, it is free—. **Everything built here is disposable by declaration**, and it
+> has to be rewritten once it is known what parameter space Geminis has to anticipate.
 
 ---
 
-## 6. Lo que corre en paralelo y no es código
+## 5. The phases
 
-Dos cosas que deciden más que cualquier fase de arriba, y que si esperan a que el código esté
-listo, llegan tarde:
+### Phase 0 · The scaffolding and the executable invariants
 
-- **Buscar comprador para el trabajo verificable de §6.2.** Es la hipótesis más cara del diseño y
-  es la única que nunca se salió a falsar: los cuatro tests miden la mitad de la sucesión y
-  ninguno pregunta si alguien compraría esto. **No necesita protocolo** — un broker manual con
-  pago real alcanza. Diez transacciones reales dicen más que diez mil de un devnet.
-- **Revisión adversarial externa.** El diseño sobrevivió sólo a los ataques de quien lo escribió.
-  Cuesta poco y vuelve rápido, y el `README.md` ya está armado para eso: termina en una lista de
-  dónde pegar primero.
+**Goal.** That I1–I5 stop being prose. Before the first line of mechanism.
+
+`protocolo/invariantes.py` is built with the five as predicates that run against any state and any
+transition, plus the test harness and CI that execute them on every commit.
+
+**Pass:** every later phase keeps passing them with no exceptions and no *skips*. The day one has to
+be marked as an exception, you stop and discuss the design, not the test.
+
+### Phase 1 · The succession engine
+
+**It is the half with a customer found, it needs no token and no VM and no economy, and it depends
+on neither of the two open problems of §10.3.**
+
+`protocolo/` and `sucesion/` are built complete, over a minimal synthetic state. A toy chain with
+toy parameters, but **the real commutation**.
+
+**Pass —written before running—:**
+
+- a chain with synthetic state commutes and **the state crosses over bit for bit identical** (I3);
+- `Verify(H0_B, H0_A, state_trigger, params)` returns TRUE for the whole chain of generations, and
+  fails if any of the three inputs is altered (I4);
+- a reorganization **before** lock-in undoes the trigger; **afterwards**, it does not undo it;
+- the notice between lock-in and activation is exactly `Δ`, **independent** of how long finality
+  took;
+- the distance to the trigger is queryable and **monotone** in the approach (I2);
+- **the node does not restart.** If a restart is needed, the phase is not passed.
+
+### Phase 2 · The replay harness — the only external evidence that code produces
+
+**Goal.** To answer with third-party data: *if `blobSchedule` had been a `TRANSITION_RULE` written in
+advance, what would have happened?*
+
+The real history is reproduced: Ethereum's blob parameters, the gas limit of EIP-8261 and the
+difficulty bomb with its six delays. The deterministic rule is run against the historical state and
+compared with what the humans actually decided.
+
+**Pass:** for each case, either the rule reproduces the human decision, or it is written down
+**exactly where it differs and whether that difference was better or worse**. A tie counts as a
+pass; what does not count is being unable to explain the difference.
+
+> **This phase is worth the most per unit of work in the whole roadmap**, because it is the only one
+> that produces evidence the author of the design did not write. It is also the one that can be
+> shown outside without asking anyone to believe anything.
+
+### Phase 3 · Ordering and settlement
+
+`estado/cuentas.py`, all of `liquidacion/` and `nodo/pod.py` are built. No economy yet: fees in
+abstract units.
+
+**Pass:**
+
+- double spend impossible thanks to the lock, with no global order;
+- **the double signature publishes the private key** and anyone can sweep the balance — verified
+  with two signatures and one subtraction;
+- under adversarial load with `N` nodes, the queue **drains faster than it fills**, and the measured
+  margin is compared against the ten PoD nodes §6.3 predicts. If a hundred are needed, the paper's
+  prediction is wrong and that has to be said.
+
+### Phase 4 · The VM and the predicate — ✅ closed
+
+**The language changes here, and it is on purpose.** The deterministic machine **is not written in
+Python**: the six-engine harness of `test2-interprete/telefono` already exists in Rust, with
+`steps_per_verify` measured identical across architectures. It gets reused.
+
+**Pass:**
+
+- the interpreter's budget fits **under real block load**, not in an isolated benchmark;
+- floating point is forbidden or canonicalized **before the gauntlet runs for the first time** — it
+  is a condition on Geminis and it cannot be lifted afterwards;
+- the step count reproduces bit for bit between x86-64 and ARM64.
+
+**Run on 20/8/2026, with six criteria passed and the seventh failed** —and the failed one is what
+made the phase worth it—. Four criteria were added to the roadmap's three on reading the interpreter
+that was going to be reused: the Test 2 harness runs a trusted guest and this runs an adversary's
+program. Adding criteria is allowed; softening them is not.
+
+> **The finding:** the step ceiling promised a budget it did not meet **by 23×**, because a step is
+> not worth a step. Out of that came a second ceiling on pages touched, `R_declarado` from 300 to
+> 70 M steps/s, and the initial capacity from 67 to 15 tx per block. Plus two amplification holes in
+> the loader that no correctness test would have found —what found them was a sweep taking minutes—.
+> All of it in `geminis/predicado/RESULTS.md`.
+
+**Closed on 21/8/2026**, with all seven criteria resolved: the vectors reproduce bit for bit between
+x86-64 and aarch64, and C1 is measured on the reference hardware (354 ms out of 1,500, margin
+4.24×).
+
+> **And it left an open problem the paper did not have:** which hardware is the worst case. The
+> design assumes the light layer is the binding one, and measured, that is false for adversarial
+> memory patterns. **Two machines are not enough to fix a hardware floor** — closing it needs more
+> machines, not more analysis.
+
+### Phase 5 · State with a cost — ✅ run
+
+`estado/permanencia.py`, `arbol.py` and `desalojo.py` are built.
+
+**Pass:** the create → pay → exhaust → evict → reactivate cycle closes completely; the accumulator
+stays on the order of hundreds of bytes **in total** and not per object; and what it really costs to
+keep a reactivation proof up to date is measured, which is the archive dependency §10.2 declares and
+cannot guarantee.
+
+**Run on 21/8/2026**, with eight criteria passed and one failed — and the one that failed did so
+**against the paper**: §8.5 claimed the floor came out at sixteen hours of storage, and the sum,
+once written, gives another order. Development in `geminis/estado/RESULTS.md`.
+
+**Still blocked where it was:** the rule that moves the rate is not chosen and there is nothing to
+calibrate it with. What did get closed is **why that is not a sum that has yet to be written but a
+boundary** —the ceiling had both its sides physical and the rate has one monetary side, and no sum
+crosses that without reading a price—. Out of that came denominating the floor in storage epochs,
+whereby **the open problem became one number instead of two**.
+
+### Phase 6 · The disposable devnet — ✅ run
+
+Only here does everything come together and a token appear — **with the warning of section 4 put in
+writing and with a reset date declared in advance.**
+
+**What it is good for:** closing the four mechanism questions nothing else answers —the real
+commutation under load, the queue with a real `N`, the budget under real blocks, the eviction
+cycle—.
+
+**What it is not good for, and this must not be confused:** knowing whether anyone leaves the GPU
+switched on, what the elasticity of storage demand is, whether the currency gets hoarded, or whether
+the antispam holds. **That needs real money or external review, and it goes down another track.**
+
+**Run on 21/8/2026, bounded to two of the four questions** — the queue with a real `N` was answered
+by Phase 3 and the budget under real blocks by Phase 4, and running again what has already been
+measured adds no evidence but does add the temptation to stare at the number until it comes out
+right.
+
+> **The finding (B3):** the permanence deposit was bought in byte-**epochs**, the epoch is counted in
+> blocks and block time is an internal parameter — so a commutation that moved it made **an
+> already-paid deposit buy twice the storage**. I3 was met: the bytes crossed over identical. What
+> changed was what they were worth, and **none of the five invariants looks at that**. Corrected by
+> denominating in declared byte-seconds. Development in `geminis/devnet/RESULTS.md`.
+
+---
+
+## 6. What runs in parallel and is not code
+
+Two things that decide more than any phase above, and that if they wait for the code to be ready,
+arrive late:
+
+- **Looking for a buyer for the verifiable work of §6.2.** It is the most expensive hypothesis of
+  the design and it is the only one nobody ever went out to falsify: the four tests measure the
+  succession half and none of them asks whether anyone would buy this. **It needs no protocol** — a
+  manual broker with real payment is enough. Ten real transactions say more than ten thousand from a
+  devnet.
+- **External adversarial review.** The design survived only the attacks of whoever wrote it. It
+  costs little and comes back fast, and `README.md` is already set up for it: it ends in a list of
+  where to hit first.

@@ -6,7 +6,7 @@
 //!
 //! Cuando el criterio se escribio la capacidad eran 67 transacciones y con esas
 //! aprobo: 1.086 ms de 1.500, margen 1,38x. Despues C7 la bajo a 26 y el margen
-//! subio a 3,42x. **Las dos corridas estan en `../RESULTADOS.md`**, porque informar
+//! subio a 3,42x. **Las dos corridas estan en `../RESULTS.es.md`**, porque informar
 //! solo la segunda seria informar un criterio que se volvio mas facil.
 //!
 //! Cada transaccion arranca una instancia nueva, que es lo que hace un nodo: la

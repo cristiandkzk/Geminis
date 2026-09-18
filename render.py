@@ -7,8 +7,8 @@ El HTML se habia quedado ~30% atras del markdown porque se mantenian a mano por
 separado. Este script hace del .md la unica fuente de verdad: el HTML se
 regenera y no se edita nunca a mano.
 
-    python render.py        castellano -> Geminis-paper.html
-    python render.py en     ingles     -> Geminis-paper-en.html
+    python render.py        ingles     -> Geminis-paper.html
+    python render.py es     castellano -> Geminis-paper.es.html
 
 La traduccion conserva la estructura del original, asi que lo unico que cambia
 por idioma vive en PERFILES: los nombres de archivo, el masthead y las palabras
@@ -17,8 +17,8 @@ resuelto). El markdown no lleva ninguna marca de idioma.
 
 Assets que el script consume y que SI se editan a mano:
     estilo.css                    la hoja de estilos (se embebe en <style>)
-    figura-conmutacion.html       el <figure> con el SVG de §3
-    figura-conmutacion-en.html    la misma figura con los rotulos en ingles
+    figure-commutation.html       el <figure> con el SVG de §3
+    figure-commutation.es.html    la misma figura con los rotulos en castellano
 
 En el markdown, `<!-- FIGURA: archivo.html -->` reemplaza al bloque de codigo
 que le sigue y al parrafo posterior (que en el HTML es el epigrafe). El perfil
@@ -37,22 +37,10 @@ RAIZ = Path(__file__).parent
 CSS = RAIZ / "estilo.css"
 
 PERFILES = {
-    "es": {
+    "en": {
         "fuente": "Geminis Paper.md",
         "salida": "Geminis-paper.html",
         "sufijo_figura": "",
-        "titulo": "Sucesión Determinista",
-        "kicker": "Protocolo · concepto",
-        "resumen": "Resumen",
-        "invariantes": "invariantes",
-        "fronteras": "fronteras",
-        "resuelto": "resuelto",
-        "etiqueta_resuelto": "Resuelto",
-    },
-    "en": {
-        "fuente": "Geminis Paper EN.md",
-        "salida": "Geminis-paper-en.html",
-        "sufijo_figura": "-en",
         "titulo": "Deterministic Succession",
         "kicker": "Protocol · concept",
         "resumen": "Abstract",
@@ -61,9 +49,27 @@ PERFILES = {
         "resuelto": "solved",
         "etiqueta_resuelto": "Solved",
     },
+    "es": {
+        "fuente": "Geminis Paper.es.md",
+        "salida": "Geminis-paper.es.html",
+        "sufijo_figura": ".es",
+        "titulo": "Sucesión Determinista",
+        "kicker": "Protocolo · concepto",
+        "resumen": "Resumen",
+        "invariantes": "invariantes",
+        "fronteras": "fronteras",
+        "resuelto": "resuelto",
+        "etiqueta_resuelto": "Resuelto",
+    },
 }
 
-PERFIL = PERFILES["es"]
+PERFIL = PERFILES["en"]
+
+# `**English** · [Español](x.es.md)` y su reverso: va en el repo, no en el paper
+SELECTOR_IDIOMA = re.compile(
+    r"^(?:\*\*English\*\*|\[English\]\([^)]*\))\s*·\s*"
+    r"(?:\*\*Español\*\*|\[Español\]\([^)]*\))\s*$"
+)
 
 
 def figura(nombre):
@@ -226,6 +232,10 @@ def render(md):
         if s.startswith("# "):
             continue
 
+        # la linea de idioma es navegacion del repo, no del documento
+        if SELECTOR_IDIOMA.match(s):
+            continue
+
         if s.startswith("## "):
             cerrar_invariantes()
             titulo = re.sub(r"^##\s*\d*\.?\s*", "", s).strip()
@@ -314,7 +324,7 @@ def render(md):
 
 def main():
     global PERFIL
-    idioma = sys.argv[1] if len(sys.argv) > 1 else "es"
+    idioma = sys.argv[1] if len(sys.argv) > 1 else "en"
     if idioma not in PERFILES:
         print(f"idioma desconocido: {idioma} (hay {', '.join(PERFILES)})")
         return 1
@@ -327,8 +337,11 @@ def main():
     # masthead: h1 + el parrafo en negrita que le sigue
     h1 = re.search(r"^#\s+(.+)$", md, re.M).group(1).strip()
     # el .+ tiene que ser perezoso: con re.S, uno goloso se come el documento
-    # entero y agarra el ultimo parrafo en negrita en vez del subtitulo
-    standfirst = re.search(r"^#\s+.+?\n\n\*\*(.+?)\*\*", md, re.S | re.M).group(1)
+    # entero y agarra el ultimo parrafo en negrita en vez del subtitulo. Y entre
+    # el titulo y la bajada va la linea de idioma, que hay que saltear.
+    standfirst = re.search(
+        r"^#\s+.+?\n\n(?:[^\n]*Español[^\n]*\n\n)?\*\*(.+?)\*\*", md, re.S | re.M
+    ).group(1)
 
     # abstract: los parrafos de la seccion de resumen
     resumen = re.search(

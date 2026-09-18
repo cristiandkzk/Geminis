@@ -1,740 +1,730 @@
-# Sucesión determinista de reglas
+# Deterministic rule succession
 
-**Una cadena que trae escrita desde el bloque 0 cómo cambian sus propias reglas, y que
-ejecuta ese cambio sin voto, sin fork político y sin intervención humana en la decisión.**
+**English** · [Español](README.es.md)
 
-**In English → [README-EN.md](README-EN.md).** El repo está traducido entero: el paper
-([Geminis Paper EN.md](Geminis%20Paper%20EN.md)), el [roadmap](ROADMAP-EN.md) y las mediciones.
+**A chain that carries written into block 0 how its own rules change, and that executes
+that change with no vote, no political fork and no human intervention in the decision.**
 
-> **Qué es esto y qué te pido.** Es el diseño completo (~19.500 palabras) comprimido a un
-> tercio: **unos 25 minutos**. Saqué el registro de decisiones, la historia de lo que se cayó
-> en el camino y las justificaciones largas — quedó el mecanismo, los números medidos y las
-> fronteras.
+> **What this is and what I am asking of you.** It is the complete design (~19,500 words)
+> compressed to a third: **about 25 minutes**. I took out the decision log, the history of what
+> fell over along the way and the long justifications — what is left is the mechanism, the
+> measured numbers and the boundaries.
 >
-> **Si tenés poco tiempo:** §2 y §3 son el mecanismo, §7 dice qué está medido y qué no, y §10
-> es el pedido concreto. Lo demás es referencia para cuando quieras pegarle a algo puntual.
+> **If you are short on time:** §2 and §3 are the mechanism, §7 says what is measured and what is
+> not, and §10 is the concrete ask. The rest is reference for when you want to hit something
+> specific.
 >
-> **No es un pitch. Es un pedido de que lo rompas.** El diseño sobrevivió a todos los ataques
-> que se le corrieron, y todos los corrió quien lo escribió, que es exactamente el tipo de
-> evidencia que no vale. Al final hay una lista de **dónde pegar primero**; si sólo tenés
-> tiempo para una cosa, andá directo ahí.
+> **This is not a pitch. It is a request that you break it.** The design survived every attack
+> that was run against it, and every one of them was run by the person who wrote it, which is
+> exactly the kind of evidence that is worth nothing. At the end there is a list of **where to hit
+> first**; if you only have time for one thing, go straight there.
 >
-> Todo lo que figura como *medido* tiene script reproducible y datos crudos.
+> Everything listed as *measured* has a reproducible script and raw data.
 
-**Dónde está el resto, si querés ir al fondo de algo.** Este archivo es el resumen. La fuente
-de verdad es **[Geminis Paper.md](Geminis%20Paper.md)** —~19.500 palabras, con las fronteras
-desarrolladas y el registro de qué se descartó en el camino—; `Geminis-paper.html` es su render
-y se regenera con `python render.py`, no se edita a mano.
+**Where the rest is, if you want to get to the bottom of something.** This file is the summary.
+The source of truth is **[Geminis Paper.md](Geminis%20Paper.md)** —~19,500 words, with the
+boundaries developed and the record of what was discarded along the way—; the Spanish original it
+was translated from is [Geminis Paper.es.md](Geminis%20Paper.es.md), and `Geminis-paper.html` is its
+render, regenerated with `python render.py` and never edited by hand.
 
-⚠️ **Ojo con los números de sección: este resumen tiene numeración propia.** Fusionó secciones,
-así que tiene 10 y el paper tiene 12, y **no coinciden** — la cola de impugnaciones es §5.3 acá y
-§6.3 allá; la creación de activos es §6.4 acá y §8.5 allá. Cuando saltes al paper largo, buscá
-por título y no por número.
+⚠️ **Careful with the section numbers: this summary has its own numbering.** It merged sections, so
+it has 10 and the paper has 12, and **they do not line up** — the challenge queue is §5.3 here and
+§6.3 there; asset creation is §6.4 here and §8.5 there. When you jump to the long paper, search by
+title and not by number.
 
-**Y si venís a escribir código:** [`ROADMAP.md`](ROADMAP.md) tiene el glosario de los conceptos,
-la estructura de módulos y las fases con sus criterios de aprobado.
+**And if you are here to write code:** [`ROADMAP.md`](ROADMAP.md) has the glossary of the concepts,
+the module structure and the phases with their pass criteria.
 
-Y cada número de acá tiene su medición, con `RESULTADOS.md` y scripts:
+And every number here has its measurement, with a `RESULTS.md` and scripts:
 
-| directorio | qué contesta |
+| directory | what it answers |
 |---|---|
-| [`test1-transicion/`](test1-transicion/RESULTADOS.md) | si el mecanismo tiene cliente afuera — los casos de §7 |
-| [`test2-interprete/`](test2-interprete/RESULTADOS.md) | el presupuesto del intérprete en hardware real, con el paquete del benchmark |
-| [`test4-ventana-k/`](test4-ventana-k/RESULTADOS.md) | el ataque de auto-pago, y la ventana que resultó vacía |
-| [`cola-impugnaciones/`](cola-impugnaciones/RESULTADOS.md) | si la cola de §5.3 satura — de dónde salen los diez nodos PoD |
-| [`expiracion-estado/`](expiracion-estado/RESULTADOS.md) | cuánto estado se genera y qué cuesta poder revivirlo |
-| [`amortizacion-mint/`](amortizacion-mint/RESULTADOS.md) | por qué la tasa no puede bajar por depositar más |
-| [`parametros-mint/`](parametros-mint/RESULTADOS.md) | los parámetros de §6.4, y cuál de ellos es realmente una decisión |
-| [`presupuesto-nodo/`](presupuesto-nodo/RESULTADOS.md) | cuánto ocupa una entrada, y de dónde salen `θ*` y `L_max` |
+| [`test1-transicion/`](test1-transicion/RESULTS.md) | whether the mechanism has a customer outside — the cases of §7 |
+| [`test2-interprete/`](test2-interprete/RESULTS.md) | the interpreter's budget on real hardware, with the benchmark package |
+| [`test4-ventana-k/`](test4-ventana-k/RESULTS.md) | the self-payment attack, and the window that turned out to be empty |
+| [`cola-impugnaciones/`](cola-impugnaciones/RESULTS.md) | whether the queue of §5.3 saturates — where the ten PoD nodes come from |
+| [`expiracion-estado/`](expiracion-estado/RESULTS.md) | how much state is generated and what being able to revive it costs |
+| [`amortizacion-mint/`](amortizacion-mint/RESULTS.md) | why the rate cannot go down by depositing more |
+| [`parametros-mint/`](parametros-mint/RESULTS.md) | the parameters of §6.4, and which of them is really a decision |
+| [`presupuesto-nodo/`](presupuesto-nodo/RESULTS.md) | how much an entry occupies, and where `θ*` and `L_max` come from |
 
 ---
 
-## 1. El problema
+## 1. The problem
 
-Todo protocolo desplegado enfrenta tarde o temprano una condición que sus reglas originales
-no manejan bien. Las tres respuestas que existen hoy ponen un humano en el lazo justo en el
-momento del cambio:
+Every deployed protocol sooner or later meets a condition its original rules do not handle well.
+The three answers that exist today all put a human in the loop at exactly the moment of the
+change:
 
-| mecanismo | ejemplo | quién decide |
+| mechanism | example | who decides |
 |---|---|---|
-| fork disputado | Bitcoin / BCH | una facción escribe software nuevo; el mercado arbitra después |
-| voto on-chain | Tezos, Polkadot | los tenedores, con toda la política que eso arrastra |
-| obsolescencia forzada | bomba de dificultad de Ethereum | el protocolo fuerza el cambio, pero el sucesor lo escriben humanos |
+| contested fork | Bitcoin / BCH | a faction writes new software; the market arbitrates afterwards |
+| on-chain vote | Tezos, Polkadot | the holders, with all the politics that drags along |
+| forced obsolescence | Ethereum's difficulty bomb | the protocol forces the change, but humans write the successor |
 
-Las tres funcionan. Ninguna es determinista: en las tres, **qué viene después** es una decisión
-tomada en el momento, por gente, bajo presión. Y esa decisión es donde un protocolo se vuelve
-político.
+All three work. None is deterministic: in all three, **what comes next** is a decision taken in the
+moment, by people, under pressure. And that decision is where a protocol turns political.
 
-La propuesta: que la regla de sucesión viva dentro de Geminis y se ejecute sola cuando el
-estado de la cadena cumple una condición verificable. El resultado no es una familia de
-cadenas — es **una sola cadena que conmuta su ruleset por generaciones**, conservando el
-estado íntegro y encadenando cada generación a su ancestro por hash.
+The proposal: that the succession rule live inside Geminis and execute on its own when the state of
+the chain meets a verifiable condition. The result is not a family of chains — it is **a single
+chain that commutes its ruleset by generation**, preserving state intact and chaining every
+generation to its ancestor by hash.
 
-**Cómo conviene leer lo que sigue.** El diseño tiene dos mitades con respaldo muy distinto, y
-decirlo temprano es más honesto que dejarlo para el final. La **sucesión de parámetros
-internos** —capacidad, emisión, tiempos de bloque— salió a buscar destinatarios afuera y los
-encontró (§7). El **intérprete** y las **generaciones encadenables** —que son lo que hace
-posible la evolución criptográfica de §5.6 y lo que separa esto de sus precedentes— pagan las
-fronteras más caras y **todavía no tienen un caso encontrado afuera**. La primera es una
-aplicación; la segunda es una apuesta.
+**How what follows should be read.** The design has two halves with very different backing, and
+saying so early is more honest than leaving it for the end. The **succession of internal
+parameters** —capacity, issuance, block times— went out looking for takers and found them (§7). The
+**interpreter** and the **chainable generations** —which are what makes the cryptographic evolution
+of §5.6 possible and what separates this from its precedents— pay the most expensive boundaries and
+**still have no case found outside**. The first is an application; the second is a bet.
 
 ---
 
-## 2. El mecanismo: conmutación
+## 2. The mechanism: commutation
 
-La pieza que hace que esto no sea un fork disfrazado es que **el nodo no se reemplaza, se
-conmuta**: el mismo proceso, con el mismo estado en memoria, ejecutando reglas distintas a
-partir de un bloque determinado.
+The piece that keeps this from being a fork in disguise is that **the node is not replaced, it is
+commuted**: the same process, with the same state in memory, executing different rules from a given
+block onward.
 
 ```
    ┌──────── ruleset A ────────┐ ┌─ F ─┐ ┌──── Δ ────┐ ┌─── ruleset B ───┐
                                                      ║
    ───▣───▣───▣───▣───▣───▣───▣───▣───▣───▣───▣───▣──╫──▣───▣───▣───▣───▶
                               ▲       ▲              ║
-                          bloque N   N final    activación
-                       TRANSITION_    LOCK-IN   conmutación efectiva
+                           block N   N final    activation
+                       TRANSITION_    LOCK-IN   commutation in effect
                         RULE → TRUE  irrevocable
-                        (advisorio)  params on-chain
+                        (advisory)   params on-chain
 
-   el MISMO nodo · el MISMO estado · sin migración, sin bridge, sin snapshot
+   the SAME node · the SAME state · no migration, no bridge, no snapshot
 ```
 
-**Son tres tiempos, no dos**, y la separación es lo que evita que cada transición sea una
-sorpresa:
+**There are three times, not two**, and the separation is what keeps every transition from being a
+surprise:
 
-1. **Disparo.** En el bloque `N`, `TRANSITION_RULE` da TRUE. No conmuta nada y no compromete
-   nada: es advisorio, y una reorganización lo puede deshacer.
-2. **Lock-in.** Cuando `N` es final, el disparo se vuelve irrevocable. No es ceremonia:
-   `H0_B` compromete `state_trigger`, y comprometerlo antes dejaría el checkpoint apuntando a
-   un estado que una reorganización puede sacar de la cadena. El lock-in emite on-chain los
-   parámetros completos y la altura de activación — todo lo que un integrador necesita está
-   en la cadena, `Δ` bloques antes, sin que nadie tenga que anunciarlo.
-3. **Activación.** `Δ` bloques después del lock-in —no después del disparo, así el aviso es
-   exactamente `Δ`— el nodo conmuta.
+1. **Trigger.** At block `N`, `TRANSITION_RULE` returns TRUE. It commutes nothing and commits
+   nothing: it is advisory, and a reorganization can undo it.
+2. **Lock-in.** When `N` is final, the trigger becomes irrevocable. It is not ceremony: `H0_B`
+   commits `state_trigger`, and committing it earlier would leave the checkpoint pointing at a
+   state a reorganization can take out of the chain. Lock-in emits on-chain the complete parameters
+   and the activation height — everything an integrator needs is on the chain, `Δ` blocks in
+   advance, without anyone having to announce it.
+3. **Activation.** `Δ` blocks after lock-in —not after the trigger, so that the notice is exactly
+   `Δ`— the node commutes.
 
-`Δ` está fijado en Geminis **por clase de transición**: una transición de circulación tolera
-ventana larga, una migración criptográfica bajo ataque necesita lo contrario.
+`Δ` is fixed in Geminis **per transition class**: a circulation transition tolerates a long window,
+a cryptographic migration under attack needs the opposite.
 
-El linaje se encadena por hash:
+The lineage is chained by hash:
 
 ```
 H0_B = H( H0_A ‖ state_trigger ‖ params_nuevos )
 Verify( H0_B, H0_A, state_trigger, params_nuevos ) → TRUE
 ```
 
-Geminis A **no conoce** el hash de B —no puede, B incorpora información que todavía no
-existe— pero conoce determinísticamente cómo se calculará. `H0_B` no es el génesis de una
-cadena nueva: es un marcador de checkpoint generacional dentro de la misma cadena.
+Geminis A **does not know** B's hash —it cannot, B incorporates information that does not yet
+exist— but it deterministically knows how it will be computed. `H0_B` is not the genesis of a new
+chain: it is a generational checkpoint marker within the same chain.
 
 ---
 
-## 3. Las cinco invariantes
+## 3. The five invariants
 
-Cada una elimina una forma de reintroducir al humano en el lazo. **Son el marco duro: un
-ataque que las respeta es un ataque contra el diseño; uno que las viola es otro diseño.**
+Each one eliminates a way of reintroducing the human into the loop. **They are the hard frame: an
+attack that respects them is an attack against the design; one that violates them is a different
+design.**
 
-**I1 · El intérprete vive en Geminis y no cambia nunca.** Una transición no introduce código
-de nodo: selecciona un punto de un espacio que el nodo **ya sabe ejecutar**. Lo que Geminis
-fija de forma permanente no es una lista de reglas posibles sino la **máquina que las corre**.
-El espacio está partido: los parámetros **internos** —emisión, fees, tamaño de bloque,
-tiempos— cambian en cualquier transición; los **visibles en la interfaz** —primitiva de firma,
-formato de dirección, serialización— sólo por la vía de I5.
+**I1 · The interpreter lives in Geminis and never changes.** A transition does not introduce node
+code: it selects a point of a space the node **already knows how to execute**. What Geminis fixes
+permanently is not a list of possible rules but the **machine that runs them**. The space is split:
+the **internal** parameters —issuance, fees, block size, timings— change in any transition; those
+**visible in the interface** —signature primitive, address format, serialization— only by way of I5.
 
-**I2 · El trigger se computa sólo desde el estado, y nadie elige el momento.** Sin oráculos, sin
-firmas, sin votos. Pero computable no alcanza: *"la dirección X recibió 1 wei"* se computa sólo
-desde el estado y es una compuerta con dueño. Hay dos formas de cumplirlo y toda regla declara en
-cuál está. Por **aproximación observable**: la cantidad que dispara es monótona, la cadena publica
-*cuántos bloques faltan al ritmo actual*, y la regla **no puede disparar desde el reposo** — si el
-bloque anterior no publicó distancia, era un escalón. Por **capacidad demostrada**: no hay
-aproximación ni puede haberla —la rotura de una primitiva ocurre, no se aproxima— y es admisible
-sólo si producir el hecho exige **exactamente la capacidad ante la que la transición reacciona**,
-declarada on-chain. Es el canario de §6.6, y su condición es que la instancia debilitada se
-**derive** de una semilla pública: si alguien la genera, retiene la trampa y el canario es suyo.
+**I2 · The trigger is computed only from the state, and nobody chooses the moment.** No oracles, no
+signatures, no votes. But computable is not enough: *"address X received 1 wei"* is computed only
+from the state and it is a gate with an owner. There are two ways of meeting it and every rule
+declares which one it is in. By **observable approach**: the quantity that triggers is monotone, the
+chain publishes *how many blocks are left at the current rate*, and the rule **cannot trigger from
+rest** — if the previous block did not publish a distance, it was a step. By **demonstrated
+capability**: there is no approach and there cannot be one —the break of a primitive happens, it is
+not approached— and it is admissible only if producing the fact requires **exactly the capability
+the transition reacts to**, declared on-chain. It is the canary of §6.6, and its condition is that
+the weakened instance be **derived** from a public seed: if somebody generates it, they keep the
+trapdoor and the canary is theirs.
 
-*Ningún nodo puede verificar que la capacidad declarada sea la verdadera; eso se audita en
-Geminis, y por eso la declaración es obligatoria y explícita. Y la distancia es una proyección al
-ritmo actual, no una promesa: la promesa es `Δ`.*
+*No node can verify that the declared capability is the true one; that is audited in Geminis, and
+that is why the declaration is mandatory and explicit. And the distance is a projection at the
+current rate, not a promise: the promise is `Δ`.*
 
-**I3 · El estado se conserva íntegro a través de la transición.** No hay migración de saldos,
-no hay snapshot — y por lo tanto no hay bridge, que es el componente más atacado de la
-industria.
+**I3 · State is preserved intact across the transition.** There is no balance migration, no
+snapshot — and therefore no bridge, which is the most attacked component in the industry.
 
-**I4 · Cada generación commitea a su ancestro.** El linaje es verificable por hash y no
-depende de que nadie lo atestigüe.
+**I4 · Every generation commits to its ancestor.** The lineage is verifiable by hash and does not
+depend on anyone attesting to it.
 
-**I5 · Las transiciones son aditivas en la interfaz.** Toda dirección y toda transacción
-llevan etiqueta de generación desde el bloque 0. Una transición puede **agregar** formatos; no
-puede quitarlos.
+**I5 · Transitions are additive in the interface.** Every address and every transaction carries a
+generation tag from block 0. A transition can **add** formats; it cannot remove them.
 
-Es la invariante que decide el modo de falla de todo **integrador externo** — un exchange, una
-wallet: software que lee la cadena desde afuera, no un nodo. No significa que se quede en una
-cadena vieja: **los objetos de la generación anterior nunca dejan de ser válidos**, así que el
-integrador que no se actualizó los sigue procesando igual que siempre. Lo que no puede es
-entender los nuevos — y ahí, como toda transacción lleva etiqueta de generación desde el bloque
-0, **falla cerrado y ruidoso** (*"versión que no conozco"*) en vez de parsearlos bajo las reglas
-viejas y sacar un resultado plausible y equivocado, que es la falla que pierde fondos. Eso es
-degradar: funciona para lo viejo, se planta ante lo nuevo.
-
----
-
-## 4. Lo que sale gratis: canonicidad
-
-Es probablemente la propiedad más valiosa del diseño y no fue buscada: **invierte la asimetría
-de legitimidad de un fork.**
-
-En Bitcoin la posición conservadora —no cambiar nada— es el default: quien quiere cambiar las
-reglas escribe software nuevo, y la cadena que sigue igual reclama ser la original. Acá es al
-revés: el cliente estándar conmuta solo, así que **para no conmutar hay que modificar
-activamente el software** y desactivar la regla. El que se queda en las reglas viejas no
-preserva la cadena original: se desvía de Geminis, y no puede invocar a Geminis para
-justificarlo.
-
-*"Cuál es la verdadera"* deja de ser una pregunta social. Un exchange o un light client corren
-la verificación de linaje, y la cadena que no conmutó no tiene checkpoint generacional válido.
-Es un criterio de canonicidad objetivo, y ningún fork disputado de la historia tuvo uno.
+It is the invariant that decides the failure mode of every **external integrator** — an exchange, a
+wallet: software that reads the chain from outside, not a node. It does not mean it stays on an old
+chain: **objects from the previous generation never stop being valid**, so the integrator that did
+not update keeps processing them just as always. What it cannot do is understand the new ones — and
+there, since every transaction carries a generation tag from block 0, it **fails closed and loud**
+(*"a version I don't know"*) instead of parsing them under the old rules and producing a plausible
+and wrong result, which is the failure that loses funds. That is degrading: it works for the old,
+it stops dead at the new.
 
 ---
 
-## 5. La arquitectura
+## 4. What comes for free: canonicity
 
-### 5.1 Dos clases de nodo
+It is probably the most valuable property of the design and it was not sought: **it inverts the
+legitimacy asymmetry of a fork.**
 
-**Nodos de cómputo.** GPU y RAM, hostean los modelos que hacen el trabajo pedido. Hardware
-caro, mercado competitivo, y **no participan del consenso**: su ingreso es el pago del pedido
-que ejecutaron.
+In Bitcoin the conservative position —change nothing— is the default: whoever wants to change the
+rules writes new software, and the chain that stays the same claims to be the original. Here it is
+the other way around: the standard client commutes on its own, so **not commuting requires actively
+modifying the software** and disabling the rule. Whoever stays on the old rules does not preserve
+the original chain: they deviate from Geminis, and cannot invoke Geminis to justify it.
 
-**Nodos PoD.** Verifican y liquidan, y cobran fee cada vez que dos contratos interactúan.
-Corren en cualquier hardware — la verificación reproduce bit a bit en x86-64, ARM64 y un
-teléfono.
-
-**El fee es ad valorem.** Un fee fijo es regresivo en las dos direcciones: vuelve impagable el
-pedido chico —que es el que una economía de agentes hace en volumen— y gratis el pedido
-grande, que es donde la quema tiene que morder.
-
-La portabilidad tiene consecuencia de gobernanza: **lo que le permite a un validador tomar de
-rehén una cadena no es su convicción, es el foso de capital.** Un nodo que entra en un teléfono
-no tiene foso. Pero hay un argumento mejor y no depende del costo de entrada:
-
-> **Podés tener 3.000 nodos o 3 millones. Si no hay demanda externa, todos compiten por una
-> torta que no existe.** Como la emisión no depende del trabajo (§6.1), sumar nodos no crea
-> ingreso: reparte el mismo fee entre más manos. **Fabricar identidades es gratis y da
-> exactamente lo mismo**, que es más robusto que hacerlo caro.
-
-**Medido.** En un Motorola Edge 40 Neo bajo Termux, una verificación ML-DSA-44 desde bytes
-corre en **391 µs** como bytecode con JIT —3,51× el nativo— y da **~640 tx/s** con un cuarto
-de núcleo. Es el mismo tiempo absoluto que en un i5-9400 de escritorio. Con una salvedad: iOS
-no permite JIT a terceros y el bytecode llega en tiempo de ejecución, así que un nodo en
-iPhone queda forzado al intérprete, **~15× más lento**. Es política de plataforma, no
-propiedad del diseño.
-
-### 5.2 PoD verifica el predicado, no la inferencia
-
-Un modelo no puede pasar el gate de determinismo. Ni a temperatura cero: el no determinismo de
-punto flotante entre hardware distinto rompe la reproducción bit a bit.
-
-La separación en dos capas lo vuelve irrelevante. **La GPU produce; el nodo liviano
-comprueba.** El pedido no dice *"generá buen código"* — dice *"entregá algo que compile y pase
-estos tests"*. La inferencia no se verifica: se verifica que **la salida satisface el
-predicado**.
-
-De ahí sale una restricción dura:
-
-> **Todo pedido lleva un predicado de aceptación determinístico y lo bastante barato como para
-> correr en la capa liviana.** Lo que no se pueda expresar así no es trabajo que la red pueda
-> liquidar.
-
-Eso convierte una advertencia difusa en una frontera nítida — y **que ese subconjunto sea lo
-bastante grande como para sostener una economía es una hipótesis, no un resultado.**
-
-Corolario que parece limitación y es lo contrario: **el cliente no elige qué nodo ejecuta su
-pedido, y no lo necesita.** La calidad no se asegura seleccionando de antemano sino en la
-aceptación: si la salida no satisface el predicado, no hay pago.
-
-### 5.3 Orden sin consenso global
-
-Verificar y ordenar no son la misma operación. Si Alice firma dos transacciones que gastan los
-mismos 100 tokens, **las dos son individualmente válidas**; sólo el orden decide cuál gana.
-
-Pero el orden **global** no hace falta: cada cuenta lleva su propia secuencia y su dueño es el
-único que puede agregarle; comprometer fondos en un contrato los saca del saldo disponible, así
-que no se pueden comprometer dos veces; y una interacción queda firme cuando pasa una **ventana
-de impugnación** sin que nadie presente prueba de conflicto.
-
-**La ventana no se puede tapar, y el motivo no es el precio:**
-
-> **Llenar es serial; drenar es paralelo.** Una impugnación no existe hasta que entra en un
-> bloque, así que el techo para llenar es la capacidad de la cadena — un solo caño. Drenar lo
-> hacen todos los nodos PoD **a la vez**.
-
-El margen es `N · h / γ`. Con `γ ≈ 1` —que es lo que garantiza el techo de pasos de VM— y 10%
-de headroom por nodo, la fórmula da **diez nodos PoD**; corrida con una cola de verdad hacen
-falta **once**. Tres condiciones lo sostienen y ninguna es automática: **cualquier nodo PoD
-resuelve cualquier impugnación**; la cola es **por orden de llegada con bono plano** —si se
-ordenara por tamaño de bono, el capital compraría prioridad—; y **cada nodo elige en su propio
-orden y no en el de la cola**. Esta última apareció al correrla: si todos toman de la cabeza,
-los `N` nodos verifican la misma impugnación, el paralelismo se evapora —con cincuenta nodos el
-margen es el de uno— y la espera de una impugnación legítima no es un plazo fijo sino una rampa
-de `9·T`. Se arregla sin coordinación: cada nodo recorre la cola en un orden pseudoaleatorio
-derivado de su identidad, y ése es el costo de diez a once. Al azar el atraso **se estabiliza**
-—con once nodos, ~400 impugnaciones y cuatro bloques de espera media— en vez de crecer.
-
-El bono no tiene que ser grande, sólo distinto de cero: **el del impugnador honesto vuelve** y
-**el del atacante se quema**.
-
-### 5.4 La equivocación no se prohíbe: se vuelve suicida
-
-Que una firma sea infalsificable no impide que su dueño firme **dos mensajes distintos**.
-Ningún esquema lo evita. Pero en Schnorr y ECDSA, firmar dos mensajes con el **mismo nonce**
-permite despejar la clave privada de las dos firmas — así se perdió la clave de la PS3.
-
-Convertido en regla de diseño: **el nonce es función determinística del índice de la cuenta.**
-Firmar dos veces en el mismo índice no es una infracción que haya que probar y sancionar — **es
-publicar la propia clave privada.**
-
-El castigo no necesita regla de protocolo ni árbitro, se verifica en un teléfono, y **el
-vigilante se financia solo**: la recompensa por pescar la infracción es el saldo del infractor.
-
-### 5.5 Toda transferencia es bilateral
-
-No existe el envío unilateral: Alice ofrece, Bob acepta, y recién ahí la transferencia existe.
-Hay dos clases de oferta. Una transferencia común es **dirigida**. Un pedido de trabajo es
-**abierto**: no nombra a nadie, y ahí está todo el mecanismo de asignación del sistema:
-
-> **Nadie asigna pedidos.** El cliente publica predicado, precio y plazo con los fondos ya
-> comprometidos; el nodo que puede cumplirlo lo acepta. Es *pull*, no *push* — el nodo se
-> autoselecciona porque conoce su propio hardware, y se autofiltra solo, porque aceptar un
-> pedido que no puede cumplir es fallar el predicado y no cobrar.
-
-De ahí salen tres cosas gratis: **no hay cómputo duplicado**, **un nodo saturado simplemente no
-acepta**, y **el cliente no puede dirigir trabajo a un nodo elegido**.
-
-El costo está declarado: no se le puede pagar a alguien que está offline, y la finalidad se
-mide en minutos u horas, no en segundos.
-
-### 5.6 Evolución criptográfica sin fondo de escalera
-
-Toda primitiva termina cediendo. El problema es que *"la primitiva se rompió"* no está en el
-estado, así que no puede ser trigger (I2); y una **lista** de reemplazos se agota y exige un
-fork humano.
-
-**El canario convierte la rotura en un hecho del estado.** Geminis publica una versión
-deliberadamente debilitada con recompensa on-chain. Si alguien la rompe y la reclama, eso sí es
-estado. El trigger no lee *"la criptografía se rompió"* — lee *"el canario fue reclamado"*. Una
-**escalera** de canarios gradúa la respuesta: el débil cede años antes y dispara una migración
-con `Δ` largo.
-
-**El intérprete quita el fondo de la escalera.** Como Geminis fija la máquina y no la lista, una
-primitiva nueva es **bytecode**, no código de nodo.
-
-**Quién lo escribe: es un pedido de trabajo.** Cuando el canario cae, el protocolo publica el
-pedido y los agentes compiten. **Quién dice que es segura: nadie puede**, así que se prueba a
-los golpes:
-
-> **El guante.** Toda candidata entra con una instancia debilitada y una recompensa on-chain
-> durante una ventana fija. Si alguien la rompe, queda descartada y pasa la siguiente. La que
-> sobrevive se instala. Es el mismo canario usado como examen de ingreso.
-
-**El guante mide seguridad; el costo lo mide otra cláusula.** Una implementación correcta e
-irrompible pero diez veces más cara sobrevive la ventana y queda instalada para siempre — y ahí
-el presupuesto de §5.1 se rompe *desde adentro del protocolo*. Por eso el predicado lleva **tres**
-cláusulas: pasar los vectores, verificar por debajo de un **techo de pasos de VM**, y hacerlo
-tocando menos de un **techo de páginas**. Las dos cotas son cantidades ejecutadas, no tiempo de
-reloj: el conteo es idéntico entre arquitecturas (medido) y el reloj sería un oráculo.
-
-**La tercera cláusula la agregó construir la máquina, y no estaba en el diseño.** Un techo de pasos
-supone que un paso vale un paso, y no: la peor mezcla de instrucciones corre **23× más lento** que
-la carga real, así que el techo prometía 22 ms por transacción y la mezcla tardaba 596. No se
-arregla pesando instrucciones —lo que hace el gas— porque la mezcla que abre el hueco es una
-lectura de memoria, y una lectura cuesta lo mismo que una suma cuando el dato está en caché: **es
-el mismo opcode**, y lo que cambia es dónde cae el dato. Lo único que se puede contar mientras
-corre son las páginas distintas que toca.
-
-**Convergencia previa.** Justin Drake propuso *cryptographic canaries* en Ethereum Research en
-febrero de 2018: bounty, prueba de amenaza, conmutación automática a un respaldo. Este diseño se
-concibió independientemente. La diferencia es la profundidad: el respaldo de Drake es precableado
-y de **un solo escalón**; acá el sucesor se deriva dentro de un espacio definido en Geminis y el
-intérprete permite **encadenar generaciones**. Eso contesta la objeción que dejó aquella idea sin
-avanzar —que calibrar el canario obliga a estimaciones tan conservadoras que la automatización se
-vuelve redundante con la supervisión manual—: con un solo escalón, una transición prematura
-consume el único recurso de recuperación y el trigger tiene que ser casi perfecto; encadenable,
-sólo consume una generación que puede generar la siguiente.
+*"Which one is the real one"* stops being a social question. An exchange or a light client run the
+lineage verification, and the chain that did not commute has no valid generational checkpoint. It is
+an objective canonicity criterion, and no contested fork in history ever had one.
 
 ---
 
-## 6. La moneda
+## 5. The architecture
 
-### 6.1 Tres mecanismos que no hay que fundir
+### 5.1 Two classes of node
 
-| mecanismo | qué hace |
+**Compute nodes.** GPU and RAM, they host the models that do the requested work. Expensive
+hardware, a competitive market, and **they do not take part in consensus**: their income is the
+payment for the request they executed.
+
+**PoD nodes.** They verify and settle, and charge a fee every time two contracts interact. They run
+on any hardware — verification reproduces bit for bit on x86-64, ARM64 and a phone.
+
+**The fee is ad valorem.** A fixed fee is regressive in both directions: it makes the small request
+unpayable —which is the one an agent economy makes in volume— and the large request free, which is
+where the burn has to bite.
+
+Portability has a governance consequence: **what lets a validator hold a chain hostage is not their
+conviction, it is the capital moat.** A node that fits in a phone has no moat. But there is a better
+argument and it does not depend on the cost of entry:
+
+> **You can have 3,000 nodes or 3 million. If there is no external demand, they all compete for a
+> pie that does not exist.** Since issuance does not depend on work (§6.1), adding nodes creates no
+> income: it splits the same fee among more hands. **Manufacturing identities is free and yields
+> exactly the same**, which is more robust than making it expensive.
+
+**Measured.** On a Motorola Edge 40 Neo under Termux, an ML-DSA-44 verification from bytes runs in
+**391 µs** as bytecode with JIT —3.51× native— and yields **~640 tx/s** with a quarter of a core.
+It is the same absolute time as on a desktop i5-9400. With one caveat: iOS does not allow
+third-party JIT and the bytecode arrives at runtime, so a node on an iPhone is forced into the
+interpreter, **~15× slower**. That is platform policy, not a property of the design.
+
+### 5.2 PoD verifies the predicate, not the inference
+
+A model cannot pass the determinism gate. Not even at temperature zero: floating-point
+non-determinism across different hardware breaks bit-for-bit reproduction.
+
+The split into two layers makes it irrelevant. **The GPU produces; the light node checks.** The
+request does not say *"generate good code"* — it says *"deliver something that compiles and passes
+these tests"*. Inference is not verified: what is verified is that **the output satisfies the
+predicate**.
+
+Out of that comes a hard restriction:
+
+> **Every request carries a deterministic acceptance predicate, cheap enough to run on the light
+> layer.** Whatever cannot be expressed that way is not work the network can settle.
+
+That turns a fuzzy warning into a sharp boundary — and **that this subset is large enough to sustain
+an economy is a hypothesis, not a result.**
+
+A corollary that looks like a limitation and is the opposite: **the client does not choose which
+node executes their request, and does not need to.** Quality is not secured by selecting in advance
+but at acceptance: if the output does not satisfy the predicate, there is no payment.
+
+### 5.3 Order without global consensus
+
+Verifying and ordering are not the same operation. If Alice signs two transactions spending the same
+100 tokens, **both are individually valid**; only order decides which one wins.
+
+But **global** order is not needed: each account carries its own sequence and its owner is the only
+one who can append to it; committing funds into a contract takes them out of the available balance,
+so they cannot be committed twice; and an interaction becomes firm when a **challenge window**
+passes without anyone presenting proof of conflict.
+
+**The window cannot be clogged, and the reason is not the price:**
+
+> **Filling is serial; draining is parallel.** A challenge does not exist until it enters a block, so
+> the ceiling for filling is the capacity of the chain — a single pipe. Draining is done by all PoD
+> nodes **at once**.
+
+The margin is `N · h / γ`. With `γ ≈ 1` —which is what the VM step ceiling guarantees— and 10%
+headroom per node, the formula gives **ten PoD nodes**; run with a real queue, **eleven** are needed.
+Three conditions hold it up and none is automatic: **any PoD node resolves any challenge**; the queue
+is **by arrival order with a flat bond** —if it were ordered by bond size, capital would buy
+priority—; and **each node picks in its own order and not in the queue's**. This last one appeared on
+running it: if they all take from the head, the `N` nodes verify the same challenge, parallelism
+evaporates —with fifty nodes the margin is that of one— and the wait of a legitimate challenge is not
+a fixed term but a ramp of `9·T`. It is fixed with no coordination: each node walks the queue in a
+pseudorandom order derived from its identity, and that is the cost from ten to eleven. At random the
+backlog **stabilizes** —with eleven nodes, ~400 challenges and a mean wait of four blocks— instead of
+growing.
+
+The bond does not have to be large, only non-zero: **the honest challenger's comes back** and **the
+attacker's is burned**.
+
+### 5.4 Getting it wrong is not forbidden: it is made suicidal
+
+That a signature is unforgeable does not stop its owner from signing **two different messages**. No
+scheme prevents it. But in Schnorr and ECDSA, signing two messages with the **same nonce** allows the
+private key to be solved for from the two signatures — that is how the PS3 key was lost.
+
+Turned into a design rule: **the nonce is a deterministic function of the account index.** Signing
+twice at the same index is not an infraction that has to be proven and sanctioned — **it is
+publishing one's own private key.**
+
+The punishment needs no protocol rule and no arbiter, it is verified on a phone, and **the watchman
+funds himself**: the reward for catching the infraction is the infringer's balance.
+
+### 5.5 Every transfer is bilateral
+
+Unilateral sending does not exist: Alice offers, Bob accepts, and only then does the transfer exist.
+There are two classes of offer. An ordinary transfer is **directed**. A work request is **open**: it
+names nobody, and there lies the entire assignment mechanism of the system:
+
+> **Nobody assigns requests.** The client publishes predicate, price and deadline with the funds
+> already committed; the node that can fulfil it accepts it. It is *pull*, not *push* — the node
+> selects itself because it knows its own hardware, and filters itself out on its own, because
+> accepting a request it cannot fulfil means failing the predicate and not getting paid.
+
+Out of that three things come for free: **there is no duplicated computation**, **a saturated node
+simply does not accept**, and **the client cannot direct work to a chosen node**.
+
+The cost is declared: you cannot pay someone who is offline, and finality is measured in minutes or
+hours, not in seconds.
+
+### 5.6 Cryptographic evolution with no bottom of the ladder
+
+Every primitive eventually gives way. The problem is that *"the primitive broke"* is not in the
+state, so it cannot be a trigger (I2); and a **list** of replacements runs out and demands a human
+fork.
+
+**The canary turns the break into a fact of the state.** Geminis publishes a deliberately weakened
+version with an on-chain reward. If someone breaks it and claims it, that is state. The trigger does
+not read *"the cryptography broke"* — it reads *"the canary was claimed"*. A **ladder** of canaries
+grades the response: the weak one gives way years earlier and fires a migration with a long `Δ`.
+
+**The interpreter removes the bottom of the ladder.** Since Geminis fixes the machine and not the
+list, a new primitive is **bytecode**, not node code.
+
+**Who writes it: it is a work request.** When the canary falls, the protocol publishes the request
+and the agents compete. **Who says it is secure: nobody can**, so it is tested the hard way:
+
+> **The gauntlet.** Every candidate enters with a weakened instance and an on-chain reward for a
+> fixed window. If someone breaks it, it is discarded and the next one goes. The one that survives
+> is installed. It is the same canary used as an entrance exam.
+
+**The gauntlet measures security; cost is measured by another clause.** A correct and unbreakable
+implementation that is ten times more expensive survives the window and stays installed forever —
+and there the budget of §5.1 breaks *from inside the protocol*. That is why the predicate carries
+**three** clauses: pass the vectors, verify below a **VM step ceiling**, and do so touching fewer
+than a **page ceiling**. Both bounds are executed quantities, not wall-clock time: the count is
+identical across architectures (measured) and the clock would be an oracle.
+
+**The third clause was added by building the machine, and it was not in the design.** A step ceiling
+assumes one step is worth one step, and it is not: the worst instruction mix runs **23× slower** than
+the real workload, so the ceiling promised 22 ms per transaction and the mix took 596. It is not
+fixed by weighting instructions —what gas does— because the mix that opens the gap is a memory read,
+and a read costs the same as an addition when the data is in cache: **it is the same opcode**, and
+what changes is where the data falls. The only thing that can be counted while it runs is the
+distinct pages it touches.
+
+**Prior convergence.** Justin Drake proposed *cryptographic canaries* on Ethereum Research in
+February 2018: bounty, proof of threat, automatic commutation to a backup. This design was conceived
+independently. The difference is the depth: Drake's backup is prewired and **single-step**; here the
+successor is derived within a space defined in Geminis and the interpreter allows **chaining
+generations**. That answers the objection that left that idea without follow-up —that calibrating the
+canary forces estimates so conservative that the automation becomes redundant with manual
+supervision—: with a single step, a premature transition consumes the only recovery resource and the
+trigger has to be nearly perfect; chainable, it only consumes a generation that can generate the next
+one.
+
+---
+
+## 6. The currency
+
+### 6.1 Three mechanisms that must not be fused
+
+| mechanism | what it does |
 |---|---|
-| **fees** | remuneran trabajo — demanda → fee → nodos |
-| **emisión** | regula el estado monetario, **independiente del trabajo** |
-| **PoD** | valida qué trabajo y qué transición son válidos |
+| **fees** | they remunerate work — demand → fee → nodes |
+| **issuance** | it regulates the monetary state, **independent of work** |
+| **PoD** | it validates which work and which transition are valid |
 
-> **Ninguna unidad nueva se crea porque un nodo decidió hacer más trabajo.**
+> **No new unit is created because a node decided to do more work.**
 
-Reparto de la fee, con porcentajes de ejemplo y no de diseño: 70% proveedores / 20% quema / 10%
-reserva. **La quema es la única pieza irreemplazable.**
+The fee split, with illustrative and not design percentages: 70% providers / 20% burn / 10% reserve.
+**The burn is the only irreplaceable piece.**
 
-### 6.2 La distribución del día 1
+### 6.2 The day-1 distribution
 
-Sacar la emisión de la ecuación del trabajo deja una pregunta sin la cual el resto no arranca:
-**quién tiene tokens antes de que exista el primer fee.** Las tres respuestas clásicas la
-contestan mal, y el motivo es un teorema:
+Taking issuance out of the work equation leaves a question without which the rest does not start:
+**who has tokens before the first fee exists.** The three classic answers get it wrong, and the
+reason is a theorem:
 
-> **Una distribución de tokens nuevos indexada a una acción rinde a lo sumo lo que cuesta esa
-> acción, o es farmeable.** Si paga menos que el costo, nadie la reclama; si paga más, se
-> farmea. Bitcoin pudo porque hashear tiene costo externo, físico e imposible de fingir.
+> **A distribution of new tokens indexed to an action yields at most what that action costs, or it
+> is farmable.** If it pays less than the cost, nobody claims it; if it pays more, it gets farmed.
+> Bitcoin could because hashing has an external, physical cost that is impossible to fake.
 
-**La forma elegida toma la tercera, acotada al bloque 0.** Geminis publica pools con tope por
-clase, y **reclamar se paga demostrando la capacidad que se reclama**: la clase de cómputo
-resuelve una tarea de referencia con predicado determinista; la clase PoD verifica un lote de
-referencia dentro del techo de pasos de VM.
+**The chosen form takes the third, bounded to block 0.** Geminis publishes pools with a cap per
+class, and **claiming is paid for by demonstrating the capability being claimed**: the compute class
+solves a reference task with a deterministic predicate; the PoD class verifies a reference batch
+within the VM step ceiling.
 
-No necesita identidad —el costo es externo y físico—, hace **verificable la separación por
-clase** —decir *"soy un nodo de cómputo"* es gratis, resolver su tarea no—, y **el trabajo no se
-tira**: reclamar es un ensayo del producto real. **Lo no reclamado se quema**, y de ahí sale la
-mejor propiedad:
+It needs no identity —the cost is external and physical—, it makes **the separation by class
+verifiable** —saying *"I am a compute node"* is free, solving its task is not—, and **the work is not
+thrown away**: claiming is a rehearsal of the real product. **What is not claimed is burned**, and
+out of that comes the best property:
 
-> **La oferta inicial no la fija el creador — la fija cuánta capacidad real apareció.**
+> **The initial supply is not set by the creator — it is set by how much real capacity showed up.**
 
-**Sin adornos: sigue siendo una subasta pagada en cómputo**, y el que tiene más hardware se
-lleva más. No es reparto igualitario y no hay que venderlo como tal. Es **abierto**, que es otra
-cosa, y es la propiedad que tuvo el lanzamiento de Bitcoin.
+**Without ornament: it is still an auction paid in compute**, and whoever has more hardware takes
+more. It is not an egalitarian split and it must not be sold as one. It is **open**, which is a
+different thing, and it is the property Bitcoin's launch had.
 
-Cada claim emite además un **certificado transferible** de haber participado. **No es dinero y
-no es licencia**: si diera derecho a tokens sería concentrar la base monetaria inicial; si hiciera
-falta para cobrar fees, la cantidad de nodos se volvería artificialmente escasa.
+Each claim also emits a **transferable certificate** of having taken part. **It is not money and it
+is not a licence**: if it gave a right to tokens it would be concentrating the initial monetary base;
+if it were needed in order to collect fees, the number of nodes would become artificially scarce.
 
-**Sin decidir: el costo exacto del claim, la duración de la ventana y los topes por clase.**
+**Undecided: the exact cost of the claim, the duration of the window and the caps per class.**
 
-### 6.3 Por qué el circuito cerrado pierde
+### 6.3 Why the closed circuit loses
 
-El ataque a descartar no depende de que nadie se disfrace: Alice tiene nodos propios, se manda
-trabajo a sí misma y cobra sus propias fees. La pregunta correcta no es si el protocolo puede
-detectarla —no puede— sino si le conviene.
+The attack to be ruled out does not depend on anyone wearing a disguise: Alice has her own nodes,
+sends work to herself and collects her own fees. The right question is not whether the protocol can
+detect her —it cannot— but whether it is worth her while.
 
-| nodos de Alice | neto por ciclo | saldo tras 1.000 ciclos, desde 1.000.000 |
+| Alice's nodes | net per cycle | balance after 1,000 cycles, from 1,000,000 |
 |---|---|---|
-| 2 de 3.000 | −0,000900 | 406.486 |
-| 99% de la red | −0,000603 | 547.068 |
-| **el 100%** | **−0,000600** | **548.713** |
+| 2 of 3,000 | −0.000900 | 406,486 |
+| 99% of the network | −0.000603 | 547,068 |
+| **100%** | **−0.000600** | **548,713** |
 
-**Pierde incluso siendo toda la red.** La cantidad de nodos sólo mueve su tajada de la reserva;
-la quema queda fuera de su alcance siempre. Con quema en cero, el ataque pasa a ser gratis.
+**She loses even while being the entire network.** The number of nodes only moves her slice of the
+reserve; the burn stays out of her reach always. With the burn at zero, the attack becomes free.
 
-> **El protocolo no distingue a Alice de un cliente real. No lo intenta.** Hace que el circuito
-> cerrado **pierda plata**, y la aritmética no necesita saber quién es nadie.
+> **The protocol does not distinguish Alice from a real client. It does not try to.** It makes the
+> closed circuit **lose money**, and the arithmetic does not need to know who anybody is.
 
-**Una oferta acotada banca actividad ilimitada.** Con supuestos hostiles —finalidad de 6 horas y
-sólo 20% del circulante en vuelo— el techo de velocidad da **292 vueltas al año**, contra 1,2 de
-M2 de EE.UU. y ~12 de Bitcoin on-chain. Entre 25× y 250× de aire.
+**A bounded supply banks unlimited activity.** With hostile assumptions —6-hour finality and only 20%
+of the circulating supply in flight— the velocity ceiling gives **292 turns a year**, against 1.2 for
+US M2 and ~12 for Bitcoin on-chain. Between 25× and 250× of headroom.
 
-**La concentración de tokens no da poder de protocolo.** I2 prohíbe que el trigger lea cualquier
-cosa que no sea `emitido − quemado` del token nativo, y señalizar preparación es información,
-nunca compuerta. Un actor con el 90% de los tokens tiene el 90% del dinero y cero poder sobre
-las reglas.
+**Token concentration does not grant protocol power.** I2 forbids the trigger from reading anything
+that is not `emitido − quemado` of the native token, and signalling readiness is information, never a
+gate. An actor with 90% of the tokens has 90% of the money and zero power over the rules.
 
-### 6.4 Crear activos: el cargo va en la permanencia
+### 6.4 Creating assets: the charge goes on permanence
 
-Se admite **una primitiva de creación de forma fija**, no una máquina abierta al estado de
-terceros. La cadena ya ejecuta código ajeno —el predicado de §5.2— pero un predicado corre,
-contesta y muere; acá se admite que un objeto **persista**. Con forma libre, el tamaño de una
-entrada lo elige el usuario y el estado deja de tener unidad de medida. Una sola primitiva cubre
-fungible y no fungible: **un no fungible es `supply = 1`, indivisible**.
+**A creation primitive of fixed shape** is admitted, not a machine open to third-party state. The
+chain already executes someone else's code —the predicate of §5.2— but a predicate runs, answers and
+dies; here an object is admitted to **persist**. With a free shape, the size of an entry is chosen by
+the user and the state stops having a unit of measure. A single primitive covers fungible and
+non-fungible: **a non-fungible is `supply = 1`, indivisible**.
 
-**El cargo no va en la creación, y es lo menos obvio del arreglo:**
+**The charge does not go on creation, and it is the least obvious part of the arrangement:**
 
-> **Un cargo a la creación no reduce la creación — reduce la registración de la creación.**
+> **A charge on creation does not reduce creation — it reduces the registration of creation.**
 
-Si crear adentro lleva cargo propio, se mintea **afuera**, y ahí se pierde todo lo que el
-mercado nativo argumenta. La asimetría es de aplicabilidad, no sólo de incentivos: **el cargo a
-la creación se evade minteando afuera; el de permanencia no, porque el estado que existe lo ven
-todos los nodos.**
+If creating inside carries a charge of its own, people mint **outside**, and there everything the
+native market argues for is lost. The asymmetry is one of applicability, not only of incentives:
+**the charge on creation is evaded by minting outside; the permanence charge is not, because the
+state that exists is seen by every node.**
 
-Entonces la tarifa tiene dos partes. Un **piso** que se quema, y no es una perilla: es el costo
-fijo del ciclo crear + desalojar, medido contra el presupuesto de un nodo, unas **dieciséis horas
-de guardado** (0,2% de lo que cuesta tener el objeto un año). Y un **depósito de permanencia**
-que se consume quemándose época a época, lineal en **tamaño × tiempo**. Es el depósito, no el
-piso, lo que hace de antispam.
+So the tariff has two parts. A **floor** that is burned, and it is not a knob: it is the fixed cost of
+the create + evict cycle, measured against a node's budget, some **sixteen hours of storage** (0.2%
+of what it costs to hold the object for a year). And a **permanence deposit** that is consumed by
+being burned epoch by epoch, linear in **size × time**. It is the deposit, not the floor, that acts
+as antispam.
 
-**La vida comprable de una vez tiene tope, `L_max`, y es condición de estabilidad y no
-recomendación.** Sin tope, un pago finito grande compra siglos. Y como la tasa no puede quedar
-congelada —es un precio nominal sobre un recurso real—, prepagar sin límite es apostar contra la
-regla que la mueva: cuando la tasa baja, comprar largo captura slots a precio de saldo que no se
-recuperan sin confiscar. **Medido: con `L_max` = 25 épocas el lazo aterriza en el objetivo; con
-50 es marginal; con 100 se rompe.**
+**The life that can be bought at once has a cap, `L_max`, and it is a stability condition and not a
+recommendation.** Without a cap, a large finite payment buys centuries. And since the rate cannot
+stay frozen —it is a nominal price on a real resource—, prepaying without limit is betting against
+whatever rule moves it: when the rate falls, buying long captures slots at bargain prices that cannot
+be recovered without confiscating. **Measured: with `L_max` = 25 epochs the loop lands on target;
+with 50 it is marginal; with 100 it breaks.**
 
-**El cargo es por entrada, no por objeto.** Un fungible es una entrada más un saldo por cada
-tenedor, y esa cuenta crece con la adopción: un token con un millón de tenedores ocupa el **3%**
-del disco de un nodo — **treinta y tres tokens exitosos llenan la cadena**. Así que **toda
-entrada de estado paga permanencia, y la funda quien la crea**. Eso cierra de paso un agujero que
-no era del minteo: **las cuentas del token nativo también son entradas de estado**, y como el fee
-es ad valorem, sobre polvo tiende a cero.
+**The charge is per entry, not per object.** A fungible is one entry plus a balance for each holder,
+and that count grows with adoption: a token with a million holders occupies **3%** of a node's disk —
+**thirty-three successful tokens fill the chain**. So **every state entry pays permanence, and
+whoever creates it funds it**. That also closes a hole that was not about minting: **native token
+accounts are state entries too**, and since the fee is ad valorem, on dust it tends to zero.
 
-> **En la cadena no existe ningún objeto cuyo costo futuro no tenga a alguien pagándolo. Nadie
-> puede comprar espacio perpetuo con un pago finito.**
+> **On the chain there is no object whose future cost does not have someone paying for it. Nobody can
+> buy perpetual space with a finite payment.**
 
-**Cambio de carácter que hay que declarar: tener un saldo deja de ser gratis.** Es demurrage
-sobre el estado y no sobre el monto — una billetera chica y quieta termina desalojada,
-recuperable con prueba.
+**A change of character that has to be declared: holding a balance stops being free.** It is
+demurrage on the state and not on the amount — a small, still wallet ends up evicted, recoverable
+with a proof.
 
-**Desalojar no es destruir, y el residuo tiene que ser O(1).** El objeto sale del conjunto activo
-y el tenedor lo revive con una prueba, pagando el costo de entonces. Pero el compromiso contra el
-que se prueba no puede ser uno por objeto: una lápida de 32 bytes por objeto son **1 GB por nodo
-para siempre**, un cuarto del presupuesto. El desalojo **agrega a un acumulador único de
-sólo-append** — unos **800 bytes en total**, no por objeto.
+**Evicting is not destroying, and the residue has to be O(1).** The object leaves the active set and
+the holder revives it with a proof, paying the cost at that time. But the commitment it is proven
+against cannot be one per object: a 32-byte tombstone per object is **1 GB per node forever**, a
+quarter of the budget. Eviction **adds to a single append-only accumulator** — some **800 bytes in
+total**, not per object.
 
-**No hay deuda ni remate.** Rematar obliga a la cadena a saber cuánto vale el activo, o sea a leer
-el pool, que es exactamente lo que I2 prohíbe y es manipulable en la dirección obvia. La
-liquidación la hace el mercado: quien no puede sostener el saldo vende antes del desalojo.
+**There is no debt and no auction.** Auctioning forces the chain to know what the asset is worth,
+that is, to read the pool, which is exactly what I2 forbids and is manipulable in the obvious
+direction. Liquidation is done by the market: whoever cannot sustain the balance sells before the
+eviction.
 
-**Ocupación objetivo `θ* = 50%`** de un presupuesto de disco declarado —del orden de pocos GB—
-que sólo una transición puede mover. El techo derivado es `θ* ≤ 67%`, porque el pico de un shock
-sostenido llega a **1,48×** antes de que el precio muerda. El sesgo conservador es deliberado:
-quedarse corto se corrige subiendo el número; pasarse expulsa a los nodos chicos y **eso no se
-revierte**, porque el que se fue no vuelve.
-
----
-
-## 7. Qué está medido y qué no
-
-Esta sección es la que decide cuánto vale todo lo anterior.
-
-**Medido contra el mundo (evidencia externa):**
-
-- **El mecanismo corre y se midió contra el historial real de Ethereum** (agosto 2026), con las
-  alturas y los offsets verificados contra los EIPs y contra la configuración que corren los nodos.
-  **Dos de los tres casos fueron en contra**, y por eso va primero: en la **bomba de dificultad**,
-  una regla con un solo número elegido de antemano reproduce las seis decisiones humanas dentro de
-  37 días —pero ese número es el promedio de un criterio que se movió **41×**, y cinco de los seis
-  forks fueron preventivos—; en los **blobs**, la regla habría actuado **383 días antes** donde la
-  restricción era la demanda y **nunca** donde era la capacidad; en el **gas limit** directamente
-  **no hay trigger admisible**, porque EIP-1559 clava la ocupación (correlación **−0,02** contra un
-  precio que se movió 650×), el precio nominal caduca y el relativo se vuelve trinquete.
-- **El mecanismo tiene cliente, y se está acercando solo.** Ethereum recalibra los parámetros de
-  capacidad de blobs (`blobSchedule`) y construyó un tipo de fork dedicado a abaratar ese cambio
-  —EIP-7892, hoy **`Final`**: *"the current approach of only modifying blob parameters in large,
-  infrequent hard forks is not agile enough to keep up with L2 growth"*—. Ya lo usó dos veces: el
-  target fue de 3 a 6, 10 y 14 en veintidós meses, y las dos últimas subas se anunciaron **juntas y
-  por adelantado**. O sea que el cliente llegó solo hasta *escribir el cronograma antes*, que es la
-  forma de BIP-103; lo que le falta para llegar acá es I2 — el disparo sigue siendo un timestamp
-  escrito a mano. En mayo de 2026 el patrón se repitió sobre el gas limit
-  (EIP-8261), con un cronograma que declara explícitamente **no** ser regla de consenso.
-  Corroboran la bomba de dificultad —retrasada por hard fork **seis veces en cinco años** para
-  instalar un entero que la cadena podía calcular sola— y la emisión terminal, que Monero
-  escribió por adelantado y obtuvo sin fork, mientras Bitcoin hoy no puede tenerla a ningún
-  precio.
-- **Precedentes.** Drake 2018 (canarios criptográficos) y BIP-103 de Pieter Wuille, 2015
-  —función determinista para el límite de tamaño de bloque, sin voto de mineros—. Ninguno cierra
-  el hueco: en Drake el respaldo es de un solo escalón; en BIP-103 el disparo es tiempo y no
-  estado, y no hay encadenamiento. **Trabajo concurrente a vigilar:** *Post-Quantum Blockchains
-  with Agility in Mind*, Tectonic Labs, IACR eprint 2026/609, marzo de 2026.
-- **El presupuesto del intérprete entra**, medido en hardware real (§5.1). Lo que lo decide es que
-  **determinismo e interpretación son separables**: para código entero el JIT es tan determinístico
-  como el intérprete y cuesta ~3× en vez de ~29×.
-
-**Y ahora lo que hay que decir sin adornos.** La corrección al alcance del primer punto: **ninguno
-de los tres clientes encontrados necesita el intérprete, ni las generaciones encadenables, ni la
-evolución criptográfica.** Son parámetros internos sobre espacios de enteros. Lo que tiene demanda
-demostrada por terceros es la mitad que **no** paga las fronteras caras. La otra mitad —incluido el
-diferenciador declarado frente a Drake— sigue sin destinatario encontrado.
-
-**Medido sólo contra sí mismo (evidencia propia, que es de otra clase):** toda la moneda. El
-ataque de auto-pago, la velocidad de circulación, la cola de impugnaciones, los parámetros de la
-permanencia, `θ*` y `L_max`. Sobrevivieron a todos los ataques que se les corrieron, y **todos los
-corrió quien escribió el diseño**.
-
-Vale una muestra de lo frágil que es esa clase de evidencia, porque pasó acá adentro: la primera
-versión de la regla que mueve la tasa de permanencia parecía estable y absorbía un shock de 3×.
-Lo que la tumbó no fue un ataque — fue **corregir un detalle del modelo con que se la había
-probado**: trataba como acortables unos plazos que el protocolo promete respetar. Con plazos
-respetados oscila entre casi cero y más del doble del objetivo, con cualquier ganancia.
-
-**Nada está construido.** El diseño no corrió nunca.
+**Target occupancy `θ* = 50%`** of a declared disk budget —of the order of a few GB— that only a
+transition can move. The derived ceiling is `θ* ≤ 67%`, because the peak of a sustained shock reaches
+**1.48×** before the price bites. The conservative bias is deliberate: falling short is corrected by
+raising the number; overshooting expels the small nodes and **that is not reversed**, because
+whoever left does not come back.
 
 ---
 
-## 8. Fronteras declaradas
+## 7. What is measured and what is not
 
-No son problemas a resolver: son el precio de propiedades que el diseño quiere, y se sostienen a
-sabiendas. Las que más pesan:
+This section is the one that decides how much everything above is worth.
 
-- **La adaptación está acotada a lo que Geminis anticipó.** Si la condición que dispara la
-  transición es algo no previsto, no hay ruleset que cargar. **Y el determinismo saca el freno de
-  emergencia**: una transición mal anticipada es exactamente el escenario donde los humanos
-  querrían negarse, y la respuesta del diseño es *"entonces sos un fork"*.
-- **El conjunto de futuros posibles deja de ser auditable.** Es el precio del intérprete. Con una
-  lista finita, cualquiera podía leer Geminis y saber en qué se puede convertir la cadena.
-- **El intérprete es un punto único de falla que no se puede parchear nunca.** Si tiene un bug, no
-  hay transición que lo arregle, porque toda transición corre sobre él. Es la única pieza donde la
-  verificación formal no es opcional.
-- **Sobrevivir el guante no es sobrevivir quince años de criptoanálisis.**
-- **El protocolo no tiene noción de identidad, así que toda palanca que mueva, la mueve para
-  todos.** Explica de una sola vez por qué murieron cuatro arreglos distintos —graduar el subsidio,
-  bloquearlo un tiempo, repartir por rol, bono de impugnación superlineal—: cada uno necesitaba
-  distinguir al honesto del atacante, y lo único que el protocolo ve son firmas y montos. **Toda
-  propuesta de la forma "que el bueno pague menos" es una propuesta de introducir identidad.**
-- **El split es ilegítimo, no imposible.** Ethereum Classic existe. La asimetría no mata a la
-  cadena disidente — la hace chica.
-- **El hash que encadena el linaje no se puede reemplazar**, porque lo que habría que migrar es el
-  pasado. Le pasa a cualquier cadena que comprometa su historia con un hash.
-- **El protocolo no puede obligar a que exista archivo.** Puede garantizar que un activo
-  desalojado *se puede* revivir; no que alguien vaya a tener con qué. Alcanza para un agente
-  permanentemente online y no alcanza para una persona, que va a depender de un servicio de
-  archivo — o sea de mercado y no de protocolo.
-- **Se puede pagar por acercar una transición, aunque no por cambiar cuál.** Al indexar la tasa de
-  permanencia a la ocupación, quien ocupa disco acelera la quema ajena, y la quema es lo que lee el
-  trigger. Con `s` la fracción de estado que ocupa el atacante y `ε` la elasticidad de la demanda
-  honesta, la quema ajena por unidad de quema propia es `((1−s)/s)·((R−1)/R)` con
-  `R = (1/(1−s))^(1/ε)`:
+**Measured against the world (external evidence):**
 
-  | `s` | `ε` = 0,25 | `ε` = 0,5 | `ε` = 1,0 | `ε` = 2,0 |
+- **The mechanism runs and was measured against Ethereum's real history** (August 2026), with the
+  heights and offsets verified against the EIPs and against the configuration the nodes run. **Two of
+  the three cases went against**, and that is why it comes first: in the **difficulty bomb**, a rule
+  with a single number chosen in advance reproduces the six human decisions within 37 days —but that
+  number is the average of a criterion that moved **41×**, and five of the six forks were
+  preventive—; in the **blobs**, the rule would have acted **383 days earlier** where the constraint
+  was demand and **never** where it was capacity; in the **gas limit** there is flatly **no
+  admissible trigger**, because EIP-1559 pins occupancy (correlation **−0.02** against a price that
+  moved 650×), the nominal price expires and the relative one becomes a ratchet.
+- **The mechanism has a customer, and it is approaching on its own.** Ethereum recalibrates the blob
+  capacity parameters (`blobSchedule`) and built a fork type dedicated to making that change cheaper
+  —EIP-7892, today **`Final`**: *"the current approach of only modifying blob parameters in large,
+  infrequent hard forks is not agile enough to keep up with L2 growth"*—. It has already used it
+  twice: the target went from 3 to 6, 10 and 14 in twenty-two months, and the last two raises were
+  announced **together and in advance**. Which means the customer got as far on its own as *writing
+  the schedule beforehand*, which is the form of BIP-103; what it is missing to get here is I2 — the
+  firing is still a timestamp written by hand. In May 2026 the pattern repeated on the gas limit
+  (EIP-8261), with a schedule that explicitly declares **not** to be a consensus rule. Corroborated
+  by the difficulty bomb —delayed by hard fork **six times in five years** to install an integer the
+  chain could compute on its own— and by terminal issuance, which Monero wrote in advance and
+  obtained with no fork, while Bitcoin today cannot have it at any price.
+- **Precedents.** Drake 2018 (cryptographic canaries) and Pieter Wuille's BIP-103, 2015
+  —a deterministic function for the block size limit, with no miners' vote—. Neither closes the gap:
+  in Drake the backup is single-step; in BIP-103 the firing is time and not state, and there is no
+  chaining. **Concurrent work to watch:** *Post-Quantum Blockchains with Agility in Mind*, Tectonic
+  Labs, IACR eprint 2026/609, March 2026.
+- **The interpreter's budget fits**, measured on real hardware (§5.1). What decides it is that
+  **determinism and interpretation are separable**: for integer code the JIT is as deterministic as
+  the interpreter and costs ~3× instead of ~29×.
+
+**And now what has to be said without ornament.** The correction to the scope of the first point:
+**none of the three customers found needs the interpreter, nor the chainable generations, nor the
+cryptographic evolution.** They are internal parameters over spaces of integers. What has demand
+demonstrated by third parties is the half that does **not** pay the expensive boundaries. The other
+half —including the differentiator declared against Drake— still has no recipient found.
+
+**Measured only against itself (own evidence, which is of a different class):** the entire currency.
+The self-payment attack, the velocity of circulation, the challenge queue, the permanence parameters,
+`θ*` and `L_max`. They survived every attack that was run against them, and **every one of them was
+run by the person who wrote the design**.
+
+A sample of how fragile that class of evidence is is worth giving, because it happened in here: the
+first version of the rule that moves the permanence rate looked stable and absorbed a 3× shock. What
+brought it down was not an attack — it was **correcting a detail of the model it had been tested
+with**: it treated as shortenable some terms the protocol promises to respect. With the terms
+respected it oscillates between almost zero and more than double the target, at any gain.
+
+**Nothing is built.** The design never ran.
+
+---
+
+## 8. Declared boundaries
+
+They are not problems to be solved: they are the price of properties the design wants, and they are
+maintained knowingly. The ones that weigh most:
+
+- **Adaptation is bounded to what Geminis anticipated.** If the condition that fires the transition
+  is something unforeseen, there is no ruleset to load. **And determinism removes the emergency
+  brake**: a badly anticipated transition is exactly the scenario in which humans would want to
+  refuse, and the design's answer is *"then you are a fork"*.
+- **The set of possible futures stops being auditable.** It is the price of the interpreter. With a
+  finite list, anyone could read Geminis and know what the chain can turn into.
+- **The interpreter is a single point of failure that can never be patched.** If it has a bug, there
+  is no transition that fixes it, because every transition runs on top of it. It is the only piece
+  where formal verification is not optional.
+- **Surviving the gauntlet is not surviving fifteen years of cryptanalysis.**
+- **The protocol has no notion of identity, so every lever it moves, it moves for everyone.** It
+  explains in one go why four different fixes died —grading the subsidy, blocking it for a time,
+  splitting by role, a superlinear challenge bond—: each one needed to distinguish the honest party
+  from the attacker, and all the protocol sees are signatures and amounts. **Every proposal of the
+  form "let the good guy pay less" is a proposal to introduce identity.**
+- **The split is illegitimate, not impossible.** Ethereum Classic exists. The asymmetry does not kill
+  the dissident chain — it makes it small.
+- **The hash that chains the lineage cannot be replaced**, because what would have to be migrated is
+  the past. It happens to any chain that commits its history with a hash.
+- **The protocol cannot force an archive to exist.** It can guarantee that an evicted asset *can* be
+  revived; not that anyone will have what it takes. It is enough for a permanently online agent and
+  not enough for a person, who is going to depend on an archive service — that is, on the market and
+  not on the protocol.
+- **It is possible to pay to bring a transition closer, though not to change which one.** On indexing
+  the permanence rate to occupancy, whoever occupies disk accelerates other people's burn, and the
+  burn is what the trigger reads. With `s` the fraction of the state the attacker occupies and `ε`
+  the elasticity of honest demand, the other people's burn per unit of their own burn is
+  `((1−s)/s)·((R−1)/R)` with `R = (1/(1−s))^(1/ε)`:
+
+  | `s` | `ε` = 0.25 | `ε` = 0.5 | `ε` = 1.0 | `ε` = 2.0 |
   |---|---|---|---|---|
-  | 5% | **3,52** | 1,85 | 0,95 | 0,48 |
-  | 25% | 2,05 | 1,31 | 0,75 | 0,40 |
-  | 50% | 0,94 | 0,75 | 0,50 | 0,29 |
+  | 5% | **3.52** | 1.85 | 0.95 | 0.48 |
+  | 25% | 2.05 | 1.31 | 0.75 | 0.40 |
+  | 50% | 0.94 | 0.75 | 0.50 | 0.29 |
 
-  **La palanca es del orden de `1/ε`**, y `ε` no se conoce sin red corriendo. Se declara en vez de
-  cerrarse: lo acota que **se compra la fecha y no el contenido** —el sucesor está escrito de
-  antemano y por I3 el estado cruza intacto—. Lo reabre una medición: si la demanda de guardado
-  resulta marcadamente inelástica, hay que cerrarlo por definición y pagar la primera excepción a
-  *circulante es emitido menos quemado*.
-- **El canario paga por delatar, y quien puede romper la primitiva gana más callándose.** El que
-  puede falsificar firmas puede tomar la cadena entera, y eso vale más que cualquier bounty. Lo
-  acota que el canario no necesita atraer al adversario óptimo sino a **cualquiera** que llegue
-  primero — que es lo que históricamente pasó con DES, MD5 y SHA-1. **Es un supuesto empírico sobre
-  cómo se difunde el criptoanálisis, no una propiedad del diseño.**
-- **No hay incentivo pagado por el protocolo a correr un nodo antes de que exista demanda.** El
-  claim compra la cohorte del día 1 y después el ingreso es fee de demanda real o nada. Es una
-  elección deliberada entre dos fallas: el diseño viejo arrancaba seguro y se auto-farmeaba; éste
-  no se auto-farmea y **puede no arrancar**.
+  **The lever is of the order of `1/ε`**, and `ε` is not known without a running network. It is
+  declared instead of closed: it is bounded by the fact that **what is bought is the date and not the
+  content** —the successor is written in advance and by I3 the state crosses over intact—. It is
+  reopened by a measurement: if the demand for storage turns out to be markedly inelastic, it has to
+  be closed by definition and the first exception to *circulating supply is issued minus burned* has
+  to be paid.
+- **The canary pays for telling, and whoever can break the primitive gains more by keeping quiet.**
+  Whoever can forge signatures can take the entire chain, and that is worth more than any bounty.
+  What bounds it is that the canary does not need to attract the optimal adversary but **anyone** who
+  gets there first — which is what historically happened with DES, MD5 and SHA-1. **It is an
+  empirical assumption about how cryptanalysis spreads, not a property of the design.**
+- **There is no incentive paid by the protocol to run a node before demand exists.** The claim buys
+  the day-1 cohort and after that the income is fees from real demand or nothing. It is a deliberate
+  choice between two failures: the old design started off safely and farmed itself; this one does not
+  farm itself and **may not start**.
 
 ---
 
-## 9. El problema abierto, y los que se cerraron
+## 9. The open problem, and the ones that were closed
 
-**Cerrado en agosto de 2026 · el techo de pasos de VM.** Estaba declarado como *un número y dónde
-vive*, con un acople que parecía obligar a elegir entre dos formas malas: congelado hay que elegirlo
-generoso —tiene que sobrevivir primitivas que no existen— y generoso deja pasar la implementación
-correcta pero 10× más lenta; apretado obliga a que sea parámetro interno, o sea una palanca.
+**Closed in August 2026 · the VM step ceiling.** It was declared as *a number and where it lives*,
+with a coupling that seemed to force a choice between two bad forms: frozen, it has to be chosen
+generous —it has to survive primitives that do not exist— and generous lets through the correct but
+10× slower implementation; tight, it has to be an internal parameter, that is, a lever.
 
-**La disyuntiva era falsa: el techo no se elige, se deriva.**
+**The dilemma was false: the ceiling is not chosen, it is derived.**
 
 ```
-techo = f* × tiempo_de_bloque × R_declarado(páginas) / tx_por_bloque
+ceiling = f* × tiempo_de_bloque × R_declarado(pages) / tx_por_bloque
 ```
 
-Lo que se congela en la máquina es **la fórmula**; el valor lo pone cada generación con parámetros
-que ya están en el espacio. No es una palanca —moverlo exige mover capacidad o tiempo de bloque— y
-**no compone**, porque no depende de qué primitiva esté instalada. Y el filo de las primitivas
-futuras se disuelve: una más cara no queda afuera, **entra pagando capacidad**, y eso lo cobra una
-transición con su `Δ` y su aviso.
+What is frozen into the machine is **the formula**; the value is set by each generation with
+parameters that are already in the space. It is not a lever —moving it demands moving capacity or
+block time— and **it does not compose**, because it does not depend on which primitive is installed.
+And the edge of future primitives dissolves: a more expensive one is not left out, **it gets in by
+paying capacity**, and that is charged by a transition with its `Δ` and its notice.
 
-Quedan dos constantes que **son decisiones y se declaran como tales**: `f*` (fracción del nodo
-liviano para verificar firmas, con piso medido en el headroom que §5.3 necesita) y `R_declarado`
-(ritmo del hardware de entrada, declarado por debajo del real porque el sobrante es headroom). Con
-25% y 70 M pasos/s, un bloque de 6 s con 15 tx da **7 millones de pasos** — el doble de la
-implementación de referencia de ML-DSA-44 y la quinta parte de la lenta que Test 2 encontró.
+Two constants remain that **are decisions and are declared as such**: `f*` (the fraction of the light
+node for verifying signatures, with a floor measured in the headroom §5.3 needs) and `R_declarado`
+(the rate of the entry hardware, declared below the real one because the surplus is headroom). With
+25% and 70 M steps/s, a 6 s block with 15 tx gives **7 million steps** — double the reference
+implementation of ML-DSA-44 and a fifth of the slow one Test 2 found.
 
-> **Y construir la máquina falsó la primera calibración de esos números.** Decían 300 M pasos/s y
-> 67 transacciones. Aquel ritmo era el de **una** mezcla de instrucciones, y el de la máquina
-> depende de la mezcla por 23×. **La fórmula sobrevivió sin un cambio** —que es exactamente lo que
-> se gana cuando un techo es una cuenta y no un número—, pero la calibración costó tres cuartas
-> partes de la capacidad del bloque, y hizo falta un segundo techo, sobre páginas tocadas: **96
-> páginas de 4 KiB**.
+> **And building the machine falsified the first calibration of those numbers.** They said 300 M
+> steps/s and 67 transactions. That rate was the rate of **one** instruction mix, and the machine's
+> rate depends on the mix by 23×. **The formula survived without a change** —which is exactly what is
+> gained when a ceiling is a sum and not a number—, but the calibration cost three quarters of the
+> block's capacity, and a second ceiling was needed, on pages touched: **96 pages of 4 KiB**.
 >
-> Y ese segundo techo trajo su propia lección, que terminó siendo la más útil de la fase. Un techo
-> derivado de la capacidad **encarece**; uno constante **sólo puede excluir**, porque no hay precio
-> que la primitiva pueda pagar — y las tres primitivas de la familia tocan 26, 40 y 65 páginas, así
-> que el primer número elegido dejaba a la tercera afuera para siempre sin que ninguna cuenta lo
-> señalara. **Se cerró con la misma jugada que había cerrado el primero: congelar la curva en vez
-> del punto.** Geminis fija cuánto ritmo sostiene el hardware de referencia para cada presupuesto de
-> memoria, el presupuesto pasa a ser un parámetro, y pedir más memoria se paga en capacidad como
-> todo lo demás. La medición está en `geminis/predicado/RESULTADOS.md`.
+> And that second ceiling brought its own lesson, which ended up being the most useful of the phase.
+> A ceiling derived from capacity **raises the price**; a constant one **can only exclude**, because
+> there is no price the primitive can pay — and the three primitives of the family touch 26, 40 and
+> 65 pages, so the first number chosen left the third one out forever without any sum pointing it
+> out. **It was closed with the same play that had closed the first: freezing the curve instead of
+> the point.** Geminis fixes how much rate the reference hardware sustains for each memory budget,
+> the budget becomes a parameter, and asking for more memory is paid for in capacity like everything
+> else. The measurement is in `geminis/predicado/RESULTS.md`.
 
-**Abierto · cuál hardware es el peor caso.** Todo el diseño supone que la capa liviana es la que
-ata —de ahí sale la entrada barata de nodos— y con ese supuesto se calibra `R_declarado`. **Medido,
-es falso para los patrones adversariales de memoria:** un teléfono de gama media corre el peor
-programa admisible a 80,8 M pasos/s y un escritorio x86-64 a 78,9, y con más memoria la distancia
-se abre al doble a favor del teléfono. Las dos máquinas se rompen por lugares distintos. No
-invalida el techo —se calibra contra el hardware declarado como referencia— pero sí la frase de que
-el hardware más barato es el peor caso. **Dos máquinas no alcanzan para fijar un piso**, y cerrarlo
-necesita más máquinas, no más análisis.
+**Open · which hardware is the worst case.** The whole design assumes the light layer is the binding
+one —that is where cheap node entry comes from— and on that assumption `R_declarado` is calibrated.
+**Measured, it is false for adversarial memory patterns:** a mid-range phone runs the worst
+admissible program at 80.8 M steps/s and an x86-64 desktop at 78.9, and with more memory the distance
+opens up to double in the phone's favour. The two machines break at different places. It does not
+invalidate the ceiling —it is calibrated against the hardware declared as reference— but it does
+invalidate the claim that the cheapest hardware is the worst case. **Two machines are not enough to
+fix a floor**, and closing it needs more machines, not more analysis.
 
-**Cerrado en septiembre de 2026 · el nivel inicial de la tasa de permanencia.** Una ley de control
-dice cómo se mueve la tasa, no dónde empieza, y dónde empieza es un precio que la cadena no puede
-leer sin violar I2 — a diferencia del techo de pasos, acá uno de los dos lados de la cuenta es
-monetario y no hay fórmula que lo derive. El replay de §11 lo puso en números: el base fee de
-Ethereum cayó 650× en cuatro años, y hasta el ancla que parecía evitar el problema —el precio
-contra su propia mediana anual— se queda sin noción de *caro* una vez que el nivel absoluto se
-perdió de vista.
+**Closed in September 2026 · the initial level of the permanence rate.** A control law says how the
+rate moves, not where it begins, and where it begins is a price the chain cannot read without
+violating I2 — unlike the step ceiling, here one of the two sides of the sum is monetary and there is
+no formula that derives it. The replay of §11 put it in numbers: Ethereum's base fee fell 650× in
+four years, and even the anchor that seemed to avoid the problem —the price against its own annual
+median— is left with no notion of *expensive* once the absolute level is lost from view.
 
-**La salida fue declararlo, con el mismo argumento que `f*` y `R_declarado`: no sale de una
-medición, pero el margen alrededor de la elección sí se mide.** `r0(0)` se fija en mil veces el
-piso de representabilidad de la época — el punto en que llenar el 100% del estado durante la
-ventana de `L_max` cuesta una fracción no trivial del supply (~1%) sin que un uso normal lo note,
-porque los dos costos escalan igual con el multiplicador.
+**The way out was to declare it, with the same argument as `f*` and `R_declarado`: it does not come
+from a measurement, but the margin around the choice is measured.** `r0(0)` is set at a thousand
+times the representability floor of the epoch — the point at which filling 100% of the state for the
+window of `L_max` costs a non-trivial fraction of the supply (~1%) without normal use noticing it,
+because both costs scale the same way with the multiplier.
 
-**Cerrado en septiembre de 2026 · la regla que mueve la tasa de permanencia.** Indexar a la
-ocupación parecía la única salida compatible con I2, y tiene una falla que sólo apareció al
-medirla contra un caso real: una vez que un precio ya raciona el recurso, la ocupación deja de
-decir si ese precio tiene sentido —medido en Ethereum, correlación −0,02 contra un precio que se
-movió 650×—. Un lazo que ajusta `r0` mirando ese mismo error hereda la ceguera.
+**Closed in September 2026 · the rule that moves the permanence rate.** Indexing to occupancy looked
+like the only way out compatible with I2, and it has a flaw that only appeared when measuring it
+against a real case: once a price already rations the resource, occupancy stops saying whether that
+price makes sense —measured on Ethereum, correlation −0.02 against a price that moved 650×—. A loop
+that adjusts `r0` by looking at that same error inherits the blindness.
 
-**La regla adoptada no mira ocupación: hace que el precio se descubra solo, contra un cupo fijo
-(§8.6 del paper).** Cada época se admite un cupo fijo de bytes nuevos (`θ*/L_max`, una cuenta, no
-una decisión) y toda entrada admitida vive exactamente `L_max` épocas —sin vida variable que
-comprar con el precio, lo que cierra el canal de arbitraje que tumbó la primera versión de esta
-regla—, con el precio saliendo de una subasta de clearing uniforme. Contra el mismo shock que
-tumbó la ley anterior, la ocupación no se mueve del objetivo en ningún momento, sin el pico de
-hasta 1,48× que la ley indexada a ocupación todavía dejaba pasar. Con pocos postores el precio es
-ruidoso —depende del cupo, no de cuánta gente compite por él— y por eso lleva una reserva de
-arranque que se apaga sola cuando el cupo crece con la red.
+**The adopted rule does not look at occupancy: it makes the price discover itself, against a fixed
+quota (§8.6 of the paper).** Each epoch a fixed quota of new bytes is admitted (`θ*/L_max`, a sum,
+not a decision) and every admitted entry lives exactly `L_max` epochs —with no variable life to buy
+with the price, which closes the arbitrage channel that brought down the first version of this
+rule—, with the price coming out of a uniform clearing auction. Against the same shock that brought
+down the previous law, occupancy does not move from target at any moment, without the spike of up to
+1.48× that the occupancy-indexed law still let through. With few bidders the price is noisy —it
+depends on the quota, not on how many people compete for it— and that is why it carries a bootstrap
+reserve that switches itself off when the quota grows with the network.
 
 ---
 
-## 10. Dónde pegar
+## 10. Where to hit
 
-Lo que más sirve es que ataques acá. Van en orden de cuánto costaría descubrirlo tarde.
+What helps most is for you to attack here. They go in order of how much it would cost to find out
+too late.
 
-**A · ¿El subconjunto de trabajo verificable es una economía o un nicho?** Todo el ingreso de la red
-depende de que existan pedidos con predicado determinista barato (§5.2). Hoy la mayor parte del valor
-económico de un modelo está en salidas sin predicado barato. **Es la hipótesis más cara del diseño y
-es la única que nunca se salió a falsar.** Pregunta concreta: ¿pagarías por esto, contra un proveedor
-centralizado que responde en segundos, con finalidad de horas?
+**A · Is the subset of verifiable work an economy or a niche?** All of the network's income depends
+on there being requests with a cheap deterministic predicate (§5.2). Today most of the economic value
+of a model is in outputs with no cheap predicate. **It is the most expensive hypothesis of the design
+and it is the only one nobody ever went out to falsify.** Concrete question: would you pay for this,
+against a centralized provider that answers in seconds, with finality in hours?
 
-**B · ¿El claim recluta operadores o reclutantes?** El reclamante óptimo de §6.2 es una flota de GPU
-alquilada durante la ventana, que se devuelve cuando cierra. El diseño demuestra que el hardware
-**existió**, no que se **queda** — y como la emisión está desacoplada del trabajo, tener tokens no da
-ninguna razón para seguir trabajando. El claim además es **irrepetible**.
+**B · Does the claim recruit operators or claimants?** The optimal claimant of §6.2 is a fleet of GPUs
+rented for the duration of the window and returned when it closes. The design proves that the
+hardware **existed**, not that it **stays** — and since issuance is decoupled from work, holding
+tokens gives no reason to keep working. The claim is moreover **unrepeatable**.
 
-**C · ¿La tarea de referencia es replayable?** Si la instancia es fija y publicada en Geminis, el
-primero que la resuelve publica la solución y el costo del claim colapsa a cero para todos los demás.
-Se arreglaría derivando la instancia de la clave del reclamante — no está escrito.
+**C · Is the reference task replayable?** If the instance is fixed and published in Geminis, the first
+to solve it publishes the solution and the cost of the claim collapses to zero for everybody else. It
+would be fixed by deriving the instance from the claimant's key — that is not written.
 
-**D · En `t = 0` todas las defensas siguen denominadas en una unidad sin precio real.** El fee es ad
-valorem, el piso y el depósito son nominales, y el nivel inicial de la tasa ya tiene un número
-declarado (§10.3) — pero ningún número puede tener precio real antes de que exista mercado. Lo que
-compra la declaración es que llenar el estado entero cueste una fracción no trivial del supply, no
-que se sepa si esa fracción es mucha o poca plata de verdad.
+**D · At `t = 0` every defence is still denominated in a unit with no real price.** The fee is ad
+valorem, the floor and the deposit are nominal, and the initial level of the rate now has a declared
+number (§10.3) — but no number can have a real price before a market exists. What the declaration
+buys is that filling the entire state costs a non-trivial fraction of the supply, not that it is
+known whether that fraction is a lot of real money or a little.
 
-**E · El escenario peligroso era el éxito, no el fracaso — y ahora tiene una defensa parcial.** Si la
-moneda se aprecia, un precio nominal fijo vuelve el guardado prohibitivo en términos reales y el
-estado se vacía; la primera versión de la regla que debía evitarlo se cayó. La regla adoptada
-(§8.6 del paper) no lee ningún precio —seguiría violando I2— pero saca el nivel de un precio de
-subasta en vez de un lazo sobre ocupación, y quien puja sí convierte al valor real sin que el
-protocolo tenga que saberlo. No es una garantía, es una defensa que antes no existía.
+**E · The dangerous scenario was success, not failure — and it now has a partial defence.** If the
+currency appreciates, a fixed nominal price makes storage prohibitive in real terms and the state
+empties out; the first version of the rule that was supposed to avoid that fell over. The adopted
+rule (§8.6 of the paper) reads no price —that would still violate I2— but it takes the level from an
+auction price instead of a loop over occupancy, and whoever bids does convert to real value without
+the protocol having to know it. It is not a guarantee, it is a defence that did not exist before.
 
-**F · El guante instala criptografía de consenso escrita por un postor anónimo**, con *"nadie rompió
-una instancia debilitada en una ventana fija"* como único filtro. ¿Alcanza?
+**F · The gauntlet installs consensus cryptography written by an anonymous bidder**, with *"nobody
+broke a weakened instance in a fixed window"* as the only filter. Is that enough?
 
-**G · El intérprete no se puede parchear nunca.** ¿Es realista verificar formalmente una VM
-determinista completa, y qué pasa el día que aparezca un bug?
+**G · The interpreter can never be patched.** Is it realistic to formally verify a complete
+deterministic VM, and what happens the day a bug appears?
 
-**H · El diseño no puede corregir un error económico del día 1**, por construcción, y un lanzamiento
-es exactamente el momento en que se descubre qué no se anticipó. Toda otra cadena arregla eso por
-gobernanza. ¿Es sostenible?
+**H · The design cannot correct an economic error from day 1**, by construction, and a launch is
+exactly the moment at which you find out what was not anticipated. Every other chain fixes that by
+governance. Is that sustainable?
 
-Si algo de esto ya está contestado en el documento largo y no se ve acá, es culpa del resumen: pedí
-la sección completa y te la mando.
+If any of this is already answered in the long document and is not visible here, that is the
+summary's fault: ask for the complete section and I will send it.

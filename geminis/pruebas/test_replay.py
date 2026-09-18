@@ -224,8 +224,8 @@ class LaDiferenciaQuedaEscrita(unittest.TestCase):
     """
 
     def test_hay_resultados_y_nombran_las_seis(self):
-        resultados = RAIZ / "herramientas" / "RESULTADOS.md"
-        self.assertTrue(resultados.exists(), "falta herramientas/RESULTADOS.md")
+        resultados = RAIZ / "herramientas" / "RESULTS.es.md"
+        self.assertTrue(resultados.exists(), "falta herramientas/RESULTS.es.md")
         texto = resultados.read_text(encoding="utf-8")
         for retraso in historial.RETRASOS:
             self.assertIn(retraso.fork, texto)

@@ -1,6 +1,6 @@
 """Fase 1 · el criterio de aprobado, escrito antes de correrlo.
 
-Son los seis puntos que el `ROADMAP.md` fijó para esta fase, uno por clase, con
+Son los seis puntos que el `ROADMAP.es.md` fijó para esta fase, uno por clase, con
 el texto del criterio en el docstring. **El orden es el del roadmap**, no el de
 conveniencia: si alguno se cae, la fase no está aprobada y no hay media
 aprobación.

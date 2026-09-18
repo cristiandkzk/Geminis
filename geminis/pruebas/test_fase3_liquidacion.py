@@ -1,6 +1,6 @@
 """Fase 3 · el criterio de aprobado, escrito antes de correrlo.
 
-Los tres puntos que el `ROADMAP.md` fijó, uno por clase:
+Los tres puntos que el `ROADMAP.es.md` fijó, uno por clase:
 
 1. **doble gasto imposible por el lock, sin orden global**;
 2. **la doble firma publica la clave privada** — verificado con dos firmas y una

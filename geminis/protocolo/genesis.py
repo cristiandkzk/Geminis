@@ -397,7 +397,7 @@ PRESUPUESTO_ESTADO_BYTES = 4 * 2**30
 #: Guardar todos los nodos internos del árbol cuesta 32 B por entrada. La alternativa es
 #: guardar los niveles por encima de un corte `d` y recomputar el subárbol de `2^d` hojas:
 #: con `d = 6` el disco baja a **1 B por entrada** y el precio son ocho puntos del
-#: presupuesto de hash del nodo. Está medido en `presupuesto-nodo/RESULTADOS.md`.
+#: presupuesto de hash del nodo. Está medido en `presupuesto-nodo/RESULTS.es.md`.
 #:
 #: **Y no es una decisión de implementación, aunque así se la anotó el 18/8/2026.** El piso
 #: de permanencia de §8.5 se **deriva** del costo de actualizar el árbol, y el piso se

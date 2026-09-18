@@ -1,4 +1,4 @@
-"""Los criterios de `nodo/CRITERIOS-PREDICADO.md`.
+"""Los criterios de `nodo/CRITERIA-PREDICATE.es.md`.
 
 `predicado/aceptacion.py` existía, la máquina existía en Rust con sus dos techos medidos, y
 **ningún nodo corrió jamás un predicado**. El veredicto se hizo canónico *para entrar al hash

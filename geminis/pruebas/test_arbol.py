@@ -1,4 +1,4 @@
-"""Los criterios de `estado/CRITERIOS-ARBOL.md` — el árbol con corte `d`.
+"""Los criterios de `estado/CRITERIA-TREE.es.md` — el árbol con corte `d`.
 
 El roadmap lo lista y ninguna fase lo construyó. La Fase 5 usó su costo de actualización
 para derivar el piso de §8.5 **sin que el árbol existiera**, y ahí estaba el problema.
@@ -62,7 +62,7 @@ class T2ProbarEsBaratoYActualizarEsLoQueMuerde(unittest.TestCase):
 
 
 class T3LaTablaYaMedidaSeReproduce(unittest.TestCase):
-    """`presupuesto-nodo/RESULTADOS.md`, 18/8/2026. Es una medición cerrada."""
+    """`presupuesto-nodo/RESULTS.es.md`, 18/8/2026. Es una medición cerrada."""
 
     def test_los_bytes_por_entrada_coinciden(self):
         for d, esperado in ((1, 32.0), (6, 1.0), (9, 0.125)):
@@ -96,7 +96,7 @@ class T4ElVeintiseisDeLaFase5EraElArbolQueNoSeUsa(unittest.TestCase):
 class ElCorteEsConsensoYNoImplementacion(unittest.TestCase):
     """**Lo más grande que salió de construir el árbol.**
 
-    `presupuesto-nodo/RESULTADOS.md` cierra diciendo que el corte *"es una decisión de
+    `presupuesto-nodo/RESULTS.es.md` cierra diciendo que el corte *"es una decisión de
     implementación que hay que tomar, no un costo que se sufre"*. No puede serlo: **el piso
     de permanencia se deriva del costo de actualizar el árbol, y el piso se quema.** Dos
     nodos con `d` distinto no coincidirían sobre cuánto se quemó al crear una entrada.

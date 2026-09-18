@@ -36,7 +36,7 @@ ARCHIVOS = [
     "geminis/predicado/vm/Cargo.toml",
     "geminis/predicado/vm/Cargo.lock",
     "geminis/predicado/vm/vectores.csv",
-    "geminis/predicado/vm/LEEME.md",
+    "geminis/predicado/vm/README.es.md",
     "geminis/predicado/vm/src/lib.rs",
     "geminis/predicado/vm/src/maquina.rs",
     "geminis/predicado/vm/src/admision.rs",
@@ -46,8 +46,8 @@ ARCHIVOS = [
     "geminis/predicado/vm/src/bin/conjunto.rs",
     "geminis/predicado/vm/src/bin/paginas.rs",
     "geminis/predicado/vm/tests/criterios.rs",
-    "geminis/predicado/CRITERIOS.md",
-    "geminis/predicado/RESULTADOS.md",
+    "geminis/predicado/CRITERIA.es.md",
+    "geminis/predicado/RESULTS.es.md",
     "test2-interprete/telefono/guest-rv/guest.elf",
 ]
 
@@ -95,7 +95,7 @@ def main(argumentos: list[str]) -> int:
     with tarfile.open(SALIDA, "w:gz") as tar:
         for a in ARCHIVOS:
             tar.add(RAIZ / a, arcname=a)
-        info = tarfile.TarInfo("LEEME-TELEFONO.md")
+        info = tarfile.TarInfo("README-PHONE.md")
         datos = INSTRUCCIONES.encode("utf-8")
         info.size = len(datos)
         import io
