@@ -61,7 +61,7 @@ o sea que entra al estado. Dos nodos con `d` distinto no coincidirían sobre cu�
 crear una entrada, que es una divergencia de consenso por un parámetro que nadie declaró.
 
 **O `d` es constante de Geminis, o el piso deja de ser derivado** — y lo segundo perdería lo que
-la Fase 5 ganó. Quedó como `CORTE_ARBOL` en `protocolo/geminis.py`.
+la Fase 5 ganó. Quedó como `CORTE_ARBOL` en `protocolo/genesis.py`.
 
 Es la misma forma que ya apareció dos veces: **algo que parecía libre resulta estar atado, porque
 alguna otra cuenta lo usa.** El techo de páginas parecía una constante y era un precio; el corte

@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import unittest
 
-from protocolo import geminis as g
+from protocolo import genesis as g
 from protocolo.linaje import calcular_h0, verificar, verificar_linaje
 from pruebas.comun import GASTAR_CANARIO, nodo_canario
 
@@ -76,9 +76,9 @@ class LaCadenaEntera(unittest.TestCase):
         self.nodo = cadena_de_dos_generaciones()
         self.checkpoints = list(self.nodo.cronograma.checkpoints)
 
-    def test_verifica_desde_geminis(self):
+    def test_verifica_desde_genesis(self):
         self.assertGreaterEqual(len(self.checkpoints), 2)
-        self.assertTrue(verificar_linaje(self.checkpoints, g.H0_GEMINIS))
+        self.assertTrue(verificar_linaje(self.checkpoints, g.H0_GENESIS))
 
     def test_no_verifica_contra_otra_raiz(self):
         """Una cadena que no conmutó no tiene checkpoint válido (§5)."""
@@ -86,31 +86,31 @@ class LaCadenaEntera(unittest.TestCase):
 
     def test_no_se_puede_sacar_un_eslabon_del_medio(self):
         sin_el_primero = self.checkpoints[1:]
-        self.assertFalse(verificar_linaje(sin_el_primero, g.H0_GEMINIS))
+        self.assertFalse(verificar_linaje(sin_el_primero, g.H0_GENESIS))
 
     def test_no_se_puede_reordenar(self):
         al_reves = list(reversed(self.checkpoints))
-        self.assertFalse(verificar_linaje(al_reves, g.H0_GEMINIS))
+        self.assertFalse(verificar_linaje(al_reves, g.H0_GENESIS))
 
     def test_cada_generacion_commitea_al_h0_de_la_anterior(self):
-        anterior = g.H0_GEMINIS
+        anterior = g.H0_GENESIS
         for punto in self.checkpoints:
             self.assertEqual(punto.h0_ancestro, anterior)
             anterior = punto.h0
 
-    def test_geminis_no_puede_conocer_el_hash_de_su_sucesor(self):
+    def test_genesis_no_puede_conocer_el_hash_de_su_sucesor(self):
         """No es una limitación: es lo que hace que el linaje signifique algo.
 
         `H0_B` incorpora el estado que disparó, que en el bloque 0 todavía no
-        existe. Lo único que Geminis fija es **cómo se calculará**, y eso es
+        existe. Lo único que Genesis fija es **cómo se calculará**, y eso es
         justamente lo que se puede verificar después.
         """
         punto = self.checkpoints[0]
         self.assertEqual(
             punto.h0,
-            calcular_h0(g.H0_GEMINIS, punto.state_trigger, punto.params),
+            calcular_h0(g.H0_GENESIS, punto.state_trigger, punto.params),
         )
-        self.assertNotEqual(punto.h0, g.H0_GEMINIS)
+        self.assertNotEqual(punto.h0, g.H0_GENESIS)
 
 
 if __name__ == "__main__":

@@ -31,7 +31,7 @@ from dataclasses import dataclass, field
 from typing import Any, Iterable, Sequence
 
 from estado.sintetico import EstadoSintetico
-from protocolo import geminis as g
+from protocolo import genesis as g
 from protocolo import invariantes
 from protocolo.generacion import Ruleset
 from protocolo.linaje import Checkpoint

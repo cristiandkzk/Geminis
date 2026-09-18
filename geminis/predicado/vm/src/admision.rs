@@ -61,7 +61,7 @@ fn u32a(b: &[u8], o: usize) -> Option<u32> {
     ]))
 }
 
-/// **El espacio de opcodes que Geminis declara cerrado para siempre (I1).**
+/// **El espacio de opcodes que Genesis declara cerrado para siempre (I1).**
 ///
 /// No es *"lo que esta maquina no implementa"* —eso cambia con cada bug— sino los
 /// opcodes mayores que RISC-V ya le asigno a extensiones que esta maquina no puede
@@ -82,7 +82,7 @@ fn u32a(b: &[u8], o: usize) -> Option<u32> {
 /// redondeo es la unica operacion de un ISA donde dos implementaciones correctas
 /// pueden diferir, y una diferencia de un ulp entre dos nodos es una bifurcacion.
 /// Cerrar el espacio de opcodes es mas fuerte que no implementarlo: **el dia que
-/// alguien quiera agregar F, tiene que romper una constante de Geminis.**
+/// alguien quiera agregar F, tiene que romper una constante de Genesis.**
 const RESERVADOS: [u8; 8] = [0x07, 0x27, 0x2F, 0x43, 0x47, 0x4B, 0x4F, 0x53];
 
 /// Un `PT_LOAD` ya validado, todavia sin copiar.
@@ -217,7 +217,7 @@ pub fn admitir(elf: &[u8], techo: u64) -> Result<(Maquina, BTreeMap<String, u32>
     // ceros, y `0x00000000` no decodifica. El relleno es legitimo. Lo que no puede
     // aparecer nunca es un opcode de una extension que esta maquina no tiene y no
     // va a tener — ahi es donde una implementacion futura agregaria F y rompria el
-    // consenso por redondeo, y por eso ese espacio se declara cerrado en Geminis.
+    // consenso por redondeo, y por eso ese espacio se declara cerrado en Genesis.
     // Una palabra ilegal por cualquier otra razon no se rechaza: si el pc llega,
     // es `Trampa`, que es un veredicto determinista y ya esta pago en pasos.
     // El barrido va sobre las **secciones** de codigo, no sobre los segmentos.

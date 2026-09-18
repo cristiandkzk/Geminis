@@ -1,7 +1,7 @@
 """El linaje generacional: `H0_B = H( H0_A ‖ state_trigger ‖ params_nuevos )` (I4).
 
 `H0_B` **no es el génesis de una cadena nueva**: es un marcador de checkpoint
-generacional dentro de la misma cadena. Geminis A no conoce el hash de B —no
+generacional dentro de la misma cadena. Genesis A no conoce el hash de B —no
 puede, porque B incorpora información que todavía no existe— pero conoce
 determinísticamente cómo se calculará, y eso alcanza para que el linaje entero
 sea verificable con un hash desde cualquier generación hacia atrás.

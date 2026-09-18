@@ -42,11 +42,11 @@ def _h(etiqueta: bytes, *partes: bytes) -> bytes:
 
 
 def hoja(datos: bytes) -> bytes:
-    return _h(b"geminis/desalojo/hoja", datos)
+    return _h(b"genesis/desalojo/hoja", datos)
 
 
 def nodo(izq: bytes, der: bytes) -> bytes:
-    return _h(b"geminis/desalojo/nodo", izq, der)
+    return _h(b"genesis/desalojo/nodo", izq, der)
 
 
 @dataclass(frozen=True)

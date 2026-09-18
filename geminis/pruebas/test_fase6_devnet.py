@@ -13,7 +13,7 @@ import unittest
 from devnet.cadena import Devnet, Registro
 from estado import permanencia as perm
 from nodo.pod import NodoPoD
-from protocolo import geminis as g
+from protocolo import genesis as g
 from protocolo.generacion import Params, Ruleset
 from pruebas.comun import correr_hasta_activar, nodo_emision
 

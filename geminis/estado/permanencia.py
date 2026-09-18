@@ -30,7 +30,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from protocolo import geminis as g
+from protocolo import genesis as g
 
 # --------------------------------------------------------------------------- #
 # La época
@@ -120,7 +120,7 @@ def piso_en_epocas(
 ) -> float:
     """**El piso, derivado: cuántas épocas de guardado cuesta el ciclo crear + desalojar.**
 
-    La cuenta iguala dos fracciones del mismo nodo, y las dos las declara Geminis:
+    La cuenta iguala dos fracciones del mismo nodo, y las dos las declara Genesis:
 
     - **la del cómputo** — el ciclo consume `C` pasos, y el nodo dedica `f*` de su ritmo
       a verificar, así que gasta `C / (f* × R × duración_de_época)` del cómputo de una época;
@@ -130,7 +130,7 @@ def piso_en_epocas(
     El piso es el cociente: cuántas épocas de disco valen lo que el ciclo gasta de cómputo.
 
     > **La equivalencia entre cómputo y disco no agrega un número nuevo, pero sí un supuesto
-    > que conviene decir en voz alta:** que las dos fracciones que Geminis declara —`f*` del
+    > que conviene decir en voz alta:** que las dos fracciones que Genesis declara —`f*` del
     > cómputo y el presupuesto de estado— están **igualmente ajustadas**, o sea que el nodo
     > satura las dos. Es lo que §6.1 construye a propósito al fijar las dos contra lo que
     > tiene un teléfono. Si una sobrara, la cuenta se corre hacia la otra.

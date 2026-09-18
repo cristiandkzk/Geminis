@@ -8,7 +8,7 @@ que no son de estilo:
 - **No hay flotantes.** Ni siquiera se aceptan para codificarlos: `codificar`
   levanta `FlotanteProhibido`. La Fase 4 exige que el flotante esté prohibido o
   canonicalizado *antes* de que el guante corra por primera vez, y una condición
-  sobre Geminis no se levanta después. Prohibirlo desde el primer archivo es más
+  sobre Genesis no se levanta después. Prohibirlo desde el primer archivo es más
   barato que descubrir en la Fase 4 que se coló uno en un acumulador.
 - **Toda codificación es autodelimitada.** Cada valor lleva etiqueta de tipo y
   largo. Sin eso, `("ab", "c")` y `("a", "bc")` tendrían la misma imagen y dos
@@ -27,7 +27,7 @@ from __future__ import annotations
 import hashlib
 from collections.abc import Mapping
 
-_PREFIJO = b"geminis/"
+_PREFIJO = b"genesis/"
 
 
 class FlotanteProhibido(TypeError):

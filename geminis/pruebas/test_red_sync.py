@@ -9,7 +9,7 @@ from __future__ import annotations
 import unittest
 
 from nodo.pod import Bloque, NodoPoD
-from protocolo import geminis as g
+from protocolo import genesis as g
 from protocolo.linaje import verificar_linaje
 from pruebas.comun import correr_hasta_activar, nodo_emision
 from red.sync import BloqueInvalido, mismo_estado, sincronizar, validar_bloque
@@ -110,7 +110,7 @@ class R3ElLinajeSeVerificaContraUnaCadenaAjena(unittest.TestCase):
         sincronizar(v, productor.cadena)
 
         self.assertTrue(v.cronograma.checkpoints, "no hubo checkpoints que verificar")
-        self.assertTrue(verificar_linaje(v.cronograma.checkpoints, g.H0_GEMINIS))
+        self.assertTrue(verificar_linaje(v.cronograma.checkpoints, g.H0_GENESIS))
 
     def test_alterar_cualquiera_de_los_tres_insumos_lo_rompe(self):
         """`H0_B = H(H0_A ‖ state_trigger ‖ params)`. **Los tres tienen que pesar**, y se
@@ -123,13 +123,13 @@ class R3ElLinajeSeVerificaContraUnaCadenaAjena(unittest.TestCase):
         v = validador()
         sincronizar(v, productor.cadena)
         original = v.cronograma.checkpoints
-        self.assertTrue(verificar_linaje(original, g.H0_GEMINIS))
+        self.assertTrue(verificar_linaje(original, g.H0_GENESIS))
 
         for campo in ("h0", "h0_ancestro", "state_trigger"):
             alterado = dataclasses.replace(original[0], **{campo: bytes(32)})
             checkpoints = [alterado] + list(original[1:])
             self.assertFalse(
-                verificar_linaje(checkpoints, g.H0_GEMINIS),
+                verificar_linaje(checkpoints, g.H0_GENESIS),
                 f"alterar {campo} no rompió el linaje",
             )
 
@@ -147,7 +147,7 @@ class R3ElLinajeSeVerificaContraUnaCadenaAjena(unittest.TestCase):
             internos={**dict(original[0].params.internos), "tx_por_bloque": 99},
         )
         checkpoints = [dataclasses.replace(original[0], params=otros)] + list(original[1:])
-        self.assertFalse(verificar_linaje(checkpoints, g.H0_GEMINIS))
+        self.assertFalse(verificar_linaje(checkpoints, g.H0_GENESIS))
 
 
 class R4UnaRaizMentidaSeRechaza(unittest.TestCase):

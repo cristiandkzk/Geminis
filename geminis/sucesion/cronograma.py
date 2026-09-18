@@ -60,7 +60,7 @@ instante** y las generaciones son consecutivas por construcción. Es también lo
 §3 ya decía de `H0_B`: se computa en el lock-in, con `N` ya final.
 
 **Y por eso el lock-in valida antes de comprometer.** Una vez emitido, el
-checkpoint es irrevocable: si commiteara un punto fuera del espacio de Geminis, el
+checkpoint es irrevocable: si commiteara un punto fuera del espacio de Genesis, el
 nodo llegaría a la activación sin poder conmutar y la cadena se pararía. Así que
 I1 e I5 se verifican **antes** de emitirlo y, si no pasan, no hay checkpoint:
 queda un **rechazo**, también on-chain. Un rechazo no recorta el sucesor al borde
@@ -79,7 +79,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Sequence
 
-from protocolo import geminis as g
+from protocolo import genesis as g
 from protocolo.generacion import Params, Ruleset
 from protocolo.invariantes import (
     ViolacionInvariante,

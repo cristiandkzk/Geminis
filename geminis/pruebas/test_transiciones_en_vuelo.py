@@ -20,7 +20,7 @@ from __future__ import annotations
 import unittest
 
 from nodo.pod import NodoPoD
-from protocolo import geminis as g
+from protocolo import genesis as g
 from protocolo.generacion import Objeto, Params, decodificar
 from protocolo.linaje import verificar_linaje
 from pruebas.comun import GASTAR_CANARIO, nodo_emision
@@ -155,7 +155,7 @@ class LasOtrasReglasNoEsperan(unittest.TestCase):
         )
         self.assertEqual(self.nodo.generacion, 2)
         self.assertTrue(
-            verificar_linaje(self.nodo.cronograma.checkpoints, g.H0_GEMINIS)
+            verificar_linaje(self.nodo.cronograma.checkpoints, g.H0_GENESIS)
         )
 
     def test_las_dos_transiciones_se_aplican_de_verdad(self):

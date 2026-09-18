@@ -23,7 +23,7 @@ from __future__ import annotations
 import unittest
 
 from nodo.pod import NodoPoD
-from protocolo import geminis as g
+from protocolo import genesis as g
 from protocolo import invariantes as inv
 from protocolo.generacion import Params
 from protocolo.invariantes import MODO_APROXIMACION, MODO_CAPACIDAD, ViolacionInvariante
@@ -96,7 +96,7 @@ class LaPuertaTrasera(unittest.TestCase):
         Un trigger de capacidad es admisible por una razón que ninguna máquina
         verifica: que producir el hecho exija exactamente la capacidad a la que la
         transición responde. Lo que el protocolo sí puede exigir es que la razón
-        esté **escrita y on-chain**, y que sea la que se lea al auditar Geminis.
+        esté **escrita y on-chain**, y que sea la que se lea al auditar Genesis.
         Acá la declaración dice *conocer la clave de una dirección*, que a
         cualquier revisor le grita lo que es.
         """

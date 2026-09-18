@@ -10,7 +10,7 @@ import unittest
 from estado import permanencia as perm
 from estado.desalojo import Acumulador
 from estado.permanencia import Entrada, VidaMaximaExcedida
-from protocolo import geminis as g
+from protocolo import genesis as g
 
 
 def entrada(ident: bytes = b"obj-1", epocas: int = 10) -> Entrada:
@@ -261,7 +261,7 @@ class A8ElPisoEsUnaCuentaYElPaperEstaMal(unittest.TestCase):
 
     §8.5 afirma que el ciclo crear + desalojar sale *"unas dieciséis horas de guardado, o
     sea el 0,2% de lo que cuesta tener el objeto un año"*. Escrita la cuenta con los
-    números que Geminis ya declara, no da eso por uno o dos órdenes de magnitud.
+    números que Genesis ya declara, no da eso por uno o dos órdenes de magnitud.
     """
 
     PAPER_EPOCAS = 16 / 24  # las dieciséis horas de §8.5, en épocas de un día

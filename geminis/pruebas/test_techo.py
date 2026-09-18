@@ -21,9 +21,9 @@ from __future__ import annotations
 import unittest
 
 from herramientas import techo as t
-from protocolo import geminis as g
+from protocolo import genesis as g
 
-#: El punto de Geminis en la curva. **No son constantes del protocolo**: desde el
+#: El punto de Genesis en la curva. **No son constantes del protocolo**: desde el
 #: 21/8/2026 el presupuesto de páginas es un parámetro y el ritmo se lee de la curva.
 PAGINAS_INICIALES = g.paginas_vigentes(g.RULESET_INICIAL)
 R_INICIAL = g.ritmo_declarado(PAGINAS_INICIALES)
@@ -74,7 +74,7 @@ class ElDatoVieneDeTest2(unittest.TestCase):
         self.assertLess(sin_endurecer / endurecida, 1.25)
 
 
-class LaFormulaEsDeGeminisYElValorDeLaGeneracion(unittest.TestCase):
+class LaFormulaEsDeGenesisYElValorDeLaGeneracion(unittest.TestCase):
     """*Dónde vive* — la pregunta que §10.3 dejaba junto al número."""
 
     def test_el_techo_sale_de_los_parametros_del_ruleset(self):
@@ -250,7 +250,7 @@ class LaMemoriaTienePrecioYNoEsUnMuro(unittest.TestCase):
     primitiva siguiente podía no tenerla.
     """
 
-    #: Una primitiva imaginaria que no entra en el punto de Geminis. No hace falta que
+    #: Una primitiva imaginaria que no entra en el punto de Genesis. No hace falta que
     #: exista: lo que se prueba es que **el mecanismo le puede cobrar**, no que alguien
     #: la vaya a instalar.
     PAGINAS_QUE_NO_ENTRAN = 300
@@ -294,7 +294,7 @@ class LaMemoriaTienePrecioYNoEsUnMuro(unittest.TestCase):
         self.assertGreaterEqual(barato, g.capacidad_para(PAGINAS_INICIALES, self.PASOS))
         self.assertGreater(barato / max(caro, 1), 5)
 
-    def test_el_punto_de_geminis_no_se_movio_al_volverlo_parametro(self):
+    def test_el_punto_de_genesis_no_se_movio_al_volverlo_parametro(self):
         """Un arreglo estructural que además cambia el bloque 0 es dos cambios."""
         self.assertEqual(PAGINAS_INICIALES, 96)
         self.assertEqual(R_INICIAL, 70_000_000)

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from nodo.pod import NodoPoD
-from protocolo import geminis as g
+from protocolo import genesis as g
 from sucesion.regla import ReglaCanarioCriptografico, ReglaEmisionAcumulada
 
 #: La transacción que gasta el canario de §6.6.

@@ -10,7 +10,7 @@ import unittest
 
 from estado import permanencia as perm
 from estado.arbol import Arbol, PruebaHoja
-from protocolo import geminis as g
+from protocolo import genesis as g
 
 
 class T1ElArbolAnda(unittest.TestCase):
@@ -102,7 +102,7 @@ class ElCorteEsConsensoYNoImplementacion(unittest.TestCase):
     nodos con `d` distinto no coincidirían sobre cuánto se quemó al crear una entrada.
     """
 
-    def test_el_corte_es_una_constante_de_geminis(self):
+    def test_el_corte_es_una_constante_de_genesis(self):
         self.assertIsInstance(g.CORTE_ARBOL, int)
         self.assertNotIn("corte_arbol", g.ESPACIO_INTERNO)
 

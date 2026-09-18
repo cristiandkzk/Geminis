@@ -24,9 +24,9 @@ techo_pasos = f* × tiempo_de_bloque × R_declarado / tx_por_bloque
 ```
 
 - **`f*`** — qué fracción del nodo liviano puede ocupar la verificación de firmas.
-  **Se congela en Geminis.** Es la única constante realmente libre de todo esto;
+  **Se congela en Genesis.** Es la única constante realmente libre de todo esto;
 - **`R_declarado`** — pasos por segundo del hardware de entrada. **Se congela en
-  Geminis**, y tiene que ser un número declarado y no medido: la cadena no puede leer
+  Genesis**, y tiene que ser un número declarado y no medido: la cadena no puede leer
   la velocidad del hardware sin convertirse en un oráculo (I2);
 - **`tiempo_de_bloque`** y **`tx_por_bloque`** — ya son parámetros internos del espacio.
 
@@ -56,7 +56,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from protocolo import geminis as g  # noqa: E402
+from protocolo import genesis as g  # noqa: E402
 
 # --------------------------------------------------------------------------- #
 # El dato, medido por Test 2 — no se estima acá
@@ -87,12 +87,12 @@ PASOS_VERIFY_ONLY = {
 MS_EN_TELEFONO = {"ML-DSA-44": 10.57, "ML-DSA-65": 16.75, "ML-DSA-87": 28.49}
 
 # --------------------------------------------------------------------------- #
-# Las constantes viven en `protocolo/geminis.py` y acá se importan
+# Las constantes viven en `protocolo/genesis.py` y acá se importan
 #
 # Hasta el 20/8/2026 este módulo tenía **su propia copia** de `R_DECLARADO` y de
 # `F_VERIFICACION_PPM`. Cuando la Fase 4 bajó el ritmo declarado, esta copia quedó
 # atrás y una prueba pasó a decir que ML-DSA-87 entraba cuando no entra. Una
-# constante de Geminis en dos archivos no es duplicación: es una bifurcación
+# constante de Genesis en dos archivos no es duplicación: es una bifurcación
 # esperando a que alguien edite uno solo.
 # --------------------------------------------------------------------------- #
 
@@ -100,7 +100,7 @@ R_DECLARADO = g.ritmo_declarado(g.paginas_vigentes(g.RULESET_INICIAL))
 F_VERIFICACION_PPM = g.F_VERIFICACION_PPM
 
 #: El presupuesto de páginas **del ruleset inicial** — desde el 21/8/2026 no es una
-#: constante sino un punto de la curva. Ver `protocolo/geminis.py`.
+#: constante sino un punto de la curva. Ver `protocolo/genesis.py`.
 TECHO_PAGINAS = g.paginas_vigentes(g.RULESET_INICIAL)
 
 #: Ritmos por mezcla **medidos en el hardware de referencia** (el teléfono de Test 2,
@@ -264,7 +264,7 @@ def informe() -> str:
         )
     lineas.append(linea)
     lineas.append(
-        f"ritmo declarado en Geminis: {R_DECLARADO / 1e6:.0f} M pasos/s "
+        f"ritmo declarado en Genesis: {R_DECLARADO / 1e6:.0f} M pasos/s "
         f"(por debajo del medido, a propósito)"
     )
 
@@ -339,7 +339,7 @@ def informe() -> str:
         )
     lineas.append("")
     lineas.append(
-        "  **El margen se usa una sola vez, en Geminis, para elegir la capacidad.**"
+        "  **El margen se usa una sola vez, en Genesis, para elegir la capacidad.**"
     )
     lineas.append("  No es una regla que el protocolo reaplique en cada transición: si lo")
     lineas.append("  fuera, el techo subiría con cada primitiva nueva y compondría — 2× por")

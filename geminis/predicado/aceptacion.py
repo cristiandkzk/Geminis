@@ -22,7 +22,7 @@ Un predicado pasa si **las dos** cosas:
 Y desde la Fase 4 los techos son **dos**, que es el hallazgo que costó la mitad de
 esa fase:
 
-- **pasos**, derivado por generación con la fórmula de `protocolo/geminis.py`;
+- **pasos**, derivado por generación con la fórmula de `protocolo/genesis.py`;
 - **páginas distintas tocadas**, también del ruleset. Fue constante hasta el
   21/8/2026, y mientras lo fue **excluía en vez de encarecer**: una primitiva que
   necesitara más memoria no tenía precio que pagar. Ahora pedir más páginas baja el
@@ -43,7 +43,7 @@ import hashlib
 from dataclasses import dataclass
 from enum import Enum
 
-from protocolo import geminis as g
+from protocolo import genesis as g
 
 #: Los veredictos de la máquina, en la codificación canónica de `vm/maquina.rs`.
 #: **Están duplicados a propósito y hay una prueba que los verifica contra el Rust.**
@@ -94,7 +94,7 @@ class Predicado:
             raise ValueError("un predicado sin vectores no dice nada")
 
     def huella(self) -> bytes:
-        """Identidad canónica. Entra en `H0_B` cuando el predicado es de Geminis."""
+        """Identidad canónica. Entra en `H0_B` cuando el predicado es de Genesis."""
         h = hashlib.sha256()
         h.update(self.programa)
         for entrada, salida in self.vectores:
@@ -117,7 +117,7 @@ class Presupuesto:
         return cls(g.techo_vigente(ruleset), g.paginas_vigentes(ruleset))
 
     def margen_de(self, pasos: int, paginas: int) -> tuple[float, float]:
-        """Cuánto sobra, en cada dimensión. Geminis eligió capacidad para que la
+        """Cuánto sobra, en cada dimensión. Genesis eligió capacidad para que la
         primitiva del bloque 0 entre con 2× en pasos."""
         return (self.pasos / pasos, self.paginas / paginas)
 

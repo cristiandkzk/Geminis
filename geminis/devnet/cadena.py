@@ -4,7 +4,7 @@
 un devnet con tokens gratis contesta preguntas de software, no de economía. Con tokens sin valor
 no hay ingreso, no hay atesoramiento, no se mide la elasticidad de la demanda de guardado y el
 antispam no se prueba. **Fecha de reset: el día que se elija la regla de la tasa de permanencia**
-(§10.3), porque ése es el número que cambia el espacio de parámetros que Geminis tiene que
+(§10.3), porque ése es el número que cambia el espacio de parámetros que Genesis tiene que
 anticipar.
 
 Y la fase se acota a lo que ninguna otra midió. De las cuatro preguntas que el roadmap le asigna,
@@ -142,7 +142,7 @@ class Devnet:
         El peor caso es el estado lleno donde nadie recarga: todo vence dentro de `L_max`,
         así que se desaloja el conjunto entero cada `L_max` épocas.
         """
-        from protocolo import geminis as g
+        from protocolo import genesis as g
 
         entradas = perm.entradas_que_entran()
         por_epoca = entradas / g.L_MAX_EPOCAS

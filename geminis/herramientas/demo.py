@@ -19,7 +19,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from nodo.pod import NodoPoD  # noqa: E402
-from protocolo import geminis as g  # noqa: E402
+from protocolo import genesis as g  # noqa: E402
 from sucesion.regla import (  # noqa: E402
     ReglaCanarioCriptografico,
     ReglaEmisionAcumulada,
@@ -87,7 +87,7 @@ def main() -> int:
                     f"{conmutacion.generacion}"
                 )
 
-    print(f"Geminis · {BLOQUES + 2} bloques, ventana de finalidad "
+    print(f"Genesis · {BLOQUES + 2} bloques, ventana de finalidad "
           f"{g.VENTANA_FINALIDAD}\n")
     print("\n".join(eventos))
     print()

@@ -142,7 +142,7 @@ def sincronizar(nodo: NodoPoD, cadena: Sequence[Bloque]) -> Veredicto:
     activa el ruleset nuevo en la misma altura porque deriva el disparo del mismo estado,
     y si no coincidiera la raíz no cerraría.
 
-    El bloque 0 no se valida: lo construye el constructor desde `H0` de Geminis, y que dos
+    El bloque 0 no se valida: lo construye el constructor desde `H0` de Genesis, y que dos
     nodos arranquen del mismo bloque 0 es lo que I4 encadena hacia adelante.
     """
     aceptados = 0

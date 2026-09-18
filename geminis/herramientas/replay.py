@@ -19,7 +19,7 @@ sin una sola serie de datos. Por eso es el primero de los tres.
 uno de los seis forks, ¿cuánto valía el término de la bomba? Si los seis números
 se parecen, entonces los humanos venían aplicando una regla que nunca escribieron
 — y una regla que nadie escribió es una regla que se podía haber escrito en
-Geminis. Es una medición y no una simulación: no hay nada que calibrar.
+Genesis. Es una medición y no una simulación: no hay nada que calibrar.
 
 **2 · El replay.** Recién después se corre una `TRANSITION_RULE` candidata contra
 el historial y se compara. Acá **sí** hay dos parámetros libres (el umbral y el
@@ -35,10 +35,10 @@ predicados de I2 que las del protocolo: se computa sólo desde el estado, su
 aproximación es monótona, publica distancia y declara su modo. Eso es lo que hace
 que esto sea un replay del mecanismo y no una planilla.
 
-Lo que **no** se reutiliza es el espacio de Geminis: `offset_bomba` no es un
-parámetro del Geminis de juguete de esta implementación. El replay declara el
+Lo que **no** se reutiliza es el espacio de Genesis: `offset_bomba` no es un
+parámetro del Genesis de juguete de esta implementación. El replay declara el
 suyo —`ESPACIO_REPLAY`— porque la pregunta es qué habría pasado en una cadena que
-sí lo tuviera. Está separado a propósito para que nadie lea que Geminis lo trae.
+sí lo tuviera. Está separado a propósito para que nadie lea que Genesis lo trae.
 """
 
 from __future__ import annotations
@@ -50,7 +50,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from herramientas import historial  # noqa: E402
-from protocolo import geminis as g  # noqa: E402
+from protocolo import genesis as g  # noqa: E402
 from protocolo import invariantes as inv  # noqa: E402
 from protocolo.generacion import Params, Ruleset  # noqa: E402
 from protocolo.serializacion import huella  # noqa: E402
@@ -61,7 +61,7 @@ from sucesion.regla import ReglaTransicion  # noqa: E402
 EPOCA = 100_000
 AJUSTE = 2
 
-#: El espacio de descendientes **de esta cadena hipotética**, no el de Geminis.
+#: El espacio de descendientes **de esta cadena hipotética**, no el de Genesis.
 ESPACIO_REPLAY = {"offset_bomba": g.RangoEntero(0, 20_000_000, paso=EPOCA)}
 
 #: Cada cuántos bloques se evalúa la regla en el replay. La altura exacta del

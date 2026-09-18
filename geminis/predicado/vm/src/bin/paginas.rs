@@ -1,5 +1,5 @@
 //! Cuantas paginas toca cada nivel de ML-DSA. **El dato que faltaba para elegir el
-//! techo de paginas**: si el sucesor natural de la primitiva de Geminis no entra,
+//! techo de paginas**: si el sucesor natural de la primitiva de Genesis no entra,
 //! el techo no lo esta encareciendo —lo esta excluyendo—, y §6.6 dice que una
 //! primitiva mas cara tiene que poder entrar pagando capacidad.
 //!

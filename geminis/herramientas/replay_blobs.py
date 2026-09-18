@@ -46,7 +46,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from herramientas import historial  # noqa: E402
 from herramientas.traer_datos import leer_serie  # noqa: E402
-from protocolo import geminis as g  # noqa: E402
+from protocolo import genesis as g  # noqa: E402
 from protocolo import invariantes as inv  # noqa: E402
 from protocolo.generacion import Params, Ruleset  # noqa: E402
 from protocolo.serializacion import huella  # noqa: E402

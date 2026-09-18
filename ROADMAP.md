@@ -208,7 +208,7 @@ La estructura sigue las piezas del paper, para que el mapeo documento ↔ códig
 ```
 geminis/
 ├── protocolo/            # lo que Geminis congela y no cambia nunca (I1)
-│   ├── geminis.py          # el bloque 0: ruleset inicial, espacio de descendientes,
+│   ├── genesis.py          # el bloque 0: ruleset inicial, espacio de descendientes,
 │   │                       #   Δ por clase de transición, θ*, L_max
 │   ├── invariantes.py      # I1–I5 como aserciones ejecutables — no comentarios
 │   ├── generacion.py       # etiqueta de generación en cada objeto (I5), ruleset vigente

@@ -1,6 +1,6 @@
 """El bloque 0: lo que se congela y no vuelve a cambiar nunca (I1).
 
-Todo lo de este archivo es una decisión que Geminis toma una sola vez. Si algo de
+Todo lo de este archivo es una decisión que Genesis toma una sola vez. Si algo de
 acá tiene que cambiar, no es una transición: es un fork común y corriente.
 
 Lo que se fija:
@@ -13,11 +13,11 @@ Lo que se fija:
   necesita lo contrario. El intercambio está declarado en §10.1;
 - **la ventana de finalidad** (§6.3), que es lo que separa el disparo del lock-in;
 - los números de estado con costo —`θ*` y `L_max`— que **esta fase no usa**.
-  Están acá porque son de Geminis, y los usa la Fase 5.
+  Están acá porque son de Genesis, y los usa la Fase 5.
 
 > **Los valores son de juguete y son desechables por declaración.** El roadmap lo
 > dice en su sección 4: todavía no se sabe qué espacio de parámetros tiene que
-> anticipar Geminis, así que estos números existen para que el mecanismo corra,
+> anticipar Genesis, así que estos números existen para que el mecanismo corra,
 > no para que alguien los herede.
 """
 
@@ -35,7 +35,7 @@ from protocolo.serializacion import huella
 #: Identidad del intérprete. Una transición **nunca** la mueve: selecciona un
 #: punto del espacio que esta máquina ya sabe ejecutar. Si cambia, I1 falla, y
 #: esa falla es correcta.
-INTERPRETE = "geminis-vm/0"
+INTERPRETE = "genesis-vm/0"
 
 HUELLA_INTERPRETE = huella(INTERPRETE, dominio="interprete")
 
@@ -79,13 +79,13 @@ class ConjuntoEntero:
 #: El espacio de descendientes, mitad interna (§4, I1). Una transición puede
 #: mover cualquiera de estos en cualquier momento, dentro de su dominio.
 # --------------------------------------------------------------------------- #
-# El presupuesto de la VM — la curva que congela Geminis (§6.6)
+# El presupuesto de la VM — la curva que congela Genesis (§6.6)
 #
 # Vive acá arriba, y no junto a las funciones del techo, porque `ESPACIO_INTERNO` la
 # necesita: el presupuesto de páginas es un punto de esta tabla y de ningún otro lado.
 # --------------------------------------------------------------------------- #
 
-#: **La curva de ritmo declarado contra presupuesto de páginas.** Lo que Geminis
+#: **La curva de ritmo declarado contra presupuesto de páginas.** Lo que Genesis
 #: congela ya no es un ritmo sino esta tabla, y ahí se cierra el último muro del
 #: diseño.
 #:
@@ -105,7 +105,7 @@ class ConjuntoEntero:
 #: Los valores salen de `predicado/vm/src/bin/conjunto.rs` corrido en el hardware de
 #: referencia, con una sola disciplina aplicada a toda la tabla: **declarado =
 #: medido × 0,866, truncado**. El 0,866 es el margen que ya tenía el punto de
-#: Geminis (70 declarados sobre 80,8 medidos) y se extiende igual a los demás para
+#: Genesis (70 declarados sobre 80,8 medidos) y se extiende igual a los demás para
 #: que ninguna fila esté elegida con más cariño que otra.
 #:
 #: | páginas | KiB | medido | declarado |
@@ -115,7 +115,7 @@ class ConjuntoEntero:
 #: | 32 | 128 | 101,1 | 87 |
 #: | 48 | 192 | 86,2 | 74 |
 #: | 64 | 256 | 84,3 | 72 |
-#: | **96** | **384** | **80,8** | **70** ← el punto de Geminis |
+#: | **96** | **384** | **80,8** | **70** ← el punto de Genesis |
 #: | 128 | 512 | 79,8 | 69 |
 #: | 256 | 1.024 | 79,3 | 68 |
 #: | 512 | 2.048 | 77,6 | 67 |
@@ -174,7 +174,7 @@ ESPACIO_INTERNO: dict[str, RangoEntero | ConjuntoEntero] = {
     "paginas_vm": ConjuntoEntero(frozenset(R_DECLARADO_POR_PAGINAS)),
 }
 
-#: Todo formato que la máquina de Geminis sabe ejecutar: la mitad **visible** del
+#: Todo formato que la máquina de Genesis sabe ejecutar: la mitad **visible** del
 #: espacio. Una transición puede activar cualquiera de estos —de forma aditiva,
 #: I5— y ninguno más: activar uno que la máquina no conoce sería cambiar la
 #: máquina.
@@ -195,10 +195,10 @@ FORMATOS_CONOCIDOS = frozenset(
 # --------------------------------------------------------------------------- #
 
 #: La semilla del canario, **pública y sin nada en la manga**. La instancia
-#: debilitada que Geminis publica no se *genera*: se **deriva** de este string.
+#: debilitada que Genesis publica no se *genera*: se **deriva** de este string.
 #:
 #: La diferencia no es de estilo y es lo que hace admisible al trigger de §6.6
-#: bajo I2. Si Geminis generara la instancia —un módulo, un par de claves—, quien
+#: bajo I2. Si Genesis generara la instancia —un módulo, un par de claves—, quien
 #: la generó conservaría su trampa y podría gastar el canario cuando quisiera: la
 #: *capacidad demostrada* pasaría a ser *un secreto que alguien se guardó*, y el
 #: canario dejaría de ser una alarma para ser una compuerta con disfraz
@@ -208,10 +208,10 @@ FORMATOS_CONOCIDOS = frozenset(
 #: En una cadena real la derivación produce la instancia debilitada de verdad
 #: (parámetros de curva, módulo, lo que corresponda) y hay que poder auditar que
 #: **nadie eligió el resultado**. Acá el hash hace de esa derivación: lo que la
-#: Fase 1 puede verificar es lo que un revisor verificaría en Geminis — que la
+#: Fase 1 puede verificar es lo que un revisor verificaría en Genesis — que la
 #: instancia publicada es exactamente la que sale de la semilla.
 CANARIO_SEMILLA = (
-    "geminis/canario/1 · instancia debilitada de firma/ed25519 · "
+    "genesis/canario/1 · instancia debilitada de firma/ed25519 · "
     "derivada, no generada · nadie retiene la trampa"
 )
 
@@ -288,7 +288,7 @@ def ritmo_declarado(paginas_vm: int) -> int:
     **Declarado y no medido**, que es la parte que importa: la cadena no puede leer
     la velocidad del hardware sin convertirse en un oráculo (I2). Es un requisito
     sobre las implementaciones —la que corra más lento está fuera de spec— y por eso
-    la tabla se congela en Geminis en vez de recalcularse.
+    la tabla se congela en Genesis en vez de recalcularse.
     """
     ritmo = R_DECLARADO_POR_PAGINAS.get(paginas_vm)
     if ritmo is None:
@@ -306,7 +306,7 @@ def techo_de_pasos(tiempo_de_bloque_ms: int, tx_por_bloque: int, paginas_vm: int
     techo = f* × tiempo_de_bloque × R_declarado(páginas) / tx_por_bloque
     ```
 
-    Lo que Geminis congela es **esta función y la curva** (I1); el valor lo determina
+    Lo que Genesis congela es **esta función y la curva** (I1); el valor lo determina
     cada generación con sus propios parámetros. Eso contesta las dos preguntas que
     §10.3 dejó abiertas —el número y dónde vive— y **no crea una palanca suelta**:
     nadie puede mover el techo sin mover capacidad, tiempo de bloque o memoria, y las
@@ -376,7 +376,7 @@ THETA_ESTRELLA_PPM = 500_000
 #: El presupuesto de estado que el nodo declara, en bytes (§10.1).
 PRESUPUESTO_ESTADO_BYTES = 4 * 2**30
 
-#: **El corte del árbol del conjunto activo (§10.1), y es constante de Geminis.**
+#: **El corte del árbol del conjunto activo (§10.1), y es constante de Genesis.**
 #:
 #: Guardar todos los nodos internos del árbol cuesta 32 B por entrada. La alternativa es
 #: guardar los niveles por encima de un corte `d` y recomputar el subárbol de `2^d` hojas:
@@ -387,7 +387,7 @@ PRESUPUESTO_ESTADO_BYTES = 4 * 2**30
 #: de permanencia de §8.5 se **deriva** del costo de actualizar el árbol, y el piso se
 #: quema — o sea que es consenso. Dos nodos con `d` distinto calcularían pisos distintos y
 #: no coincidirían sobre cuánto se quemó al crear una entrada. **O `d` es constante de
-#: Geminis, o el piso deja de ser derivado.**
+#: Genesis, o el piso deja de ser derivado.**
 #:
 #: El precio de `d` es de tres monedas y no de dos, que es lo que faltaba ver:
 #:
@@ -421,11 +421,11 @@ PARAMS_INICIALES = Params(
         # 67 → 26 → 15 el 20/8/2026, en tres correcciones del mismo día. **No cambió
         # el techo: cambió lo que un segundo de reloj compra en pasos garantizados.**
         # Con R_declarado en 70 M el bloque tiene 105 M pasos, y darle a ML-DSA-44 el
-        # margen de 2× que eligió Geminis deja 15 transacciones. Es exactamente el
+        # margen de 2× que eligió Genesis deja 15 transacciones. Es exactamente el
         # mecanismo que §6.6 describe —una primitiva más cara entra pagando capacidad—
         # cobrado sobre la que ya estaba, y no sobre una futura.
         "tx_por_bloque": 15,
-        #: 96 páginas: donde estaba el techo constante, así que el punto de Geminis no
+        #: 96 páginas: donde estaba el techo constante, así que el punto de Genesis no
         #: se movió al volverlo parámetro. ML-DSA-44 toca 26 y entra con 3,7×.
         "paginas_vm": 96,
     },
@@ -434,12 +434,12 @@ PARAMS_INICIALES = Params(
 
 #: La raíz del linaje (I4). Es el único hash de la cadena que no commitea a nada
 #: anterior; todo lo demás cuelga de acá.
-H0_GEMINIS = huella(
+H0_GENESIS = huella(
     {"interprete": HUELLA_INTERPRETE, "params": PARAMS_INICIALES.canonico()},
     dominio="linaje/raiz",
 )
 
-RULESET_INICIAL = Ruleset(params=PARAMS_INICIALES, h0=H0_GEMINIS)
+RULESET_INICIAL = Ruleset(params=PARAMS_INICIALES, h0=H0_GENESIS)
 
 
 def motivo_fuera_del_espacio(params: Params) -> str | None:
@@ -456,7 +456,7 @@ def motivo_fuera_del_espacio(params: Params) -> str | None:
     sobrantes = set(params.internos) - set(ESPACIO_INTERNO)
     if sobrantes:
         return (
-            f"parámetros que el espacio de Geminis no define: {sorted(sobrantes)} — "
+            f"parámetros que el espacio de Genesis no define: {sorted(sobrantes)} — "
             "agregar un parámetro es cambiar la máquina, no seleccionar un punto"
         )
 
@@ -468,7 +468,7 @@ def motivo_fuera_del_espacio(params: Params) -> str | None:
     desconocidos = params.formatos - FORMATOS_CONOCIDOS
     if desconocidos:
         return (
-            "formatos que la máquina de Geminis no sabe ejecutar: "
+            "formatos que la máquina de Genesis no sabe ejecutar: "
             f"{sorted(desconocidos)}"
         )
     return None

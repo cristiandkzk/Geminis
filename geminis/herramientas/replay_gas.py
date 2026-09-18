@@ -20,7 +20,7 @@ correlación con el base fee es **−0,02**. El observable de cantidad, que es e
 §7.6 quiere, está vacío por construcción.
 
 **2 · El base fee es la única señal, y es nominal.** Cayó de ~26 gwei a 0,08 gwei
-—unas 300 veces— en cuatro años. Cualquier umbral en gwei elegido en Geminis deja de
+—unas 300 veces— en cuatro años. Cualquier umbral en gwei elegido en Genesis deja de
 significar lo que significaba. Es exactamente lo que C7.13 encontró para `r0`: *un
 precio nominal fijo no puede racionar un recurso real bajo una moneda que flota.*
 
@@ -50,7 +50,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from herramientas import historial  # noqa: E402
 from herramientas.traer_datos import leer_serie  # noqa: E402
-from protocolo import geminis as g  # noqa: E402
+from protocolo import genesis as g  # noqa: E402
 from protocolo import invariantes as inv  # noqa: E402
 from protocolo.generacion import Params, Ruleset  # noqa: E402
 from protocolo.serializacion import huella  # noqa: E402
@@ -373,7 +373,7 @@ def informe() -> str:
         f"{senal.base_fee_minimo / 1e9:.3f} gwei — {senal.caida_del_fee:,.0f}×."
     )
     lineas.append(
-        "    Cualquier número elegido en Geminis deja de significar lo que significaba."
+        "    Cualquier número elegido en Genesis deja de significar lo que significaba."
     )
     lineas.append("")
     lineas.append("  forma adimensional (fee sobre su mediana anual ≥ k):")

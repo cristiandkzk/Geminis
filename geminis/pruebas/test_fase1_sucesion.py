@@ -15,7 +15,7 @@ from __future__ import annotations
 import unittest
 
 from nodo.pod import ReorganizacionProfunda
-from protocolo import geminis as g
+from protocolo import genesis as g
 from protocolo.generacion import FormatoDesconocido, Objeto, decodificar
 from pruebas.comun import GASTAR_CANARIO, correr_hasta_activar, nodo_canario, nodo_emision
 
@@ -64,7 +64,7 @@ class ElLinajeVerifica(unittest.TestCase):
     """*"`Verify(H0_B, H0_A, state_trigger, params)` da TRUE para toda la cadena
     de generaciones."*  El detalle de los tres insumos está en `test_linaje.py`."""
 
-    def test_dos_generaciones_encadenadas_verifican_contra_geminis(self):
+    def test_dos_generaciones_encadenadas_verifican_contra_genesis(self):
         from protocolo.linaje import verificar_linaje
 
         nodo = nodo_canario()
@@ -75,7 +75,7 @@ class ElLinajeVerifica(unittest.TestCase):
         nodo.producir(20)
 
         self.assertGreaterEqual(len(nodo.cronograma.checkpoints), 2)
-        self.assertTrue(verificar_linaje(nodo.cronograma.checkpoints, g.H0_GEMINIS))
+        self.assertTrue(verificar_linaje(nodo.cronograma.checkpoints, g.H0_GENESIS))
         self.assertEqual(
             [c.generacion for c in nodo.cronograma.checkpoints],
             list(range(1, len(nodo.cronograma.checkpoints) + 1)),

@@ -25,7 +25,7 @@ import copy
 import inspect
 from typing import Any, Protocol, Sequence, runtime_checkable
 
-from protocolo import geminis as g
+from protocolo import genesis as g
 from protocolo.generacion import Objeto, Params, Ruleset, es_aditivo, formatos_retirados
 from protocolo.linaje import Checkpoint, motivo_linaje_invalido
 from protocolo.serializacion import corto, huella
@@ -46,12 +46,12 @@ class TieneHuella(Protocol):
 
 
 # --------------------------------------------------------------------------- #
-# I1 · el intérprete vive en Geminis y no cambia nunca
+# I1 · el intérprete vive en Genesis y no cambia nunca
 # --------------------------------------------------------------------------- #
 
 
 def i1_interprete_congelado(huella_actual: bytes) -> None:
-    """El nodo sigue corriendo la máquina de Geminis.
+    """El nodo sigue corriendo la máquina de Genesis.
 
     Se chequea contra la constante y no contra "la de antes": comparar con el
     valor anterior deja pasar una deriva lenta, que es exactamente la forma en
@@ -60,7 +60,7 @@ def i1_interprete_congelado(huella_actual: bytes) -> None:
     if huella_actual != g.HUELLA_INTERPRETE:
         raise ViolacionInvariante(
             "I1",
-            f"el intérprete es {corto(huella_actual)}... y Geminis congeló "
+            f"el intérprete es {corto(huella_actual)}... y Genesis congeló "
             f"{corto(g.HUELLA_INTERPRETE)}... — eso no es una transición, es un fork",
         )
 
@@ -70,7 +70,7 @@ def i1_sucesor_en_el_espacio(params: Params) -> None:
     motivo = g.motivo_fuera_del_espacio(params)
     if motivo is not None:
         raise ViolacionInvariante(
-            "I1", f"el sucesor no es un punto del espacio de Geminis — {motivo}"
+            "I1", f"el sucesor no es un punto del espacio de Genesis — {motivo}"
         )
 
 
@@ -156,7 +156,7 @@ def i2_modo_declarado(regla: Any) -> None:
 
     No hay default: una regla sin modo es una regla sobre la que nadie puede
     decidir si es admisible, y el lugar donde eso se decide es la auditoría de
-    Geminis, no el runtime.
+    Genesis, no el runtime.
     """
     modo = getattr(regla, "modo", None)
     if modo not in MODOS:
@@ -223,7 +223,7 @@ def i2_canario_sin_trampa(semilla: str, instancia: bytes) -> None:
     """El canario de §6.6 no lo generó nadie: se deriva de una semilla pública.
 
     Es la condición que vuelve admisible al trigger por capacidad, y **no estaba
-    escrita**. Si Geminis *generara* la instancia debilitada en vez de derivarla,
+    escrita**. Si Genesis *generara* la instancia debilitada en vez de derivarla,
     quien la generó conservaría su trampa —los factores, la clave, lo que sea— y
     podría gastar el canario cuando quisiera. Ahí la *capacidad demostrada* pasa a
     ser *un secreto que alguien se guardó*, y el canario deja de ser una alarma
@@ -296,7 +296,7 @@ def i3_estado_intacto(
 # --------------------------------------------------------------------------- #
 
 
-def i4_linaje(checkpoints: Sequence[Checkpoint], h0_raiz: bytes = g.H0_GEMINIS) -> None:
+def i4_linaje(checkpoints: Sequence[Checkpoint], h0_raiz: bytes = g.H0_GENESIS) -> None:
     motivo = motivo_linaje_invalido(checkpoints, h0_raiz)
     if motivo is not None:
         raise ViolacionInvariante("I4", motivo)

@@ -18,7 +18,7 @@ from nodo.predicado import (
     predicados_por_bloque,
 )
 from predicado.aceptacion import Predicado, Presupuesto, Veredicto
-from protocolo import geminis as g
+from protocolo import genesis as g
 from pruebas.comun import correr_hasta_activar, nodo_emision
 from red.sync import sincronizar
 

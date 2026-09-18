@@ -32,7 +32,7 @@ from dataclasses import dataclass, field
 from typing import Protocol
 
 from predicado.aceptacion import Corrida, Predicado, Presupuesto, Veredicto
-from protocolo import geminis as g
+from protocolo import genesis as g
 
 
 class Maquina(Protocol):

@@ -5,9 +5,9 @@
 justamente lo que ningún test de Rust puede ver: **que los dos lenguajes digan lo
 mismo**.
 
-Que una constante de Geminis viva en dos archivos es exactamente el riesgo que I1
+Que una constante de Genesis viva en dos archivos es exactamente el riesgo que I1
 señala, y ya cobró una vez en este proyecto: `herramientas/techo.py` tenía su propia
-copia de `R_DECLARADO`, la Fase 4 bajó el valor en `protocolo/geminis.py`, y la copia
+copia de `R_DECLARADO`, la Fase 4 bajó el valor en `protocolo/genesis.py`, y la copia
 quedó atrás diciendo que ML-DSA-87 entraba cuando no entra. Se detectó porque una
 prueba falló. Estas comprobaciones son para que se siga detectando así.
 
@@ -21,7 +21,7 @@ import unittest
 from pathlib import Path
 
 from predicado.aceptacion import Corrida, Predicado, Presupuesto, Veredicto, acepta
-from protocolo import geminis as g
+from protocolo import genesis as g
 
 VM = Path(__file__).resolve().parent.parent / "predicado" / "vm"
 
@@ -39,7 +39,7 @@ def constante_rust(texto: str, nombre: str) -> int:
 
 
 class LosDosLenguajesDicenLoMismo(unittest.TestCase):
-    """**El único lugar donde una constante de Geminis puede desincronizarse.**"""
+    """**El único lugar donde una constante de Genesis puede desincronizarse.**"""
 
     def test_el_techo_de_pasos_coincide_con_el_de_python(self):
         rust = constante_rust(fuente("src", "lib.rs"), "TECHO_INICIAL")
@@ -77,7 +77,7 @@ class LosDosLenguajesDicenLoMismo(unittest.TestCase):
 
 
 class LaMaquinaNoTienePalancas(unittest.TestCase):
-    """I1: lo que Geminis congela, no se mueve por generación."""
+    """I1: lo que Genesis congela, no se mueve por generación."""
 
     def test_el_tamano_de_memoria_es_constante_y_no_parametro(self):
         """El arnés de Test 2 hacía `dirección & MASK`, y con eso el resultado de un
@@ -89,7 +89,7 @@ class LaMaquinaNoTienePalancas(unittest.TestCase):
     def test_el_espacio_de_opcodes_reservados_esta_cerrado(self):
         """Los ocho opcodes mayores que RISC-V le asignó a F, D y A. **Cerrarlos es
         más fuerte que no implementarlos**: el día que alguien quiera agregar punto
-        flotante, tiene que romper una constante declarada en Geminis."""
+        flotante, tiene que romper una constante declarada en Genesis."""
         rs = fuente("src", "admision.rs")
         m = re.search(r"const RESERVADOS: \[u8; 8\] = \[([^\]]+)\]", rs)
         self.assertIsNotNone(m)

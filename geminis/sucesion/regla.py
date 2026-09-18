@@ -26,7 +26,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any
 
-from protocolo import geminis as g
+from protocolo import genesis as g
 from protocolo.generacion import Params, Ruleset
 from protocolo.invariantes import MODO_APROXIMACION, MODO_CAPACIDAD
 
@@ -49,7 +49,7 @@ class ReglaTransicion(ABC):
       publicar una cuenta regresiva inventada (`i2_trigger_discreto`).
 
     La declaración no es documentación: va on-chain con la distancia, y es lo
-    único que le permite a un tercero auditar en Geminis si el que puede producir
+    único que le permite a un tercero auditar en Genesis si el que puede producir
     el hecho es el único ante quien la transición existe para reaccionar.
     """
 

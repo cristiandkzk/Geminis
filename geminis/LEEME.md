@@ -52,7 +52,7 @@ clases de transición **superpuestas**, el estado cruzando intacto— es eso.
 | módulo | qué implementa |
 |---|---|
 | `protocolo/serializacion.py` | codificación canónica. **El flotante está prohibido desde el primer archivo** — la Fase 4 lo exige antes de que el guante corra, y una condición sobre Geminis no se levanta después |
-| `protocolo/geminis.py` | el bloque 0: la máquina, el espacio de descendientes, `Δ` por clase, la ventana de finalidad, `θ*`, `L_max`, **la fórmula del techo de pasos** —que es lo que se congela, no el número (§10.3)— y **el techo de páginas**, que sí es un número y no se deriva |
+| `protocolo/genesis.py` | el bloque 0: la máquina, el espacio de descendientes, `Δ` por clase, la ventana de finalidad, `θ*`, `L_max`, **la fórmula del techo de pasos** —que es lo que se congela, no el número (§10.3)— y **el techo de páginas**, que sí es un número y no se deriva |
 | `protocolo/generacion.py` | ruleset, etiqueta de generación, decodificación que **falla cerrado** (I5) |
 | `protocolo/linaje.py` | `H0_B = H( H0_A ‖ state_trigger ‖ params )` y su `Verify` (I4, §3) |
 | `protocolo/invariantes.py` | **I1–I5 ejecutables.** No son comentarios (Fase 0). Incluye las dos formas de cumplir I2 y el chequeo del canario derivado |
@@ -175,7 +175,7 @@ una versión debilitada de la primitiva"* deja abierto quién la genera — y si
 genera alguien, ese alguien **retiene la trampa** y puede reclamar el canario cuando
 quiera. Ahí *capacidad demostrada* es *un secreto que alguien se guardó*, y el
 canario deja de ser una alarma para ser una compuerta con disfraz criptográfico.
-La instancia se **deriva** de una semilla pública (`protocolo/geminis.py`), y el
+La instancia se **deriva** de una semilla pública (`protocolo/genesis.py`), y el
 nodo lo verifica en cada bloque: **un canario que no se puede rederivar de su
 semilla no es un canario, es de alguien.**
 

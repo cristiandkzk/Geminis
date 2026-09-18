@@ -15,13 +15,13 @@
 //! - **fuera de rango es trampa, no envolver.** El arnes hace `dir & MASK`, que es
 //!   determinista pero **depende del tamano de memoria**. Si el tamano fuera un
 //!   parametro del espacio, el mismo programa daria distinto en dos generaciones y
-//!   eso rompe I1 justo donde no se puede. Acá el tamano es constante de Geminis y
+//!   eso rompe I1 justo donde no se puede. Acá el tamano es constante de Genesis y
 //!   toda direccion invalida es `Trampa`;
 //! - **todo final es un veredicto, no un `Err`.** Las dos partes de una impugnacion
 //!   tienen que leer el mismo resultado. Un error de ejecucion que cada nodo
 //!   reporta como quiere no sirve: el final entra al hash del bloque.
 
-/// Tamano de la memoria del guest. **Constante de Geminis, no parametro** (C6):
+/// Tamano de la memoria del guest. **Constante de Genesis, no parametro** (C6):
 /// el resultado de un programa no puede depender de la generacion en la que corre.
 pub const MEM: u32 = 64 * 1024 * 1024;
 /// Donde arranca el texto. Tiene que coincidir con el `link.ld` del guest.
@@ -30,7 +30,7 @@ pub const TEXT_BASE: u32 = 0x1000;
 pub const PILA: u32 = MEM;
 /// Direccion de retorno imposible: cuando el pc la alcanza, la llamada volvio.
 pub const CENTINELA: u32 = 0xFFFF_FFF0;
-/// Tamano de pagina para el segundo techo. **Constante de Geminis.**
+/// Tamano de pagina para el segundo techo. **Constante de Genesis.**
 pub const PAGINA: u32 = 4096;
 
 /// Como termino una corrida. **Esto es dato de consenso**: entra al hash del

@@ -253,7 +253,7 @@ fn mezclas() -> Vec<Mezcla> {
 ///
 /// Una sola corrida en este arnes tiene una dispersion de hasta 20% —lo midio el propio
 /// proyecto cruzando dos herramientas que tenian que coincidir y no coincidian—, y el
-/// numero que sale de aca fija una constante de Geminis. Tomar la peor es la direccion
+/// numero que sale de aca fija una constante de Genesis. Tomar la peor es la direccion
 /// segura: `R_declarado` tiene que quedar por debajo de lo que el hardware sostiene en su
 /// peor momento, no en el mejor.
 fn ritmo(mz: &Mezcla) -> Option<f64> {
@@ -416,7 +416,7 @@ fn main() {
 
     // La consecuencia, para no tener que hacerla a mano: cuantas transacciones por
     // bloque tolera la cota medida dandole a ML-DSA-44 el margen de 2x que eligio
-    // Geminis. **El costo en pasos de una verificacion lo fija el ISA**, asi que
+    // Genesis. **El costo en pasos de una verificacion lo fija el ISA**, asi que
     // todo lo que baje `R_declarado` sale de la capacidad.
     let pasos_por_bloque = tope_telefono * 1e6 * 1.5; // f* x tiempo_de_bloque
     let tx = pasos_por_bloque / (2.0 * 3_339_364.0);

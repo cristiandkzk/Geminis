@@ -8,7 +8,7 @@ El **ruleset** se parte en dos mitades con reglas distintas, y la partición es 
 I1, no una comodidad de implementación:
 
 - `internos` — emisión, tamaño de bloque, tiempos. Cambian en cualquier
-  transición, mientras el valor nuevo esté dentro del espacio que Geminis fijó.
+  transición, mientras el valor nuevo esté dentro del espacio que Genesis fijó.
 - `formatos` — lo visible en la interfaz. Sólo por la vía de I5: **se agregan,
   nunca se quitan**.
 
@@ -130,7 +130,7 @@ def vigente(historial: Sequence[tuple[int, Ruleset]], altura: int) -> Ruleset:
     """El ruleset en vigor a la altura dada.
 
     `historial` es la secuencia de (altura de activación, ruleset), empezando por
-    (0, ruleset de Geminis). No se interpola ni se adivina: se toma el último
+    (0, ruleset de Genesis). No se interpola ni se adivina: se toma el último
     cuya activación ya ocurrió.
     """
     if not historial or historial[0][0] != 0:

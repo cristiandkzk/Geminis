@@ -12,7 +12,7 @@ ejecuta cualquier tercero, movido por el botín.** Es el mismo patrón del canar
 
 > **Esto NO es criptografía de producción y no pretende serlo.** El grupo es de 134
 > bits, elegido para que el mecanismo corra y se pueda leer. La primitiva real la
-> elige Geminis (§6.6) y la Fase 4 reutiliza el arnés en Rust de `test2-interprete`.
+> elige Genesis (§6.6) y la Fase 4 reutiliza el arnés en Rust de `test2-interprete`.
 > Lo que esta implementación sí demuestra es **la propiedad**, que es lo que la
 > Fase 3 tiene que falsar: firmar dos veces publica la clave.
 

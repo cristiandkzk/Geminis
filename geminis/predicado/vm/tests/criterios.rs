@@ -313,7 +313,7 @@ fn la_semantica_reproduce_test2_paso_a_paso() {
 }
 
 /// Y una verificacion entra en los dos techos del ruleset inicial, con el margen
-/// que Geminis eligio. Si esto falla, el bloque 0 no se puede escribir.
+/// que Genesis eligio. Si esto falla, el bloque 0 no se puede escribir.
 #[test]
 fn una_verificacion_entra_en_los_dos_techos() {
     let (mut m, syms) = admitir(vm::GUEST_RV, u64::MAX).expect("admitir");
@@ -330,7 +330,7 @@ fn una_verificacion_entra_en_los_dos_techos() {
     let pasos = m.pasos - base;
     assert!(
         (vm::TECHO_INICIAL as f64) / (pasos as f64) >= 2.0,
-        "margen de pasos {:.2}x, Geminis eligio 2x",
+        "margen de pasos {:.2}x, Genesis eligio 2x",
         (vm::TECHO_INICIAL as f64) / (pasos as f64)
     );
     assert!(m.paginas_usadas <= PAGINAS_INICIALES, "{} paginas", m.paginas_usadas);

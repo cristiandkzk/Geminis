@@ -103,7 +103,7 @@ generación nueva sigue operando en la anterior y degrada en vez de detenerse (�
 en el paper y es lo que hace que el número chico no sea catastrófico — pero entonces `Δ`
 está haciendo mucho menos de lo que §10.1 le atribuye.
 
-> **Los valores 64 y 8 nunca aparecieron en el paper.** Viven sólo en `protocolo/geminis.py`
+> **Los valores 64 y 8 nunca aparecieron en el paper.** Viven sólo en `protocolo/genesis.py`
 > desde la Fase 1, donde alcanzaban para que las pruebas corrieran. El paper habla de *"`Δ`
 > largo"* y *"`Δ` corto"* sin dar números, así que nadie los contrastó nunca contra lo que la
 > sección dice que compran.

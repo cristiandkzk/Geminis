@@ -13,7 +13,7 @@ from __future__ import annotations
 import unittest
 
 from estado import permanencia as perm
-from protocolo import geminis as g
+from protocolo import genesis as g
 
 
 def con(**cambios):
@@ -85,7 +85,7 @@ class LoQueSigueAbierto(unittest.TestCase):
     def test_el_aviso_a_los_valores_actuales_es_de_minutos(self):
         """§10.1 dice que `Δ` *compra seguridad de integración con tiempo de reacción*.
 
-        A los valores que están en Geminis compra seis minutos y cuarenta y ocho segundos.
+        A los valores que están en Genesis compra seis minutos y cuarenta y ocho segundos.
         **La tensión que §10.1 describe no existe a estos números**: los dos valores están
         del mismo lado, el de *ningún aviso*.
         """

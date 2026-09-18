@@ -57,7 +57,7 @@ class Distancia:
     #: Cómo cumple esta regla la segunda mitad de I2. Va on-chain porque es lo
     #: que le permite a un tercero auditar por qué el trigger es admisible: una
     #: regla sin aproximación tiene que decir **qué capacidad** hay que ejercer
-    #: para producir el hecho, y esa frase es la que se lee en Geminis.
+    #: para producir el hecho, y esa frase es la que se lee en Genesis.
     modo: str = ""
     capacidad: str | None = None
 

@@ -9,7 +9,7 @@ Lo que se verifica en el acto, y por qué cada cosa:
 
 - **el checkpoint commitea al ruleset que está saliendo** (I4). Si el ancestro no
   es el `h0` vigente, esta cadena no es la que produjo ese checkpoint;
-- **el sucesor es un punto del espacio de Geminis** (I1). Un parámetro fuera de
+- **el sucesor es un punto del espacio de Genesis** (I1). Un parámetro fuera de
   dominio no es una transición: es un fork;
 - **la interfaz sólo creció** (I5);
 - **el estado no se movió** (I3), por huella *y* por identidad de objeto.
@@ -33,7 +33,7 @@ def conmutar(estado: Any, ruleset_actual: Ruleset, checkpoint: Checkpoint) -> Ru
 
     Levanta `ViolacionInvariante` si algo de I1, I3, I4 o I5 no se cumple. No hay
     modo degradado: un nodo que no puede conmutar tiene que parar, porque seguir
-    con las reglas viejas es desviarse de Geminis (§5).
+    con las reglas viejas es desviarse de Genesis (§5).
     """
     if checkpoint.h0_ancestro != ruleset_actual.h0:
         raise ViolacionInvariante(

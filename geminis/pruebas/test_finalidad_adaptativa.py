@@ -28,7 +28,7 @@ from __future__ import annotations
 
 import unittest
 
-from protocolo import geminis as g
+from protocolo import genesis as g
 from pruebas.comun import GASTAR_CANARIO, alturas_de, nodo_canario, nodo_emision
 
 

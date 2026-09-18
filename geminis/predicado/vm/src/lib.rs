@@ -21,7 +21,7 @@ pub mod maquina;
 pub use admision::{admitir, Rechazo};
 pub use maquina::{Causa, Clase, Maquina, Op, Veredicto, MEM, TEXT_BASE};
 
-/// El techo de pasos del ruleset inicial, de `protocolo/geminis.py`:
+/// El techo de pasos del ruleset inicial, de `protocolo/genesis.py`:
 /// `f* × tiempo_de_bloque × R_declarado / tx_por_bloque`
 /// = `0,25 × 6000 ms × 70 M pasos/s / 15`.
 ///
@@ -44,11 +44,11 @@ pub const TX_INICIAL: u64 = 15;
 /// punteros por 63 MiB gasta su techo de pasos en 596 ms en vez de los 22 que el
 /// techo promete.
 ///
-/// **Esto es el punto de Geminis, no una constante del protocolo.** Hasta el
+/// **Esto es el punto de Genesis, no una constante del protocolo.** Hasta el
 /// 21/8/2026 lo era, y mientras lo fue el techo de paginas **excluia en vez de
 /// encarecer**: una primitiva que necesitara mas memoria no tenia precio que pagar.
 /// Ahora el presupuesto es un parametro del ruleset y pedir mas paginas baja el
-/// ritmo declarado —ver `R_DECLARADO_POR_PAGINAS` en `protocolo/geminis.py`—, que
+/// ritmo declarado —ver `R_DECLARADO_POR_PAGINAS` en `protocolo/genesis.py`—, que
 /// baja el techo de pasos. La maquina recibe los dos techos y no deriva ninguno.
 pub const PAGINAS_INICIALES: u32 = 96;
 

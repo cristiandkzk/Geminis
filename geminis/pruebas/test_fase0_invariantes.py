@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import unittest
 
-from protocolo import geminis as g
+from protocolo import genesis as g
 from protocolo import invariantes as inv
 from protocolo.generacion import Objeto, Params
 from protocolo.invariantes import ViolacionInvariante
@@ -68,12 +68,12 @@ class ReglaQueEscribe(ReglaTransicion):
 
 
 class I1(unittest.TestCase):
-    def test_el_interprete_de_geminis_pasa(self):
+    def test_el_interprete_de_genesis_pasa(self):
         inv.i1_interprete_congelado(g.HUELLA_INTERPRETE)
 
     def test_otro_interprete_no_es_una_transicion_es_un_fork(self):
         with self.assertRaises(ViolacionInvariante) as caso:
-            inv.i1_interprete_congelado(huella("geminis-vm/1", dominio="interprete"))
+            inv.i1_interprete_congelado(huella("genesis-vm/1", dominio="interprete"))
         self.assertEqual(caso.exception.invariante, "I1")
 
     def test_el_ruleset_inicial_es_un_punto_del_espacio(self):

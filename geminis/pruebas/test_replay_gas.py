@@ -9,7 +9,7 @@ Las tres, en orden de importancia:
 
 1. **la ocupación no lleva información** — correlación −0,02 con el base fee mientras
    el fee se mueve 650×. Es la medición que cierra la puerta de §7.6;
-2. **el base fee nominal se derrumba** — cualquier umbral en gwei elegido en Geminis
+2. **el base fee nominal se derrumba** — cualquier umbral en gwei elegido en Genesis
    caduca;
 3. **la forma adimensional arregla eso y trae un trinquete** — dispara de nuevo con el
    fee en 0,26 gwei, porque sin referencia absoluta *caro* es sólo *más que recién*.

@@ -40,11 +40,11 @@ def _h(etiqueta: bytes, *partes: bytes) -> bytes:
 
 
 def hoja(datos: bytes) -> bytes:
-    return _h(b"geminis/arbol/hoja", datos)
+    return _h(b"genesis/arbol/hoja", datos)
 
 
 def nodo(izq: bytes, der: bytes) -> bytes:
-    return _h(b"geminis/arbol/nodo", izq, der)
+    return _h(b"genesis/arbol/nodo", izq, der)
 
 
 VACIO = bytes(32)

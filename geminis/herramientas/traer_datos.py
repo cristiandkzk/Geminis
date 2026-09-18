@@ -124,7 +124,7 @@ def _pedir(url: str, metodo: str, parametros: list, tiempo_limite: int = 20) -> 
     pedido = urllib.request.Request(
         url,
         data=cuerpo,
-        headers={"Content-Type": "application/json", "User-Agent": "geminis-replay/1"},
+        headers={"Content-Type": "application/json", "User-Agent": "genesis-replay/1"},
     )
     with urllib.request.urlopen(pedido, timeout=tiempo_limite) as respuesta:
         payload = json.loads(respuesta.read())
