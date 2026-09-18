@@ -302,7 +302,14 @@ class Cronograma:
 
         for disparo in maduros:
             base = self.comprometido
-            altura_lockin = self.altura_de_lockin(disparo, ventana_finalidad)
+            # La altura **real** del bloque que procesa el lock-in, no la que la
+            # fórmula hubiera dado (C23). En calma son el mismo número; bajo
+            # ataque, el valor de la fórmula ya pasó, y como
+            # `altura_activacion = altura_lockin + Δ` se computa sobre esto, una
+            # altura retroactiva dejaría la activación cerrada antes de
+            # anunciarse: el integrador se queda con aviso negativo, que es
+            # exactamente lo que `Δ` existe para prometer que no pasa.
+            altura_lockin = altura_cabeza
             del self.pendientes[disparo.nombre]
 
             try:

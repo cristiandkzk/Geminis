@@ -60,14 +60,14 @@ MUTACIONES = [
     (
         "el evento de lock-in se publica al madurar y no por altura",
         "nodo/pod.py",
-        "        self.cronograma.promover(altura, self.ventana_finalidad)\n"
+        "        self.cronograma.promover(altura, self._ventana_efectiva())\n"
         "        for checkpoint in self.cronograma.checkpoints:\n"
         "            if checkpoint.altura_lockin == altura:\n"
         '                self.estado.eventos.append({"tipo": "lock-in", **checkpoint.canonico()})\n'
         "        for rechazo in self.cronograma.rechazos:\n"
         "            if rechazo.altura == altura:\n"
         "                self.estado.eventos.append(rechazo.canonico())",
-        "        nuevos, rechazados = self.cronograma.promover(altura, self.ventana_finalidad)\n"
+        "        nuevos, rechazados = self.cronograma.promover(altura, self._ventana_efectiva())\n"
         "        for checkpoint in nuevos:\n"
         '            self.estado.eventos.append({"tipo": "lock-in", **checkpoint.canonico()})\n'
         "        for rechazo in rechazados:\n"

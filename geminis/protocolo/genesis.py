@@ -257,9 +257,13 @@ VENTANA_FINALIDAD = 12
 #: un arreglo, es un préstamo*). Acota cuánto puede estirar la finalidad una
 #: inundación de impugnaciones antes de que el lock-in ocurra igual.
 #:
-#: **Está inerte en esta fase.** Sin impugnaciones (Fase 3) la finalidad llega
-#: siempre a `N + VENTANA_FINALIDAD` y el tope nunca muerde. Se escribe ahora
-#: para que el cronograma no tenga que aprender a esperar después.
+#: **Ya no está inerte** (C23): `pod.py` estira la ventana efectiva mientras la
+#: cola de impugnaciones esté por encima de `BACKLOG_SEGURO`, y este tope es lo
+#: único que impide que un ataque sostenido la estire para siempre.
+#:
+#: `CRIPTOGRAFICA = 32` queda **sin decidir a propósito**: el barrido de C23.6
+#: midió el caso de circulación, no éste. No moverlo sin volver a medir con el
+#: `Δ` corto, que es el que menos margen tiene.
 #:
 #: Su residuo, declarado: *un fraude descubierto después del tope no detiene la
 #: transición*, y esa exposición es igual el día 1 que el año 20.
@@ -267,6 +271,18 @@ TOPE_DEMORA_LOCKIN: dict[str, int] = {
     CIRCULACION: 256,
     CRIPTOGRAFICA: 32,
 }
+
+#: Cuántas impugnaciones en cola el nodo considera **calma** (C23.6).
+#:
+#: Por debajo o igual a esto la finalidad llega en `VENTANA_FINALIDAD` y el
+#: comportamiento es el de antes de C23. Por encima, la ventana efectiva se
+#: estira hasta el tope de la clase.
+#:
+#: El valor sale de la meseta del barrido de C23.6: entre ~30 y ~60 la tasa de
+#: impugnaciones legítimas que no llegan a verificarse casi no se mueve, así que
+#: 40 no es un número al borde de un acantilado. **No es una constante del
+#: protocolo**: es el punto que eligió este Genesis de juguete.
+BACKLOG_SEGURO = 40
 
 # --------------------------------------------------------------------------- #
 # El techo de pasos de VM (§6.6, §10.3)

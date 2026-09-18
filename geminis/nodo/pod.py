@@ -94,6 +94,16 @@ class NodoPoD:
         self.ventana_ritmo = ventana_ritmo
         self.revisar_invariantes = revisar_invariantes
 
+        #: Impugnaciones en cola que el nodo vio en el último bloque (C23). Cero
+        #: es calma, y es el default: **sin nadie reportando backlog, todo esto se
+        #: comporta igual que antes de C23.** Nada lo alimenta con datos reales
+        #: todavía —`liquidacion/` no está conectado acá—, así que ésta es la
+        #: mitad de la reacción esperando la mitad de la señal (Fase 3).
+        self.backlog_impugnaciones = 0
+        #: Bloques calmos seguidos. Es lo que destraba el lock-in: no alcanza con
+        #: que el ataque pare, tiene que haber parado `ventana_finalidad` bloques.
+        self._racha_calma = 0
+
         self.reglas: list[ReglaTransicion] = list(reglas)
         self.cronograma = Cronograma(ruleset)
         self.historial_rulesets: list[tuple[int, Ruleset]] = [(0, ruleset)]
@@ -146,9 +156,33 @@ class NodoPoD:
     def es_final(self, altura: int) -> bool:
         return self.altura >= altura + self.ventana_finalidad
 
+    def _ventana_efectiva(self) -> int:
+        """La ventana que se le pasa al cronograma este bloque (C23).
+
+        Dos valores y nada en el medio, porque el medio no significaría nada: o
+        la cola estuvo calma una ventana entera y la finalidad es la de siempre,
+        o no, y entonces **sólo el tope duro de la clase puede madurar el
+        disparo**. Devolver base + el tope más largo garantiza eso para toda
+        clase, sin que este método tenga que saber de qué clase es cada disparo:
+        `altura_de_lockin` ya hace `min(ventana, tope_de_la_clase)`.
+
+        Que no haya interpolación es deliberado. Una ventana que crece de a poco
+        con el backlog sería un número que cada nodo computa sobre lo que *él*
+        vio en su cola, y dos nodos con colas distintas madurarían en alturas
+        distintas: un fork por congestión. Acá el único insumo que decide es
+        cuántos bloques seguidos estuvo calmo, que es un hecho de la cadena.
+        """
+        if self._racha_calma >= self.ventana_finalidad:
+            return self.ventana_finalidad
+        return self.ventana_finalidad + max(g.TOPE_DEMORA_LOCKIN.values())
+
     # -- producción de bloques --------------------------------------------- #
 
-    def producir_bloque(self, transacciones: Sequence[tuple] = ()) -> Bloque:
+    def producir_bloque(
+        self,
+        transacciones: Sequence[tuple] = (),
+        backlog_impugnaciones: int = 0,
+    ) -> Bloque:
         altura = self.altura + 1
 
         # 1 · activación: el ruleset nuevo gobierna el bloque entero.
@@ -173,7 +207,15 @@ class NodoPoD:
         # que volver a emitirse cuando esa altura se vuelve a producir. Publicar
         # sólo lo recién madurado dejaba un lock-in vigente sin rastro on-chain,
         # o sea un aviso que el integrador no puede leer.
-        self.cronograma.promover(altura, self.ventana_finalidad)
+        #
+        # La racha se actualiza **antes** de promover: el bloque que completa la
+        # ventana de calma es el que madura, no el siguiente (C23).
+        self.backlog_impugnaciones = backlog_impugnaciones
+        if backlog_impugnaciones > g.BACKLOG_SEGURO:
+            self._racha_calma = 0
+        else:
+            self._racha_calma += 1
+        self.cronograma.promover(altura, self._ventana_efectiva())
         for checkpoint in self.cronograma.checkpoints:
             if checkpoint.altura_lockin == altura:
                 self.estado.eventos.append({"tipo": "lock-in", **checkpoint.canonico()})
