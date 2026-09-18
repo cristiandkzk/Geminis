@@ -1,20 +1,29 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Renderiza `Geminis Paper.md` a `Geminis-paper.html` conservando el diseno.
+Renderiza el paper a HTML conservando el diseno.
 
 El HTML se habia quedado ~30% atras del markdown porque se mantenian a mano por
 separado. Este script hace del .md la unica fuente de verdad: el HTML se
 regenera y no se edita nunca a mano.
 
-    python render.py
+    python render.py        castellano -> Geminis-paper.html
+    python render.py en     ingles     -> Geminis-paper-en.html
+
+La traduccion conserva la estructura del original, asi que lo unico que cambia
+por idioma vive en PERFILES: los nombres de archivo, el masthead y las palabras
+con las que el render reconoce secciones (resumen, invariantes, fronteras,
+resuelto). El markdown no lleva ninguna marca de idioma.
 
 Assets que el script consume y que SI se editan a mano:
-    estilo.css                 la hoja de estilos (se embebe en <style>)
-    figura-conmutacion.html    el <figure> con el SVG de §3
+    estilo.css                    la hoja de estilos (se embebe en <style>)
+    figura-conmutacion.html       el <figure> con el SVG de §3
+    figura-conmutacion-en.html    la misma figura con los rotulos en ingles
 
 En el markdown, `<!-- FIGURA: archivo.html -->` reemplaza al bloque de codigo
-que le sigue y al parrafo posterior (que en el HTML es el epigrafe).
+que le sigue y al parrafo posterior (que en el HTML es el epigrafe). El perfil
+le agrega su sufijo al nombre declarado y cae al declarado si esa variante no
+existe.
 
 El HTML de salida es formato Artifact: sin <!doctype>, <html>, <head> ni <body>.
 """
@@ -25,12 +34,43 @@ import sys
 from pathlib import Path
 
 RAIZ = Path(__file__).parent
-FUENTE = RAIZ / "Geminis Paper.md"
-SALIDA = RAIZ / "Geminis-paper.html"
 CSS = RAIZ / "estilo.css"
 
-TITULO = "Sucesión Determinista"
-KICKER = "Protocolo · concepto"
+PERFILES = {
+    "es": {
+        "fuente": "Geminis Paper.md",
+        "salida": "Geminis-paper.html",
+        "sufijo_figura": "",
+        "titulo": "Sucesión Determinista",
+        "kicker": "Protocolo · concepto",
+        "resumen": "Resumen",
+        "invariantes": "invariantes",
+        "fronteras": "fronteras",
+        "resuelto": "resuelto",
+        "etiqueta_resuelto": "Resuelto",
+    },
+    "en": {
+        "fuente": "Geminis Paper EN.md",
+        "salida": "Geminis-paper-en.html",
+        "sufijo_figura": "-en",
+        "titulo": "Deterministic Succession",
+        "kicker": "Protocol · concept",
+        "resumen": "Abstract",
+        "invariantes": "design invariants",
+        "fronteras": "declared boundaries",
+        "resuelto": "solved",
+        "etiqueta_resuelto": "Solved",
+    },
+}
+
+PERFIL = PERFILES["es"]
+
+
+def figura(nombre):
+    """Variante de idioma de una figura; el archivo declarado es el respaldo."""
+    declarado = Path(nombre)
+    variante = RAIZ / f"{declarado.stem}{PERFIL['sufijo_figura']}{declarado.suffix}"
+    return variante if variante.exists() else RAIZ / nombre
 
 
 # ---------- inline ----------
@@ -104,14 +144,15 @@ def render_cita(bloque):
     if not partes:
         return ""
     enc = lider(partes[0])
-    if enc and enc[0].lower().startswith("resuelto"):
+    if enc and enc[0].lower().startswith(PERFIL["resuelto"]):
         # formato: **Resuelto:** *nombre del problema*. cuerpo...
         # el lider puede traer una aclaracion extra ("Resuelto, y queda registrado porque...")
         resto = enc[1]
         m = re.match(r"\*(.+?)\*\.?\s*(.*)$", resto, flags=re.S)
         nombre, resto = (m.group(1).strip(), m.group(2).strip()) if m else ("", resto)
-        aparte = re.sub(r"^resuelto:?", "", enc[0], flags=re.I).strip(" ,.:")
-        etiqueta = "Resuelto · " + nombre if nombre else "Resuelto"
+        aparte = re.sub(rf"^{PERFIL['resuelto']}:?", "", enc[0], flags=re.I).strip(" ,.:")
+        etiqueta = PERFIL["etiqueta_resuelto"]
+        etiqueta = f"{etiqueta} · {nombre}" if nombre else etiqueta
         cls, hcls = "resuelto", "rh"
         cuerpo = (f"<em>({inline(aparte)})</em> " if aparte else "") + inline(resto)
         primero = f'<p><span class="{hcls}">{inline(etiqueta)}</span>{cuerpo}</p>'
@@ -172,7 +213,7 @@ def render(md):
         # figura declarada: reemplaza el fence siguiente y el parrafo posterior
         m = re.match(r"<!--\s*FIGURA:\s*(\S+)\s*-->", s)
         if m:
-            archivo = RAIZ / m.group(1)
+            archivo = figura(m.group(1))
             if archivo.exists():
                 out.append(archivo.read_text(encoding="utf-8").strip())
                 saltar = 2
@@ -189,7 +230,7 @@ def render(md):
             cerrar_invariantes()
             titulo = re.sub(r"^##\s*\d*\.?\s*", "", s).strip()
             contexto = titulo
-            if titulo.lower() == "resumen":
+            if titulo.lower() == PERFIL["resumen"].lower():
                 continue
             if seccion_abierta:
                 out.append("</section>")
@@ -235,7 +276,7 @@ def render(md):
             titulo, resto = enc
 
             # §4 invariantes: I1..I5 abren item, los parrafos sueltos lo continuan
-            if contexto.lower().startswith("invariantes") and re.match(r"^I\d", titulo):
+            if contexto.lower().startswith(PERFIL["invariantes"]) and re.match(r"^I\d", titulo):
                 invariantes.append([f"<strong>{inline(titulo)}</strong> {inline(resto)}"])
                 continue
 
@@ -251,7 +292,7 @@ def render(md):
                 continue
 
             # §10 fronteras declaradas
-            if contexto.lower().startswith("fronteras"):
+            if contexto.lower().startswith(PERFIL["fronteras"]):
                 cerrar_invariantes()
                 out.append(
                     f'<div class="frontera"><p><span class="fh">{inline(titulo)}</span>'
@@ -272,14 +313,27 @@ def render(md):
 
 
 def main():
-    md = FUENTE.read_text(encoding="utf-8")
+    global PERFIL
+    idioma = sys.argv[1] if len(sys.argv) > 1 else "es"
+    if idioma not in PERFILES:
+        print(f"idioma desconocido: {idioma} (hay {', '.join(PERFILES)})")
+        return 1
+    PERFIL = PERFILES[idioma]
+    fuente = RAIZ / PERFIL["fuente"]
+    salida = RAIZ / PERFIL["salida"]
+
+    md = fuente.read_text(encoding="utf-8")
 
     # masthead: h1 + el parrafo en negrita que le sigue
     h1 = re.search(r"^#\s+(.+)$", md, re.M).group(1).strip()
-    standfirst = re.search(r"^#\s+.+\n\n\*\*(.+?)\*\*", md, re.S | re.M).group(1)
+    # el .+ tiene que ser perezoso: con re.S, uno goloso se come el documento
+    # entero y agarra el ultimo parrafo en negrita en vez del subtitulo
+    standfirst = re.search(r"^#\s+.+?\n\n\*\*(.+?)\*\*", md, re.S | re.M).group(1)
 
-    # abstract: los parrafos de ## Resumen
-    resumen = re.search(r"^## Resumen\s*\n(.*?)(?=\n---|\n## )", md, re.S | re.M).group(1)
+    # abstract: los parrafos de la seccion de resumen
+    resumen = re.search(
+        rf"^## {PERFIL['resumen']}\s*\n(.*?)(?=\n---|\n## )", md, re.S | re.M
+    ).group(1)
     abstract = "".join(
         f"<p>{inline(p.strip())}</p>"
         for p in resumen.strip().split("\n\n")
@@ -289,7 +343,7 @@ def main():
     cuerpo = render(md)
 
     partes = [
-        f"<title>{html.escape(TITULO)}</title>",
+        f"<title>{html.escape(PERFIL['titulo'])}</title>",
         "<style>",
         CSS.read_text(encoding="utf-8").strip(),
         "</style>",
@@ -297,7 +351,7 @@ def main():
         '<div class="wrap">',
         "",
         '<header class="masthead">',
-        f'  <p class="kicker">{inline(KICKER)}</p>',
+        f'  <p class="kicker">{inline(PERFIL["kicker"])}</p>',
         f"  <h1>{inline(h1)}</h1>",
         f'  <p class="standfirst">{inline(standfirst)}</p>',
         "</header>",
@@ -309,10 +363,10 @@ def main():
         "</div>",
         "",
     ]
-    SALIDA.write_text("\n".join(partes), encoding="utf-8")
+    salida.write_text("\n".join(partes), encoding="utf-8")
 
     palabras = len(re.sub(r"<[^>]+>", " ", "\n".join(partes)).split())
-    print(f"escrito {SALIDA.name}: {SALIDA.stat().st_size} bytes, ~{palabras} palabras")
+    print(f"escrito {salida.name}: {salida.stat().st_size} bytes, ~{palabras} palabras")
 
 
 if __name__ == "__main__":

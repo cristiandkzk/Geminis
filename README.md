@@ -3,6 +3,9 @@
 **Una cadena que trae escrita desde el bloque 0 cómo cambian sus propias reglas, y que
 ejecuta ese cambio sin voto, sin fork político y sin intervención humana en la decisión.**
 
+**In English → [README-EN.md](README-EN.md).** El repo está traducido entero: el paper
+([Geminis Paper EN.md](Geminis%20Paper%20EN.md)), el [roadmap](ROADMAP-EN.md) y las mediciones.
+
 > **Qué es esto y qué te pido.** Es el diseño completo (~19.500 palabras) comprimido a un
 > tercio: **unos 25 minutos**. Saqué el registro de decisiones, la historia de lo que se cayó
 > en el camino y las justificaciones largas — quedó el mecanismo, los números medidos y las

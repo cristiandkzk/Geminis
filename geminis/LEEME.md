@@ -13,7 +13,7 @@ python herramientas/replay_gas.py     # Fase 2, caso 3: el gas limit
 python herramientas/cola.py           # Fase 3: la cola de impugnaciones bajo ataque
 python herramientas/techo.py          # el techo de pasos de VM, derivado (§10.3)
 
-cd predicado/vm && cargo test --release   # la máquina: 18 criterios (Fase 4)
+cd predicado/vm && cargo test --release   # la máquina: 20 criterios (Fase 4)
 ```
 
 Las series de Ethereum que usa el replay ya están en el repo (`herramientas/datos/`,

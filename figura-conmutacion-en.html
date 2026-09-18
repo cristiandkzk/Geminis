@@ -1,0 +1,50 @@
+<figure>
+    <div class="figbox">
+      <svg viewBox="0 0 640 250" width="640" height="250" role="img" aria-label="Diagram: a single node track that commutes from generation A to generation B at the transition block, with state preserved and generation B's hash derived from A's.">
+
+        <!-- generation labels -->
+        <text x="18" y="30" class="svg-title svg-mute">GENERATION A</text>
+        <text x="366" y="30" class="svg-title svg-accent">GENERATION B</text>
+
+        <!-- state band: one continuous track -->
+        <rect x="18" y="46" width="336" height="44" class="fill-surface stroke-rule" stroke-width="1"/>
+        <rect x="354" y="46" width="268" height="44" class="fill-accsoft stroke-accent" stroke-width="1"/>
+        <text x="30" y="73" class="svg-label svg-mute">ruleset A</text>
+        <text x="366" y="73" class="svg-label svg-accent">ruleset B</text>
+
+        <!-- the same node, continuous -->
+        <line x1="18" y1="120" x2="622" y2="120" class="stroke-ink" stroke-width="1.5"/>
+        <text x="18" y="140" class="svg-label svg-ink">the SAME node · the SAME state · no migration, no bridge, no snapshot</text>
+
+        <!-- blocks along the track -->
+        <g class="svg-mute">
+          <rect x="40"  y="112" width="15" height="16" class="fill-surface stroke-rule" stroke-width="1"/>
+          <rect x="80"  y="112" width="15" height="16" class="fill-surface stroke-rule" stroke-width="1"/>
+          <rect x="120" y="112" width="15" height="16" class="fill-surface stroke-rule" stroke-width="1"/>
+          <rect x="160" y="112" width="15" height="16" class="fill-surface stroke-rule" stroke-width="1"/>
+          <rect x="200" y="112" width="15" height="16" class="fill-surface stroke-rule" stroke-width="1"/>
+          <rect x="240" y="112" width="15" height="16" class="fill-surface stroke-rule" stroke-width="1"/>
+          <rect x="280" y="112" width="15" height="16" class="fill-surface stroke-rule" stroke-width="1"/>
+          <rect x="320" y="112" width="15" height="16" class="fill-surface stroke-rule" stroke-width="1"/>
+        </g>
+        <g>
+          <rect x="390" y="112" width="15" height="16" class="fill-accsoft stroke-accent" stroke-width="1"/>
+          <rect x="430" y="112" width="15" height="16" class="fill-accsoft stroke-accent" stroke-width="1"/>
+          <rect x="470" y="112" width="15" height="16" class="fill-accsoft stroke-accent" stroke-width="1"/>
+          <rect x="510" y="112" width="15" height="16" class="fill-accsoft stroke-accent" stroke-width="1"/>
+          <rect x="550" y="112" width="15" height="16" class="fill-accsoft stroke-accent" stroke-width="1"/>
+        </g>
+
+        <!-- trigger boundary -->
+        <line x1="366" y1="38" x2="366" y2="176" class="stroke-accent" stroke-width="1.5" stroke-dasharray="3 3"/>
+        <text x="366" y="192" class="svg-label svg-accent" text-anchor="middle">transition block</text>
+        <text x="366" y="206" class="svg-label svg-mute" text-anchor="middle">TRANSITION_RULE → TRUE</text>
+
+        <!-- hash lineage -->
+        <text x="18" y="232" class="svg-label svg-mute">H0_A</text>
+        <line x1="56" y1="228" x2="176" y2="228" class="stroke-rule" stroke-width="1"/>
+        <text x="184" y="232" class="svg-label svg-ink">H0_B = H( H0_A ‖ state_trigger ‖ params_nuevos )</text>
+      </svg>
+    </div>
+    <figcaption>The node's track is not cut at the transition block: it changes rules. State crosses over intact because it never leaves the process that holds it.</figcaption>
+  </figure>

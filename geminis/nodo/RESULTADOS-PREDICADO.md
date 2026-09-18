@@ -94,4 +94,4 @@ Y no hay mercado de trabajo: quién publica pedidos y quién los toma es §6.2 y
 
 ## Estado
 
-**296 criterios en Python, 20 en Rust, 39 mutaciones, todas cazadas.**
+**302 criterios en Python, 20 en Rust, 39 mutaciones, todas cazadas.**
