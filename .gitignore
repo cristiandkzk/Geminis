@@ -43,10 +43,10 @@ CONTEXTO.md
 # Geminis-paper.html SÍ se versiona: es el entregable que se le pasa a alguien.
 # Lo que no se versiona es la copia de seguridad previa al render — para eso
 # está el historial de git, que es justamente lo que este repo viene a dar.
-genesis-paper.html.bak
+geminis-paper.html.bak
 
 # El paquete para el telefono: se regenera con herramientas/empaquetar_vm.py
-genesis/vm-telefono.tar.gz
+geminis/vm-telefono.tar.gz
 
 # ─── Correspondencia privada ───────────────────────────────────────────────────
 # Borradores de mensajes a personas puntuales, no documentacion del proyecto.

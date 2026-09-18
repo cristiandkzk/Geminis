@@ -81,7 +81,7 @@ real es de varios múltiplos del bloque, no de una décima.
 >
 > El diez de esta tabla sigue siendo el piso teórico correcto. Lo que faltaba era una
 > condición sobre cómo elige cada nodo, y **se escribió en §6.3 el mismo día**.
-> Detalle en `genesis/liquidacion/RESULTADOS.md` §3.
+> Detalle en `geminis/liquidacion/RESULTADOS.md` §3.
 
 ## 3. La pieza que sostiene todo: el techo de pasos de VM
 

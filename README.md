@@ -648,7 +648,7 @@ implementación de referencia de ML-DSA-44 y la quinta parte de la lenta que Tes
 > señalara. **Se cerró con la misma jugada que había cerrado el primero: congelar la curva en vez
 > del punto.** Geminis fija cuánto ritmo sostiene el hardware de referencia para cada presupuesto de
 > memoria, el presupuesto pasa a ser un parámetro, y pedir más memoria se paga en capacidad como
-> todo lo demás. La medición está en `genesis/predicado/RESULTADOS.md`.
+> todo lo demás. La medición está en `geminis/predicado/RESULTADOS.md`.
 
 **Abierto · cuál hardware es el peor caso.** Todo el diseño supone que la capa liviana es la que
 ata —de ahí sale la entrada barata de nodos— y con ese supuesto se calibra `R_declarado`. **Medido,

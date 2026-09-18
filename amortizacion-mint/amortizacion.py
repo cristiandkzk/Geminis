@@ -26,7 +26,7 @@ Se contesta en cinco bloques:
   B. EL ATAQUE QUE ABARATA       -> cuanto cuesta ocupar el disco para siempre
   C. EL COSTO FIJO REAL          -> cuanto vale crear, medido en horas de disco
   D. LA VERSION ACOTADA          -> tarifa en dos partes: el descuento con piso
-  E. EL RECIBO DEL GENESIS       -> si el tope duro de 7.2 necesita deposito
+  E. EL RECIBO DEL GEMINIS       -> si el tope duro de 7.2 necesita deposito
 
 Supuestos declarados:
 
@@ -57,7 +57,7 @@ FRACCION_NUCLEO = 0.25            # el presupuesto de firma de 6.1
 SEG_POR_ANIO = 365 * 24 * 3600.0
 
 HORIZONTE_PARA_SIEMPRE = 100      # anios: mas que cualquier tenedor humano
-RECIBOS_GENESIS = 3500
+RECIBOS_GEMINIS = 3500
 
 GB = 1024 ** 3
 
@@ -278,20 +278,20 @@ def bloque_d():
     print("literalmente lo que se pidio: 'un piso, y que se pueda aumentar'.")
 
 
-# ---------------------------------------------------- E: el recibo del genesis
+# ---------------------------------------------------- E: el recibo del geminis
 
 def bloque_e():
     sep("E - ?El recibo del bloque 0 tiene que pagar deposito?")
 
     tope = (4 * GB) // 128
-    frac = RECIBOS_GENESIS / float(tope)
+    frac = RECIBOS_GEMINIS / float(tope)
     print("Recibos de 7.2 con tope duro: %s (3.000 PoD + 500 computo)."
-          % "{:,}".format(RECIBOS_GENESIS))
+          % "{:,}".format(RECIBOS_GEMINIS))
     print("Tope de slots (4 GB / 128 B): %s" % "{:,}".format(tope))
     print()
     print("Ocupacion: %.6f%% del presupuesto de un nodo." % (100 * frac))
     print("En bytes, sobre los 3.000 nodos: %.1f MB en toda la red."
-          % (RECIBOS_GENESIS * 128 * NODOS / float(1024 ** 2)))
+          % (RECIBOS_GEMINIS * 128 * NODOS / float(1024 ** 2)))
     print()
     print("  El recibo puede seguir siendo gratis y perpetuo sin romper nada,")
     print("  y la razon es cuantitativa, no de encuadre: el tope duro lo hace")
@@ -300,7 +300,7 @@ def bloque_e():
     print()
     print("O sea que las dos decisiones no se contradicen: C7.6 decidio gratis")
     print("para un conjunto de %s entradas; esto decide piso + deposito para un"
-          % "{:,}".format(RECIBOS_GENESIS))
+          % "{:,}".format(RECIBOS_GEMINIS))
     print("conjunto sin cota. La variable que separa los casos es el tope.")
 
 
@@ -339,7 +339,7 @@ def veredicto():
     print("   por el piso en vez de crecer sin tope.")
     print()
     print("5. El recibo del bloque 0 no entra en conflicto: su tope duro lo")
-    print("   deja en %.4f%% del presupuesto." % (100 * RECIBOS_GENESIS / float((4 * GB) // 128)))
+    print("   deja en %.4f%% del presupuesto." % (100 * RECIBOS_GEMINIS / float((4 * GB) // 128)))
 
 
 if __name__ == "__main__":

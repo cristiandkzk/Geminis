@@ -59,7 +59,7 @@ transacción.
 > implementación que hay que tomar, no un costo que se sufre.
 
 > **Nota del 22/8/2026 — la tabla de bytes se reprodujo exacta, y la última frase no.**
-> Construido el árbol (`genesis/estado/arbol.py`), los bytes por entrada dan
+> Construido el árbol (`geminis/estado/arbol.py`), los bytes por entrada dan
 > 32,0 / 1,0 / 0,125 / 0,016 igual que acá. Lo que no se sostiene es *"decisión de
 > implementación"*: **el piso de permanencia de §8.5 se deriva del costo de actualizar
 > el árbol, y el piso se quema**, así que dos nodos con `d` distinto no coincidirían
@@ -68,7 +68,7 @@ transacción.
 >
 > Y aparece una tercera moneda que esta medición no miraba: **con `d=6` el piso es el
 > 77% del depósito máximo, y con `d=7` lo supera.** El margen es más fino de lo que se
-> veía mirando sólo disco y hash. Desarrollo en `genesis/estado/RESULTADOS-ARBOL.md`.
+> veía mirando sólo disco y hash. Desarrollo en `geminis/estado/RESULTADOS-ARBOL.md`.
 
 ## C · El índice de desalojo
 

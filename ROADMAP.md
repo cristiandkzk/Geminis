@@ -124,7 +124,7 @@ hay que contar lo único que se ve mientras corre: las páginas distintas que to
 excluir**. Las tres primitivas de la familia ML-DSA tocan 26, 40 y 65 páginas, así que el primer
 número elegido (48) dejaba a la tercera afuera para siempre. **En este diseño, un número que hay
 que elegir suele ser una cuenta que falta escribir** — pasó dos veces con el mismo techo. *(21/8/2026,
-`genesis/predicado/RESULTADOS.md`.)*
+`geminis/predicado/RESULTADOS.md`.)*
 
 **Desafío de cómputo (§6.7).** Una tercera clase de trabajo, distinta del pedido de §6.5: en vez de
 asignarse a un solo nodo antes de computar, varios nodos calculan en paralelo y solo uno cobra por
@@ -206,9 +206,9 @@ ya entendió mal el sistema.
 La estructura sigue las piezas del paper, para que el mapeo documento ↔ código sea directo:
 
 ```
-genesis/
+geminis/
 ├── protocolo/            # lo que Geminis congela y no cambia nunca (I1)
-│   ├── genesis.py          # el bloque 0: ruleset inicial, espacio de descendientes,
+│   ├── geminis.py          # el bloque 0: ruleset inicial, espacio de descendientes,
 │   │                       #   Δ por clase de transición, θ*, L_max
 │   ├── invariantes.py      # I1–I5 como aserciones ejecutables — no comentarios
 │   ├── generacion.py       # etiqueta de generación en cada objeto (I5), ruleset vigente
@@ -366,7 +366,7 @@ un adversario. Agregar criterios está permitido; ablandarlos no.
 > paso no vale un paso. Salieron de ahí un segundo techo sobre páginas tocadas, `R_declarado` de
 > 300 a 70 M pasos/s, y la capacidad inicial de 67 a 15 tx por bloque. Más dos agujeros de
 > amplificación en el cargador que ningún test de corrección habría encontrado —los encontró que un
-> barrido tardara minutos—. Todo en `genesis/predicado/RESULTADOS.md`.
+> barrido tardara minutos—. Todo en `geminis/predicado/RESULTADOS.md`.
 
 **Cerrada el 21/8/2026**, con los siete criterios resueltos: los vectores reproducen bit a bit entre
 x86-64 y aarch64, y C1 está medido sobre el hardware de referencia (354 ms de 1.500, margen 4,24×).
@@ -387,7 +387,7 @@ que §10.2 declara y no puede garantizar.
 
 **Corrida el 21/8/2026**, con ocho criterios aprobados y uno reprobado — y el que reprobó lo hizo
 **contra el paper**: §8.5 afirmaba que el piso salía dieciséis horas de guardado, y la cuenta, ya
-escrita, da otro orden. Desarrollo en `genesis/estado/RESULTADOS.md`.
+escrita, da otro orden. Desarrollo en `geminis/estado/RESULTADOS.md`.
 
 **Sigue bloqueada donde estaba:** la regla que mueve la tasa no está elegida y no hay con qué
 calibrarla. Lo que sí se cerró es **por qué ésa no es una cuenta que falta escribir sino una
@@ -417,7 +417,7 @@ evidencia pero sí agrega la tentación de mirar el número hasta que dé.
 > moviera hacía que **un depósito ya pagado comprara el doble de guardado**. I3 se cumplía: los
 > bytes cruzaban idénticos. Lo que cambiaba era lo que valían, y **eso no lo mira ninguna de las
 > cinco invariantes**. Corregido denominando en byte-segundos declarados. Desarrollo en
-> `genesis/devnet/RESULTADOS.md`.
+> `geminis/devnet/RESULTADOS.md`.
 
 ---
 

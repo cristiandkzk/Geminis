@@ -2062,7 +2062,7 @@ presupuesto de 1.500: **1,67× por encima, reprobado**, contra el margen de 4,24
 mecanismo que lo rompe tampoco es el mismo que separaba a las dos primeras máquinas: ahí competían
 dos patrones de memoria; acá la división entera (`divu`, sin costo especial en las otras dos) empata
 con la persecución de punteros como la mezcla más cara, así que el segundo techo de §6.6.1 —pensado
-para el patrón de memoria— no la ve ni la cobra. Tablas en `genesis/predicado/RESULTADOS.md`.
+para el patrón de memoria— no la ve ni la cobra. Tablas en `geminis/predicado/RESULTADOS.md`.
 
 Esto no cierra la pregunta —sigue haciendo falta más hardware, y esta vez además de máquinas más
 débiles hace falta variar qué recurso ata— pero fija un punto: bajo los parámetros vigentes, un
@@ -2256,7 +2256,7 @@ corren los nodos:
 
 **El replay no produjo evidencia de que este diseño sea mejor.** Produjo los tres lugares donde se
 rompe contra el mundo real, cada uno con su número. Los tres están escritos donde corresponde
-—§10.1, §10.3 y §7.6— en vez de quedar en un anexo. Reproducción en `genesis/herramientas/`.
+—§10.1, §10.3 y §7.6— en vez de quedar en un anexo. Reproducción en `geminis/herramientas/`.
 
 **Test 2 pasado**: el presupuesto del intérprete entra con margen, medido en hardware real, y el
 §10.3 que podía tumbar una pieza estructural quedó resuelto. El agujero que el test encontró de
@@ -2457,7 +2457,7 @@ arriba: éste no se pudo correr antes de construir, y por eso llegó tarde.)* �
 criterio central salió reprobado**. Test 2 midió el intérprete con un guest propio, escrito por el
 mismo repo. Este mide el mismo intérprete corriendo el programa de la contraparte de una
 impugnación: alguien que quiere que el nodo se cuelgue o se caiga. Los criterios se escribieron
-antes de la primera línea de código, en `genesis/predicado/CRITERIOS.md`, y siete de ellos son
+antes de la primera línea de código, en `geminis/predicado/CRITERIOS.md`, y siete de ellos son
 operables con un número.
 
 > **Resultado: seis pasaron y el séptimo destapó que el techo de §6.6 prometía de más por 23×.**
@@ -2468,7 +2468,7 @@ operables con un número.
 > opcode y lo que cambia es dónde cae el dato. De ahí salieron **un techo nuevo sobre páginas
 > tocadas** (§6.6.1), una recalibración de `R_declarado` de 300 a 70 M pasos/s, y las tres cuartas
 > partes de la capacidad inicial del bloque: de 67 a 15 transacciones. Tablas y método en
-> `genesis/predicado/RESULTADOS.md`.
+> `geminis/predicado/RESULTADOS.md`.
 >
 > *Y tres hallazgos que no eran de rendimiento sino de superficie de ataque:* el cargador reservaba
 > 64 MiB antes de validar una sola cabecera, y una cabecera de sección alterada podía forzar 128 MiB
