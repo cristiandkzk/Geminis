@@ -24,7 +24,7 @@ import subprocess
 import sys
 import time
 import urllib.request
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 
 import modal
@@ -109,7 +109,7 @@ def correr(modelo: str, intentos: int, warmup: int, timeout_s: float) -> str:
 
         proceso = subprocess.Popen(
             [
-                sys.executable, "/root/medicion.py",
+                sys.executable, "-u", "/root/medicion.py",  # -u: cada intento sale en vivo
                 "--endpoint", f"{BASE}/v1/chat/completions",
                 "--model", modelo,
                 "--intentos", str(intentos),
@@ -153,5 +153,7 @@ def main(
     for modelo in [m.strip() for m in modelos.split(",") if m.strip()]:
         texto = correr.remote(modelo, intentos, warmup, timeout)
         archivo = carpeta / f"{date.today().isoformat()}_{GPU}_{modelo.replace(':', '_')}.txt"
+        if archivo.exists():  # nunca pisar una corrida ya guardada
+            archivo = archivo.with_name(f"{archivo.stem}_{datetime.now():%H%M}.txt")
         archivo.write_text(texto + "\n", encoding="utf-8")
         print(f"\n>> guardado: {archivo}\n")
