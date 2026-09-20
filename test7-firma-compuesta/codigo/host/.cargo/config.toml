@@ -1,0 +1,20 @@
+# Cross-compilacion desde Windows hacia el telefono (aarch64, Termux/Android).
+# Se usa solo cuando se pasa --target aarch64-linux-android; las corridas
+# nativas en la PC no lo miran.
+#
+#   cargo build --release --locked --target aarch64-linux-android
+#
+# Existe porque cranelift-codegen no compila dentro de Termux (rustc desborda la
+# pila parseando el match que genera ISLE para el backend ARM64), y este host
+# lleva wasmtime siempre: los tres motores salen del mismo binario. Es la misma
+# configuracion que test2-interprete/telefono/host/.cargo/config.toml; ahi esta
+# explicado por que se apunta a clang.exe directo y no al wrapper .cmd del NDK.
+
+[target.aarch64-linux-android]
+linker = "C:/Users/Cristian/AppData/Local/Android/Sdk/ndk/28.2.13676358/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe"
+rustflags = ["-C", "link-arg=--target=aarch64-linux-android30"]
+
+[env]
+CC_aarch64-linux-android = "C:/Users/Cristian/AppData/Local/Android/Sdk/ndk/28.2.13676358/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe"
+CFLAGS_aarch64-linux-android = "--target=aarch64-linux-android30"
+AR_aarch64-linux-android = "C:/Users/Cristian/AppData/Local/Android/Sdk/ndk/28.2.13676358/toolchains/llvm/prebuilt/windows-x86_64/bin/llvm-ar.exe"

@@ -2,9 +2,10 @@
 
 **English** · [Español](RESULTS.es.md)
 
-> Status: **partial. Desktop (x86-64) run on all three engines, preliminary verdict.** The phone
-> (ARM64) is missing and Part A (velocity threshold on dormant value) is missing — see README.md,
-> "What is missing". This is an order-of-magnitude signal, not a result citable as closed.
+> Status: **partial. Desktop (x86-64) and phone (ARM64) run on all three engines, preliminary
+> verdict.** Part A (velocity threshold on dormant value) and the size cost are missing — see
+> README.md, "What is missing". This is an order-of-magnitude signal, not a result citable as
+> closed.
 
 ## 1. What was measured
 
@@ -64,9 +65,9 @@ chain's general traffic.
 
 ## 4. What this number does NOT say yet
 
-- **It is not run on the phone.** Test 2's native/JIT/interpreter ratio was not identical between x86
-  and ARM (§10.3 already measured that for ML-DSA); there is no guarantee that the composite ~4.2×
-  holds the same way on the real reference hardware.
+- **The phone was run (section 5), but it is a single device** (Motorola Edge 40 Neo, MT6879). The
+  composite came out at 3.9× under Cranelift, close to the desktop's ~4.2×; but the interpreter costs
+  ~2× more than on x86, and a single SoC does not say whether that holds on other mid-range phones.
 - **It does not include the size cost.** An additional 7,856 B per affected transaction is a block
   size and state budget cost (§10.1) this test does not quantify — it only measures verification
   time.
@@ -74,11 +75,68 @@ chain's general traffic.
   —which velocity ceiling on dormant value does not brush against legitimate activity—, which is
   still unmeasured.
 
-## 5. Reproducibility
+## 5. On the real phone (ARM64)
+
+Motorola Edge 40 Neo (MediaTek MT6879), Termux, aarch64. Three complete runs on 2026-09-20, each a
+fresh process, with no charger plugged in and no pauses (Test 2's recipe, §6.1). The binaries were
+cross-compiled from the PC with `--target aarch64-linux-android`, because Cranelift does not compile
+inside Termux (see README.md, "On the phone"). Raw outputs in `resultados-telefono/`.
+
+**`decode+verify`**, median of the three runs (µs per signature · signatures/s · penalty vs. its own
+native)
+
+| | native | cranelift (JIT) | wasmi (int.) |
+|---|---|---|---|
+| **ML-DSA-44** | 113.4 µs · 8,818/s | 469.8 µs · 2,129/s · **4.1×** | 7.35 ms · 136/s · **64.8×** |
+| **SLH-DSA-128s** | 1,004.0 µs · 996/s | 1,363.3 µs · 734/s · **1.4×** | 20.21 ms · 49/s · **20.1×** |
+
+**SLH-DSA-128s against ML-DSA-44 on the same engine:** native 8.9× · cranelift **2.9×** · wasmi 2.8×.
+
+**Composite cost** (both signatures verified together):
+
+| engine | ML-DSA-44 + SLH-DSA-128s | vs. ML-DSA-44 alone (same engine) | per core · per quarter core |
+|---|---|---|---|
+| cranelift | 469.8 + 1,363.3 = **1,833 µs** | **3.9×** | ~545/s · ~136/s |
+| wasmi | 7.35 + 20.21 = **27.6 ms** | 3.75× | ~36/s · ~9/s |
+
+**Against the desktop** (phone / PC, median of three runs each)
+
+| | native | cranelift | wasmi |
+|---|---|---|---|
+| ML-DSA-44 | 0.91× | 1.00× | 2.09× |
+| SLH-DSA-128s | 0.79× | 1.18× | 1.99× |
+
+*Variance and validity.* Between runs (max minus min, over the median): cranelift 0.1% on ML-DSA-44
+and 0.02% on SLH-DSA-128s; wasmi 0.7% and 1.8%; native 8% and 5% (the noisiest, for the same reason as
+on the desktop). Cranelift's `compile_ms` came out at 184.0–186.7 ms in all six measurements; a run
+contaminated by migration to the little cluster would give ~4× (Test 2, §6), and there is no trace of
+it. Against Test 2: this test's module gives ML-DSA-44/cranelift ~20% slower than Test 2's *on both
+machines* (PC: 471.3 vs. 392.5 µs; phone: 469.8 vs. 390.6 µs), with a phone/PC ratio of 1.00 in both.
+It is a difference of the module and not of the phone; the cause was not investigated. That is why the
+composite is compared against ML-DSA-44 inside this same module (3.9×) and not against Test 2's 391 µs
+(which would give 4.7×).
+
+**What shows:**
+
+- **The interpreter costs ~2× more on ARM** (2.09× on ML-DSA-44, 1.99× on SLH-DSA-128s), the same
+  pattern as Test 2 (5.96 vs. 3.11 ms on ML-DSA-44, 1.9×). Against native, that takes wasmi's penalty
+  on ML-DSA-44 from 28.3× to 64.8×. The JIT, by contrast, performs the same on both architectures for
+  ML-DSA-44.
+- **SLH-DSA-128s no longer ties with its native under JIT:** 0.9× on the desktop, 1.4× on the phone.
+  What moves is the native (0.79× of the PC's), not the JIT (1.18×). One possible cause, unverified:
+  ARM's native code uses hardware SHA-2 instructions and the wasm guest cannot; the i5-9400 has no
+  SHA-NI, so on x86 that advantage did not exist.
+- **The desktop's order of magnitude holds under Cranelift** (composite 3.9×, ~136 tx/s per quarter
+  core, against ~4.2× and ~150 tx/s). **What changes is the interpreter:** ~27.6 ms per composite
+  verification, ~9 tx/s per quarter core, about 15× fewer than Cranelift. Which of the two numbers
+  applies to the budget depends on which engine the real VM uses, and this test does not decide that.
+
+## 6. Reproducibility
 
 Code in `codigo/`. Two crates: `guest/` (compiles to `wasm32-unknown-unknown`, exposes
 `run_ml_dsa44` and `run_slh_dsa128s`) and `host/` (measures with `wasmi` and `wasmtime`, plus the
-`nativo` binary for the reference row). Complete instructions in `README.md`. No dependencies outside
+`nativo` binary for the reference row). Complete instructions in `README.md`, including the route for
+the phone (binaries cross-compiled from the PC). No dependencies outside
 `crates.io`; the same RustCrypto crates `pqcore` from Test 2 already uses, plus `slh-dsa` 0.1.0.
 
 *Method note:* `slh-dsa` 0.1.0 requires pinning `signature = "=2.3.0-pre.4"` by hand — the default

@@ -2,9 +2,9 @@
 
 [English](README.md) · **Español**
 
-> Estado: **parcial.** Escritorio (x86-64) corrido en los tres motores. Falta
-> la pata de teléfono (ARM64) — no hay dispositivo a mano para esta corrida —
-> y falta toda la Parte A del problema que motiva este test. Ver RESULTS.es.md.
+> Estado: **parcial.** Escritorio (x86-64) y teléfono (ARM64) corridos en los
+> tres motores. Falta toda la Parte A del problema que motiva este test y el
+> costo de tamaño. Ver RESULTS.es.md.
 
 ## De dónde sale esto
 
@@ -72,13 +72,32 @@ contra la que está compilado `slh-dsa` 0.1.0 — una versión más nueva
 por un cambio de API entre pre-releases. Si `slh-dsa` sube de versión, esto
 hay que revisarlo.
 
+## En el teléfono (Termux, aarch64)
+
+Cranelift no compila dentro de Termux: `cranelift-codegen` hace desbordar la pila
+de rustc parseando el código que genera ISLE para ARM64 (ver
+`test2-interprete/RESULTS.es.md`), y el host de este test lleva `wasmtime` siempre.
+Hay que cruzar desde la PC:
+
+```
+rustup target add aarch64-linux-android
+cd codigo/host
+cargo build --release --locked --target aarch64-linux-android
+```
+
+`codigo/host/.cargo/config.toml` apunta al NDK de esta PC (rutas absolutas de
+Windows: hay que ajustarlas). Salen `target/aarch64-linux-android/release/host` y
+`.../nativo`; se copian al teléfono y en Termux se les hace `chmod +x` **dentro de
+`~`**, porque el almacenamiento compartido está montado `noexec`. Cada corrida es un
+proceso nuevo, sin cargador enchufado y sin pausas (Test 2, §6.1). `--locked`
+conserva el pin de `signature`.
+
 ## Lo que falta antes de que el número signifique algo para el paper
 
-1. **El teléfono real.** Igual que Test 2 y Test 5, el hardware de referencia
-   de los nodos PoD es un teléfono de gama media, no un escritorio x86. Todo lo
-   de este test corrió en una máquina de escritorio — el ratio nativo/wasmi
-   podría no trasladarse igual a ARM (§10.3 ya midió que ARM y x86 se rompen
-   por lugares distintos para ML-DSA).
+1. **Más de un teléfono.** La pata de ARM64 está corrida (RESULTS.es.md, sección
+   5), pero es un solo aparato y un solo SoC (Motorola Edge 40 Neo, MT6879). La
+   penalidad de intérprete (~2× más que en x86) y la brecha de SLH-DSA-128s bajo
+   JIT podrían moverse en otro teléfono de gama media.
 2. **La Parte A del problema que motiva esto:** el umbral de velocidad sobre
    valor dormiente en sí — qué techo no roza actividad legítima — no está
    medido. `herramientas/traer_datos.py` solo trae series a nivel de bloque

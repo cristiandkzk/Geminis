@@ -2,9 +2,9 @@
 
 **English** · [Español](README.es.md)
 
-> Status: **partial.** Desktop (x86-64) run on all three engines. The phone leg
-> (ARM64) is missing — no device at hand for this run — and the whole of Part A
-> of the problem that motivates this test is missing. See RESULTS.md.
+> Status: **partial.** Desktop (x86-64) and phone (ARM64) run on all three
+> engines. The whole of Part A of the problem that motivates this test and the
+> size cost are missing. See RESULTS.md.
 
 ## Where this comes from
 
@@ -71,13 +71,30 @@ compiled against — a newer one (`2.3.0-pre.7`, the one that resolves by defaul
 breaks the crate's compilation because of an API change between pre-releases. If
 `slh-dsa` moves version, this has to be revisited.
 
+## On the phone (Termux, aarch64)
+
+Cranelift does not compile inside Termux: `cranelift-codegen` overflows rustc's stack
+parsing the code ISLE generates for ARM64 (see `test2-interprete/RESULTS.md`), and this
+test's host always carries `wasmtime`. It has to be cross-compiled from the PC:
+
+```
+rustup target add aarch64-linux-android
+cd codigo/host
+cargo build --release --locked --target aarch64-linux-android
+```
+
+`codigo/host/.cargo/config.toml` points at this PC's NDK (absolute Windows paths: they
+have to be adjusted). The output is `target/aarch64-linux-android/release/host` and
+`.../nativo`; copy them to the phone and, in Termux, `chmod +x` them **inside `~`**,
+because shared storage is mounted `noexec`. Each run is a fresh process, with no charger
+plugged in and no pauses (Test 2, §6.1). `--locked` keeps the `signature` pin.
+
 ## What is missing before the number means anything for the paper
 
-1. **The real phone.** Just as in Test 2 and Test 5, the reference hardware of the
-   PoD nodes is a mid-range phone, not an x86 desktop. Everything in this test ran
-   on a desktop machine — the native/wasmi ratio might not carry over the same way
-   to ARM (§10.3 already measured that ARM and x86 break at different places for
-   ML-DSA).
+1. **More than one phone.** The ARM64 leg is run (RESULTS.md, section 5), but it is a
+   single device and a single SoC (Motorola Edge 40 Neo, MT6879). The interpreter
+   penalty (~2× more than on x86) and SLH-DSA-128s's gap under JIT could move on
+   another mid-range phone.
 2. **Part A of the problem that motivates this:** the velocity threshold on dormant
    value itself — which ceiling does not brush against legitimate activity — is not
    measured. `herramientas/traer_datos.py` only brings block-level series (blobs,

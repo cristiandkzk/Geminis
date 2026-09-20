@@ -1,0 +1,9 @@
+# motorola edge 40 neo / mt6879 / 2026-09-20T01:26:41-03:00
+
+ML-DSA-44    native decode+verify: 112.6 us/op (8885 ops/s)
+SLH-DSA-128s native decode+verify: 1004.0 us/op (996 ops/s)  [8.9x ML-DSA-44]
+
+modulo: 142788 bytes
+
+ML-DSA-44      wasmi:  7340.8 us/op (   136 ops/s, compilar 3.0 ms)   cranelift:   469.8 us/op (  2129 ops/s, compilar 184.9 ms)
+SLH-DSA-128s   wasmi: 20214.9 us/op (    49 ops/s, compilar 1.0 ms)   cranelift:  1363.5 us/op (   733 ops/s, compilar 186.7 ms)
