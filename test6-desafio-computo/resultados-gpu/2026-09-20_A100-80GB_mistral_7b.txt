@@ -1,0 +1,135 @@
+# fecha:  2026-09-20
+# gpu:    NVIDIA A100 80GB PCIe, 81920 MiB, 580.95.05
+# ollama: ollama version is 0.34.2
+# modelo: mistral:7b
+
+# carga del modelo: 9.8s (fuera de la medición)
+
+Corriendo 100 intentos (+3 de warmup) contra mistral:7b en http://127.0.0.1:11434/v1/chat/completions
+
+  [1/103] es-cocina: 1.46s (warmup, descartado)
+  [2/103] en-historia: 1.19s (warmup, descartado)
+  [3/103] pt-tecnologia: 2.00s (warmup, descartado)
+  [4/103] es-producto: 1.56s — OK
+  [5/103] es-cocina: 1.45s — OK
+  [6/103] en-historia: 1.10s — OK
+  [7/103] pt-tecnologia: 1.12s — OK
+  [8/103] es-producto: 1.64s — OK
+  [9/103] es-cocina: 2.12s — OK
+  [10/103] en-historia: 1.24s — RECHAZADO (no es JSON válido)
+  [11/103] pt-tecnologia: 1.92s — OK
+  [12/103] es-producto: 1.29s — OK
+  [13/103] es-cocina: 1.47s — OK
+  [14/103] en-historia: 0.99s — OK
+  [15/103] pt-tecnologia: 1.49s — RECHAZADO (no es JSON válido)
+  [16/103] es-producto: 1.48s — OK
+  [17/103] es-cocina: 1.63s — OK
+  [18/103] en-historia: 1.09s — RECHAZADO (no es JSON válido)
+  [19/103] pt-tecnologia: 1.81s — OK
+  [20/103] es-producto: 1.59s — OK
+  [21/103] es-cocina: 2.36s — RECHAZADO (por debajo del piso de palabras alfabéticas)
+  [22/103] en-historia: 1.31s — OK
+  [23/103] pt-tecnologia: 1.85s — OK
+  [24/103] es-producto: 1.78s — OK
+  [25/103] es-cocina: 1.52s — OK
+  [26/103] en-historia: 0.61s — RECHAZADO (no es JSON válido)
+  [27/103] pt-tecnologia: 1.57s — OK
+  [28/103] es-producto: 2.36s — OK
+  [29/103] es-cocina: 2.12s — OK
+  [30/103] en-historia: 1.43s — RECHAZADO (no es JSON válido)
+  [31/103] pt-tecnologia: 1.68s — OK
+  [32/103] es-producto: 1.80s — OK
+  [33/103] es-cocina: 2.50s — RECHAZADO (por debajo del piso de palabras alfabéticas)
+  [34/103] en-historia: 1.17s — OK
+  [35/103] pt-tecnologia: 0.96s — OK
+  [36/103] es-producto: 2.22s — OK
+  [37/103] es-cocina: 1.62s — OK
+  [38/103] en-historia: 1.28s — OK
+  [39/103] pt-tecnologia: 1.56s — RECHAZADO (faltan campos)
+  [40/103] es-producto: 1.33s — OK
+  [41/103] es-cocina: 1.20s — OK
+  [42/103] en-historia: 1.26s — OK
+  [43/103] pt-tecnologia: 1.37s — RECHAZADO (no es JSON válido)
+  [44/103] es-producto: 1.50s — OK
+  [45/103] es-cocina: 1.77s — OK
+  [46/103] en-historia: 0.82s — OK
+  [47/103] pt-tecnologia: 1.85s — RECHAZADO (no es JSON válido)
+  [48/103] es-producto: 1.48s — OK
+  [49/103] es-cocina: 1.33s — OK
+  [50/103] en-historia: 0.94s — OK
+  [51/103] pt-tecnologia: 1.68s — OK
+  [52/103] es-producto: 1.46s — OK
+  [53/103] es-cocina: 2.17s — RECHAZADO (por debajo del piso de palabras alfabéticas)
+  [54/103] en-historia: 0.92s — OK
+  [55/103] pt-tecnologia: 1.20s — RECHAZADO (faltan campos)
+  [56/103] es-producto: 2.39s — OK
+  [57/103] es-cocina: 4.44s — RECHAZADO (por debajo del piso de palabras alfabéticas)
+  [58/103] en-historia: 1.02s — OK
+  [59/103] pt-tecnologia: 2.19s — OK
+  [60/103] es-producto: 2.28s — OK
+  [61/103] es-cocina: 1.52s — OK
+  [62/103] en-historia: 1.03s — OK
+  [63/103] pt-tecnologia: 1.30s — RECHAZADO (no es JSON válido)
+  [64/103] es-producto: 1.72s — OK
+  [65/103] es-cocina: 1.82s — OK
+  [66/103] en-historia: 1.52s — OK
+  [67/103] pt-tecnologia: 1.72s — OK
+  [68/103] es-producto: 1.75s — OK
+  [69/103] es-cocina: 1.63s — OK
+  [70/103] en-historia: 0.95s — RECHAZADO (no es JSON válido)
+  [71/103] pt-tecnologia: 1.68s — RECHAZADO (no es JSON válido)
+  [72/103] es-producto: 1.50s — OK
+  [73/103] es-cocina: 2.34s — OK
+  [74/103] en-historia: 0.92s — RECHAZADO (faltan campos)
+  [75/103] pt-tecnologia: 1.33s — OK
+  [76/103] es-producto: 2.67s — OK
+  [77/103] es-cocina: 1.52s — OK
+  [78/103] en-historia: 1.11s — OK
+  [79/103] pt-tecnologia: 1.65s — RECHAZADO (no es JSON válido)
+  [80/103] es-producto: 1.35s — OK
+  [81/103] es-cocina: 3.04s — OK
+  [82/103] en-historia: 1.23s — RECHAZADO (no es JSON válido)
+  [83/103] pt-tecnologia: 1.20s — OK
+  [84/103] es-producto: 2.51s — OK
+  [85/103] es-cocina: 1.86s — OK
+  [86/103] en-historia: 0.99s — OK
+  [87/103] pt-tecnologia: 1.31s — RECHAZADO (no es JSON válido)
+  [88/103] es-producto: 2.07s — OK
+  [89/103] es-cocina: 1.29s — OK
+  [90/103] en-historia: 1.06s — OK
+  [91/103] pt-tecnologia: 1.29s — RECHAZADO (faltan campos)
+  [92/103] es-producto: 2.19s — OK
+  [93/103] es-cocina: 1.32s — OK
+  [94/103] en-historia: 0.98s — OK
+  [95/103] pt-tecnologia: 1.16s — RECHAZADO (no es JSON válido)
+  [96/103] es-producto: 2.02s — OK
+  [97/103] es-cocina: 1.71s — OK
+  [98/103] en-historia: 1.24s — OK
+  [99/103] pt-tecnologia: 1.09s — OK
+  [100/103] es-producto: 1.69s — OK
+  [101/103] es-cocina: 1.33s — OK
+  [102/103] en-historia: 1.29s — OK
+  [103/103] pt-tecnologia: 1.21s — OK
+
+==============================================================================
+Resultado
+==============================================================================
+
+Tasa de intentos que pasan el filtro estructural: 78% (78/100)
+
+Latencia de intentos válidos (segundos):
+  p50 = 1.52   p90 = 2.20   p99 = 2.76   peor caso = 3.04
+
+Por dominio:
+  es-producto          p50 = 1.72s  (n=25)
+  es-cocina            p50 = 1.62s  (n=21)
+  en-historia          p50 = 1.08s  (n=18)
+  pt-tecnologia        p50 = 1.63s  (n=14)
+
+Con tiempo_de_bloque = 6s, el peor caso medido da X ≈ 1 bloques.
+Si los intentos son secuenciales (no en paralelo), el tiempo esperado hasta
+el primero válido es aproximadamente p50 / tasa_de_éxito, no p50 solo.
+Esto es un solo modelo en una sola corrida — no alcanza para fijar X (ver README.es.md).
+
+NAME          ID              SIZE      PROCESSOR    CONTEXT    UNTIL               
+mistral:7b    6577803aa9a0    5.0 GB    100% GPU     4096       59 minutes from now

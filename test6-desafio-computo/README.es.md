@@ -2,8 +2,9 @@
 
 [English](README.md) · **Español**
 
-> Estado: **sin correr.** Falta elegir el modelo de referencia y el hardware
-> "grande" con el que comparar. Ver §6.7.1 y el problema abierto de §10.3.
+> Estado: **corrido en dos máquinas** (GTX 1660 SUPER local y A100 80GB PCIe en Modal,
+> cinco corridas). Falta decidir qué modelo y hardware cuentan como referencia. Ver
+> RESULTS.es.md, §6.7.1 y el problema abierto de §10.3.
 
 Lo que pide §6.7.1: medir cuánto tarda un nodo de cómputo en producir **un intento
 válido** del desafío —una pasada de inferencia con el `nonce` adentro del prompt,
@@ -55,6 +56,28 @@ python medicion.py --endpoint http://localhost:11434/v1/chat/completions \
 
 Sin dependencias externas — sólo `urllib` de la librería estándar, para no atarse a
 qué cliente HTTP tenga instalado cada máquina.
+
+## En una GPU grande (Modal)
+
+`modal_gpu.py` corre las mediciones sobre un A100 de 80 GB alquilado en Modal, sin tocar
+`medicion.py`: levanta Ollama en un contenedor, baja cada modelo una sola vez a un volumen y
+corre `medicion.py` contra localhost dentro del mismo contenedor, para que la red no entre en
+la latencia. Fija la versión de Ollama (`OLLAMA_TAG`, la misma que en las medidas locales),
+el contexto en 4096 y una petición a la vez, y marca como inválida cualquier fila donde el
+modelo no quede 100% en GPU.
+
+```
+pip install modal
+python -m modal setup
+python -m modal run modal_gpu.py            # llama3.1:8b, mistral:7b y llama3.1:70b, 100 intentos
+python -m modal run modal_gpu.py --modelos llama3.1:8b --intentos 30
+```
+
+Otra GPU: definir `TEST6_GPU` (por ejemplo `H100`) antes de correr. **Modal exige un método
+de pago cargado para usar cualquier GPU**, aunque el crédito gratis del plan Starter ($30/mes)
+se aplica primero. La corrida completa tardó unos 35 minutos, que a $2.50/h del A100 80GB son
+~$1.50 como cota superior (el gasto real está en el panel de Modal). Cada corrida tiene un
+corte duro de 2 horas. Las salidas quedan en `resultados-gpu/`.
 
 ## Lo que falta decidir antes de que el número signifique algo
 

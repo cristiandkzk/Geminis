@@ -1,0 +1,135 @@
+# fecha:  2026-09-20
+# gpu:    NVIDIA A100 80GB PCIe, 81920 MiB, 580.95.05
+# ollama: ollama version is 0.34.2
+# modelo: llama3.1:8b
+
+# carga del modelo: 54.3s (fuera de la medición)
+
+Corriendo 100 intentos (+3 de warmup) contra llama3.1:8b en http://127.0.0.1:11434/v1/chat/completions
+
+  [1/103] es-cocina: 1.46s (warmup, descartado)
+  [2/103] en-historia: 1.74s (warmup, descartado)
+  [3/103] pt-tecnologia: 1.16s (warmup, descartado)
+  [4/103] es-producto: 2.19s — OK
+  [5/103] es-cocina: 1.19s — RECHAZADO (no es JSON válido)
+  [6/103] en-historia: 1.33s — OK
+  [7/103] pt-tecnologia: 1.43s — OK
+  [8/103] es-producto: 1.62s — OK
+  [9/103] es-cocina: 1.55s — OK
+  [10/103] en-historia: 1.01s — OK
+  [11/103] pt-tecnologia: 1.59s — OK
+  [12/103] es-producto: 2.24s — OK
+  [13/103] es-cocina: 1.32s — OK
+  [14/103] en-historia: 0.97s — OK
+  [15/103] pt-tecnologia: 1.44s — OK
+  [16/103] es-producto: 1.89s — OK
+  [17/103] es-cocina: 1.84s — RECHAZADO (no es JSON válido)
+  [18/103] en-historia: 1.44s — OK
+  [19/103] pt-tecnologia: 1.68s — OK
+  [20/103] es-producto: 2.10s — OK
+  [21/103] es-cocina: 1.42s — OK
+  [22/103] en-historia: 1.33s — OK
+  [23/103] pt-tecnologia: 1.51s — OK
+  [24/103] es-producto: 1.38s — OK
+  [25/103] es-cocina: 1.51s — RECHAZADO (no es JSON válido)
+  [26/103] en-historia: 1.22s — OK
+  [27/103] pt-tecnologia: 1.30s — OK
+  [28/103] es-producto: 1.85s — OK
+  [29/103] es-cocina: 1.65s — OK
+  [30/103] en-historia: 1.34s — OK
+  [31/103] pt-tecnologia: 1.41s — OK
+  [32/103] es-producto: 1.65s — OK
+  [33/103] es-cocina: 1.53s — OK
+  [34/103] en-historia: 1.69s — OK
+  [35/103] pt-tecnologia: 1.40s — OK
+  [36/103] es-producto: 1.49s — OK
+  [37/103] es-cocina: 1.57s — OK
+  [38/103] en-historia: 1.05s — OK
+  [39/103] pt-tecnologia: 1.48s — OK
+  [40/103] es-producto: 1.05s — RECHAZADO (no es JSON válido)
+  [41/103] es-cocina: 1.62s — OK
+  [42/103] en-historia: 1.38s — OK
+  [43/103] pt-tecnologia: 0.81s — OK
+  [44/103] es-producto: 1.75s — OK
+  [45/103] es-cocina: 1.09s — OK
+  [46/103] en-historia: 1.06s — OK
+  [47/103] pt-tecnologia: 1.49s — OK
+  [48/103] es-producto: 1.85s — OK
+  [49/103] es-cocina: 1.23s — OK
+  [50/103] en-historia: 1.00s — OK
+  [51/103] pt-tecnologia: 1.24s — OK
+  [52/103] es-producto: 1.55s — OK
+  [53/103] es-cocina: 1.30s — OK
+  [54/103] en-historia: 0.83s — OK
+  [55/103] pt-tecnologia: 1.30s — RECHAZADO (no es JSON válido)
+  [56/103] es-producto: 2.13s — OK
+  [57/103] es-cocina: 1.40s — OK
+  [58/103] en-historia: 1.69s — OK
+  [59/103] pt-tecnologia: 1.07s — OK
+  [60/103] es-producto: 1.66s — OK
+  [61/103] es-cocina: 1.53s — OK
+  [62/103] en-historia: 1.53s — OK
+  [63/103] pt-tecnologia: 1.32s — OK
+  [64/103] es-producto: 1.28s — OK
+  [65/103] es-cocina: 1.80s — OK
+  [66/103] en-historia: 0.93s — OK
+  [67/103] pt-tecnologia: 0.92s — OK
+  [68/103] es-producto: 1.30s — OK
+  [69/103] es-cocina: 1.20s — OK
+  [70/103] en-historia: 0.99s — OK
+  [71/103] pt-tecnologia: 1.18s — OK
+  [72/103] es-producto: 2.23s — OK
+  [73/103] es-cocina: 2.33s — OK
+  [74/103] en-historia: 1.13s — OK
+  [75/103] pt-tecnologia: 1.27s — OK
+  [76/103] es-producto: 1.77s — OK
+  [77/103] es-cocina: 2.04s — OK
+  [78/103] en-historia: 0.85s — OK
+  [79/103] pt-tecnologia: 1.36s — OK
+  [80/103] es-producto: 1.61s — OK
+  [81/103] es-cocina: 1.90s — OK
+  [82/103] en-historia: 1.39s — OK
+  [83/103] pt-tecnologia: 0.97s — OK
+  [84/103] es-producto: 1.99s — OK
+  [85/103] es-cocina: 1.60s — OK
+  [86/103] en-historia: 1.14s — OK
+  [87/103] pt-tecnologia: 1.24s — OK
+  [88/103] es-producto: 1.20s — OK
+  [89/103] es-cocina: 1.56s — OK
+  [90/103] en-historia: 1.44s — OK
+  [91/103] pt-tecnologia: 1.31s — OK
+  [92/103] es-producto: 2.26s — OK
+  [93/103] es-cocina: 1.95s — OK
+  [94/103] en-historia: 1.60s — OK
+  [95/103] pt-tecnologia: 1.01s — OK
+  [96/103] es-producto: 2.21s — RECHAZADO (no es JSON válido)
+  [97/103] es-cocina: 1.20s — OK
+  [98/103] en-historia: 0.79s — OK
+  [99/103] pt-tecnologia: 0.91s — OK
+  [100/103] es-producto: 2.01s — RECHAZADO (no es JSON válido)
+  [101/103] es-cocina: 1.45s — OK
+  [102/103] en-historia: 1.34s — OK
+  [103/103] pt-tecnologia: 1.28s — OK
+
+==============================================================================
+Resultado
+==============================================================================
+
+Tasa de intentos que pasan el filtro estructural: 93% (93/100)
+
+Latencia de intentos válidos (segundos):
+  p50 = 1.41   p90 = 1.94   p99 = 2.26   peor caso = 2.33
+
+Por dominio:
+  es-producto          p50 = 1.76s  (n=22)
+  en-historia          p50 = 1.22s  (n=25)
+  pt-tecnologia        p50 = 1.31s  (n=24)
+  es-cocina            p50 = 1.54s  (n=22)
+
+Con tiempo_de_bloque = 6s, el peor caso medido da X ≈ 1 bloques.
+Si los intentos son secuenciales (no en paralelo), el tiempo esperado hasta
+el primero válido es aproximadamente p50 / tasa_de_éxito, no p50 solo.
+Esto es un solo modelo en una sola corrida — no alcanza para fijar X (ver README.es.md).
+
+NAME           ID              SIZE      PROCESSOR    CONTEXT    UNTIL               
+llama3.1:8b    46e0c10c039e    5.3 GB    100% GPU     4096       59 minutes from now

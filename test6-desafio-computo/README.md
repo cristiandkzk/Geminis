@@ -2,8 +2,9 @@
 
 **English** · [Español](README.es.md)
 
-> Status: **not run.** The reference model and the "large" hardware to compare
-> against still have to be chosen. See §6.7.1 and the open problem of §10.3.
+> Status: **run on two machines** (local GTX 1660 SUPER and A100 80GB PCIe on Modal, five
+> runs). Which model and hardware count as the reference is still to be decided. See
+> RESULTS.md, §6.7.1 and the open problem of §10.3.
 
 What §6.7.1 asks for: measure how long a compute node takes to produce **one valid
 attempt** at the challenge —an inference pass with the `nonce` inside the prompt,
@@ -54,6 +55,28 @@ python medicion.py --endpoint http://localhost:11434/v1/chat/completions \
 
 No external dependencies — only `urllib` from the standard library, so as not to tie
 it to whichever HTTP client each machine happens to have installed.
+
+## On a large GPU (Modal)
+
+`modal_gpu.py` runs the measurements on an 80 GB A100 rented on Modal, without touching
+`medicion.py`: it starts Ollama in a container, downloads each model once into a volume and
+runs `medicion.py` against localhost inside the same container, so the network does not enter
+the latency. It pins the Ollama version (`OLLAMA_TAG`, the same as in the local measurements),
+the context at 4096 and one request at a time, and marks as invalid any row where the model does
+not end up 100% on GPU.
+
+```
+pip install modal
+python -m modal setup
+python -m modal run modal_gpu.py            # llama3.1:8b, mistral:7b and llama3.1:70b, 100 attempts
+python -m modal run modal_gpu.py --modelos llama3.1:8b --intentos 30
+```
+
+For another GPU, set `TEST6_GPU` (for example `H100`) before running. **Modal requires a payment
+method on file to use any GPU**, although the free credit of the Starter plan ($30/month) is
+applied first. The full run took about 35 minutes, which at $2.50/h for the A100 80GB is ~$1.50
+as an upper bound (the real spend is in Modal's dashboard). Each run has a hard 2-hour cutoff.
+Outputs land in `resultados-gpu/`.
 
 ## What has to be decided before the number means anything
 

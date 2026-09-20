@@ -1,0 +1,135 @@
+# fecha:  2026-09-20
+# gpu:    NVIDIA A100 80GB PCIe, 81920 MiB, 580.95.05
+# ollama: ollama version is 0.34.2
+# modelo: llama3.1:70b
+
+# carga del modelo: 36.6s (fuera de la medición)
+
+Corriendo 100 intentos (+3 de warmup) contra llama3.1:70b en http://127.0.0.1:11434/v1/chat/completions
+
+  [1/103] es-cocina: 15.94s (warmup, descartado)
+  [2/103] en-historia: 4.69s (warmup, descartado)
+  [3/103] pt-tecnologia: 15.43s (warmup, descartado)
+  [4/103] es-producto: 11.02s — OK
+  [5/103] es-cocina: 9.99s — OK
+  [6/103] en-historia: 7.46s — OK
+  [7/103] pt-tecnologia: 8.29s — OK
+  [8/103] es-producto: 13.01s — OK
+  [9/103] es-cocina: 8.90s — OK
+  [10/103] en-historia: 7.44s — OK
+  [11/103] pt-tecnologia: 9.29s — OK
+  [12/103] es-producto: 11.11s — OK
+  [13/103] es-cocina: 17.75s — OK
+  [14/103] en-historia: 6.42s — OK
+  [15/103] pt-tecnologia: 7.71s — OK
+  [16/103] es-producto: 13.24s — OK
+  [17/103] es-cocina: 7.04s — OK
+  [18/103] en-historia: 8.25s — OK
+  [19/103] pt-tecnologia: 5.42s — OK
+  [20/103] es-producto: 9.78s — OK
+  [21/103] es-cocina: 13.96s — OK
+  [22/103] en-historia: 7.08s — OK
+  [23/103] pt-tecnologia: 4.69s — OK
+  [24/103] es-producto: 13.43s — OK
+  [25/103] es-cocina: 15.41s — OK
+  [26/103] en-historia: 8.30s — OK
+  [27/103] pt-tecnologia: 6.08s — OK
+  [28/103] es-producto: 9.96s — OK
+  [29/103] es-cocina: 9.10s — OK
+  [30/103] en-historia: 8.46s — OK
+  [31/103] pt-tecnologia: 11.21s — OK
+  [32/103] es-producto: 9.46s — OK
+  [33/103] es-cocina: 10.70s — OK
+  [34/103] en-historia: 8.33s — OK
+  [35/103] pt-tecnologia: 9.27s — OK
+  [36/103] es-producto: 11.43s — OK
+  [37/103] es-cocina: 13.88s — OK
+  [38/103] en-historia: 10.32s — OK
+  [39/103] pt-tecnologia: 8.42s — OK
+  [40/103] es-producto: 10.12s — OK
+  [41/103] es-cocina: 10.62s — OK
+  [42/103] en-historia: 11.17s — OK
+  [43/103] pt-tecnologia: 6.81s — OK
+  [44/103] es-producto: 8.25s — OK
+  [45/103] es-cocina: 5.66s — RECHAZADO (por debajo del piso de palabras alfabéticas)
+  [46/103] en-historia: 6.10s — OK
+  [47/103] pt-tecnologia: 14.15s — OK
+  [48/103] es-producto: 10.38s — OK
+  [49/103] es-cocina: 8.66s — OK
+  [50/103] en-historia: 3.86s — OK
+  [51/103] pt-tecnologia: 4.86s — OK
+  [52/103] es-producto: 7.18s — OK
+  [53/103] es-cocina: 12.16s — OK
+  [54/103] en-historia: 6.17s — OK
+  [55/103] pt-tecnologia: 14.95s — OK
+  [56/103] es-producto: 5.13s — RECHAZADO (por debajo del mínimo de palabras)
+  [57/103] es-cocina: 8.40s — OK
+  [58/103] en-historia: 10.49s — OK
+  [59/103] pt-tecnologia: 11.33s — OK
+  [60/103] es-producto: 10.90s — OK
+  [61/103] es-cocina: 9.05s — OK
+  [62/103] en-historia: 13.25s — OK
+  [63/103] pt-tecnologia: 6.47s — OK
+  [64/103] es-producto: 12.03s — OK
+  [65/103] es-cocina: 11.93s — OK
+  [66/103] en-historia: 8.74s — OK
+  [67/103] pt-tecnologia: 6.80s — OK
+  [68/103] es-producto: 12.90s — OK
+  [69/103] es-cocina: 10.51s — OK
+  [70/103] en-historia: 6.43s — OK
+  [71/103] pt-tecnologia: 4.62s — OK
+  [72/103] es-producto: 13.17s — OK
+  [73/103] es-cocina: 11.90s — OK
+  [74/103] en-historia: 8.06s — OK
+  [75/103] pt-tecnologia: 10.39s — OK
+  [76/103] es-producto: 9.15s — OK
+  [77/103] es-cocina: 13.43s — OK
+  [78/103] en-historia: 6.70s — OK
+  [79/103] pt-tecnologia: 5.47s — OK
+  [80/103] es-producto: 14.40s — OK
+  [81/103] es-cocina: 12.60s — OK
+  [82/103] en-historia: 8.78s — OK
+  [83/103] pt-tecnologia: 9.56s — OK
+  [84/103] es-producto: 10.62s — OK
+  [85/103] es-cocina: 8.28s — OK
+  [86/103] en-historia: 5.79s — OK
+  [87/103] pt-tecnologia: 5.20s — OK
+  [88/103] es-producto: 8.32s — OK
+  [89/103] es-cocina: 13.80s — OK
+  [90/103] en-historia: 6.79s — OK
+  [91/103] pt-tecnologia: 13.49s — OK
+  [92/103] es-producto: 10.89s — OK
+  [93/103] es-cocina: 15.06s — OK
+  [94/103] en-historia: 8.07s — OK
+  [95/103] pt-tecnologia: 4.58s — OK
+  [96/103] es-producto: 9.99s — OK
+  [97/103] es-cocina: 27.68s — OK
+  [98/103] en-historia: 8.83s — OK
+  [99/103] pt-tecnologia: 5.32s — OK
+  [100/103] es-producto: 11.46s — OK
+  [101/103] es-cocina: 7.12s — OK
+  [102/103] en-historia: 7.65s — OK
+  [103/103] pt-tecnologia: 6.75s — OK
+
+==============================================================================
+Resultado
+==============================================================================
+
+Tasa de intentos que pasan el filtro estructural: 98% (98/100)
+
+Latencia de intentos válidos (segundos):
+  p50 = 9.21   p90 = 13.58   p99 = 18.05   peor caso = 27.68
+
+Por dominio:
+  es-producto          p50 = 10.90s  (n=24)
+  es-cocina            p50 = 11.30s  (n=24)
+  en-historia          p50 = 8.06s  (n=25)
+  pt-tecnologia        p50 = 6.81s  (n=25)
+
+Con tiempo_de_bloque = 6s, el peor caso medido da X ≈ 5 bloques.
+Si los intentos son secuenciales (no en paralelo), el tiempo esperado hasta
+el primero válido es aproximadamente p50 / tasa_de_éxito, no p50 solo.
+Esto es un solo modelo en una sola corrida — no alcanza para fijar X (ver README.es.md).
+
+NAME            ID              SIZE     PROCESSOR    CONTEXT    UNTIL               
+llama3.1:70b    711a9e8463af    43 GB    100% GPU     4096       59 minutes from now
