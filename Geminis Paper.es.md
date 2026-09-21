@@ -722,6 +722,37 @@ que la automatización recaía en supervisión humana.
 La segunda objeción de esa misma discusión —que quien puede romper la primitiva gana más
 callándose que cobrando la recompensa— no la resuelve este lazo, y está declarada en §10.2.
 
+### 6.6.2 · Un escenario: migrar una firma clásica a una post-cuántica
+
+Lo anterior es el lazo; esto es lo que hace con un cambio de firma concreto. Una cadena que nació con una firma
+clásica —Ed25519, o secp256k1 como las cuentas de Ethereum— puede pasar a una post-cuántica **por sucesión**, sin un
+fork coordinado: la transición agrega el formato sucesor (ML-DSA-44) a los que acepta la generación, y desde ahí
+valen las dos. Lo que se conserva es lo que I3 y I4 prometen: el estado, la raíz del Génesis y un linaje que verifica
+de punta a punta.
+
+**Por qué la implementación de referencia arranca con una firma clásica.** No es una postura sobre qué debería usar
+una cadena: la elección de Geminis para una cadena que nace nueva sigue siendo ML-DSA-44 (§10.1). Es que para mostrar
+un *cambio* de firma hace falta partir de una distinta de la de destino, y clásica → post-cuántica es la migración
+que tienen pendiente las cadenas que ya existen. **La firma inicial es un parámetro del Génesis, no una propiedad del
+mecanismo.**
+
+Lo medido está en §12 (Tests 8 a 10) y tiene cuatro salvedades que importan:
+
+- **La firma clásica no es la barata.** Verificar secp256k1 cuesta 1,71× lo que ML-DSA-44 (5,67 M contra 3,32 M
+  pasos) y `ecrecover` no cabe bajo el techo inicial. Migrar devolvería capacidad; lo que crece es el tamaño, unas 38
+  veces por firma más clave.
+- **Los mecanismos son independientes; la seguridad, no.** La sucesión del hash (BLAKE2s → SHA-3) y la de la firma
+  (Ed25519 → ML-DSA-44) avanzan una sin la otra y en cualquier orden, con el linaje verificando y la raíz intacta.
+  Pero Ed25519 hashea con SHA-2 y ML-DSA con Keccak: cuando ocurrieron las dos, `H` comparte núcleo con la firma
+  sucesora. Es el límite que declara §10.1.
+- **Ethereum no eligió ML-DSA-44.** Según [ethereum.org](https://ethereum.org/roadmap/security/quantum-resistance/) y
+  [pq.ethereum.org](https://pq.ethereum.org/) (septiembre de 2026), su equipo evalúa Falcon, Dilithium y SPHINCS+
+  para las cuentas, con account abstraction (EIP-8141), y leanXMSS —basada en hashes— para los validadores. Este
+  escenario muestra que el mecanismo puede expresar ese cambio; no que ése deba ser el destino.
+- **Lo que viene después de ML-DSA-44 sigue abierto.** Como dice §6.6, el sucesor lo entrega un pedido de trabajo
+  como bytecode y lo acepta el guante; ese camino no está construido. ML-DSA-87 no es un escalón: es un nivel de
+  costo medido en Test 2.
+
 ### 6.7 El desafío de cómputo: rápido gana, mejor no alcanza
 
 §6.5 asigna cada pedido de trabajo a un solo nodo, antes de que compute — es lo que elimina el
@@ -1721,6 +1752,15 @@ migración tendría que correr sobre una cadena cuya verificación de linaje ya 
 Geminis elige `H` de una familia distinta de la que usa la primitiva de firma inicial. Es barato el
 día uno e imposible después.
 
+**Con una firma inicial clásica, "de otra familia" deja de ser SHA-2, y la regla no se puede sostener en todos los
+escalones.** Ed25519 hashea con SHA-512, así que un `H` SHA-2 comparte núcleo con ella desde el bloque 0: la
+implementación de referencia usa BLAKE2s, que no es SHA-2 ni Keccak. Pero las firmas son aditivas (I5: Ed25519 no se
+retira) y la biblioteca estándar solo garantiza tres familias de hash —SHA-2, Keccak y BLAKE—, así que las
+sucesiones del hash y de la firma no pueden evitar acoplarse en algún escalón: apenas el hash sucesor es SHA-3 y la
+firma sucesora ML-DSA-44, comparten Keccak. Un chequeo (`protocolo/nucleo.py`) **reporta ese acople en el escalón
+donde aparece y no lo bloquea**, porque bloquearlo dejaría a la cadena de hash sin sucesor. La regla se hace cumplir
+con filo para el `H` de la generación 0 y para lo que sigue es un **límite declarado**; §6.6.2 tiene el caso.
+
 **Elegir la primitiva más escrutinada, no la más rara, y sostener a sabiendas el riesgo de
 monocultura que eso trae.** Casi toda la industria cripto hoy comparte núcleo — secp256k1 para
 Bitcoin y para las cuentas de Ethereum —, así que una ruptura matemática real del problema de base
@@ -2490,6 +2530,42 @@ operables con un número.
 >
 > **Y la reproducibilidad entre arquitecturas quedó verificada**: los siete vectores —veredicto,
 > pasos, páginas y huella de los registros— dan idénticos en x86-64 y en aarch64.
+
+**Los Tests 6 y 7 se usan donde corresponden, y después vinieron tres más.** El 6 (`test6-desafio-computo/`) mide el
+presupuesto del desafío de cómputo de §6.7.1 y el 7 (`test7-firma-compuesta/`) la mitigación de §10.2. Los tres que
+siguen miden la firma y su sucesión, y son de la misma clase que el quinto: no se podían correr sin la máquina.
+
+**Test 8 · Ed25519 en la máquina.** ✅ **Corrido** (septiembre 2026). "Ed25519 es más eficiente" era una intuición:
+hasta acá todo lo medido en la máquina era ML-DSA. Se compiló ed25519-dalek a RV32IM y se corrió en la máquina de
+§6.6 sin tocarla, con el mismo método que Test 2 (`test8-ed25519/`).
+
+> **Resultado: entre 1,02× y 1,11× menos pasos que ML-DSA-44, no un orden de magnitud.** `verify_strict` cuesta
+> 3,28 M pasos y `verify` 3,01 M, contra los 3,34 M de ML-DSA-44; en capacidad por bloque son ~1,3×. Donde
+> Ed25519 gana por mucho es en bytes, que el test no mide. El vector 1 de RFC 8032 verifica en el guest y una firma
+> alterada da cero. Un crate de referencia sin ajustar y solo x86-64.
+
+**Test 9 · Ed25519 → ML-DSA-44 en la misma cadena.** ✅ **Corrido** (septiembre 2026). ¿Componen las piezas? La
+sucesión de formatos estaba probada con firmas que eran etiquetas, y la máquina con cada primitiva suelta. Un nodo
+real cruza la transición del canario y, en cada generación, una firma se admite por el formato que ese ruleset
+conoce (I5) y se verifica de verdad en la máquina bajo los techos de *esa* generación, contrastando cada veredicto
+con la verificación nativa (`test9-ed25519-a-mldsa/`).
+
+> **Resultado: componen.** La generación 0 rechaza ML-DSA-44 por formato sin invocar la máquina; la 1 acepta las dos
+> y la firma nacida en la 0 sigue valiendo. `H0_GENESIS` no se mueve y el linaje verifica. Rechazar una firma mala
+> cuesta lo que aceptar una buena (~3,3 M pasos). **El enrutado firma → máquina es andamiaje de la prueba, no del
+> protocolo**: el estado sintético no tiene cuentas ni transacciones firmadas.
+
+**Test 10 · secp256k1 → ML-DSA-44: el cambio que Ethereum haría con un fork.** ✅ **Corrido** (septiembre 2026).
+Lo mismo con la firma que usan hoy las cuentas de Ethereum, sobre un Génesis alternativo que es solo de la prueba
+(`test10-secp256k1-a-mldsa/`). Con dos anclas externas para que no sea la implementación coincidiendo consigo
+misma: la clave privada 1 da la dirección conocida `0x7e5f…5bdf` y `ecrecover` corrido en la máquina recupera esa
+misma dirección; y se rechaza la firma con `s` alto (EIP-2).
+
+> **Resultado: el mecanismo expresa el cambio, y la firma de Ethereum es la más cara de las tres.** Verificar
+> secp256k1 cuesta 5,67 M pasos (1,71× ML-DSA-44) y `ecrecover` 11,33 M, que **no cabe bajo el techo inicial** de 7
+> M. Migrar a ML-DSA-44 devolvería capacidad; lo que crece es el tamaño, ~38×. *Y un hallazgo sobre el nodo:* la
+> invariante I4 se revisa contra el `H0_GENESIS` de Geminis, así que hoy el nodo no soporta otro Génesis. Un crate
+> por primitiva, sin ajustar; **no se afirma que Ethereum deba elegir ML-DSA-44**.
 
 **Los tests 1 y 4 eran independientes y dieron resultados opuestos.** El Test 1 decidía si el
 mecanismo generacional tiene cliente y encontró uno, más chico que el mecanismo; el Test 4 decidía
