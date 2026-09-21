@@ -1,0 +1,17 @@
+[package]
+name = "guest-secp256k1-io"
+version = "0.1.0"
+edition = "2021"
+
+# ECDSA sobre secp256k1: **la firma de las cuentas de Ethereum hoy**. El crate `k256` de RustCrypto,
+# igual que el resto de los guests de referencia (ed25519-dalek, ml-dsa): se mide la implementacion
+# del ecosistema, no una escrita a mano, y el numero depende de esa eleccion.
+[dependencies]
+k256 = { version = "0.13", default-features = false, features = ["ecdsa", "arithmetic"] }
+
+# El mismo perfil que `test2-interprete/telefono/guest-rv` y que los guests de Test 8 y Test 9.
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"

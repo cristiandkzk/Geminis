@@ -1,0 +1,25 @@
+# Test 10 — secp256k1 -> ML-DSA-44 en la misma cadena — x86-64 (Windows), 2026-09-21
+# maquina: geminis/predicado/vm en el commit daab109 (cambios sin commitear en geminis/predicado/vm: 4)
+# guests: k256 0.13.4 (ECDSA, low-S) · ml-dsa 0.1.1 (el guest de Test 9)
+
+.....................
+----------------------------------------------------------------------
+Ran 21 tests in 0.511s
+
+OK
+
+# Génesis alternativo adf7399e299686d8 · Geminis 6175777756bd3f8c sin tocar · activó en la altura 23 · 1 checkpoint, linaje verifica: True
+caso                         acepta nativo      pasos  pág
+secp_gen0                         1      1  5,673,513    5
+secp_hash_otro_gen0               0      0  5,673,513    5
+secp_s_alto_gen0                  0      0    254,962    2
+secp_de_gen0_en_gen1              1      1  5,673,513    5
+secp_s_alto_gen1                  0      0    254,962    2
+ml_gen1                           1      1  3,318,608   28
+ml_hash_otro_gen1                 0      0  3,318,387   28
+ml_firma_alterada_gen1            0      0  3,318,422   28
+secp_bytes_como_ml                0      0         40    1
+ml_bytes_como_secp                0      0         33    1
+ecrecover (sin techo)             1        11,331,894    7  -> 0x7e5f4552091a69125d5dfcb7b8c2659029395bdf
+ecrecover bajo el techo de 7,000,000: TechoExcedido
+ml_en_gen0: rechazada por formato (no invocó la máquina: True)
