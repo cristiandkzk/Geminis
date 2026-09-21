@@ -1,0 +1,23 @@
+# Test 9 — ed25519 -> ML-DSA-44 en la misma cadena — x86-64 (Windows), 2026-09-21 (H de gen 0 = BLAKE2s)
+# maquina: geminis/predicado/vm en el commit daab109 (cambios sin commitear en geminis/predicado/vm: 0)
+# guests: ed25519-dalek 2.2.0 (verify_strict) · ml-dsa 0.1.1 (mismo lock que Test 2)
+
+................
+----------------------------------------------------------------------
+Ran 16 tests in 0.383s
+
+OK
+
+# H0_GENESIS 6175777756bd3f8c (igual antes y después) · activó en la altura 23 · 1 checkpoint, linaje verifica: True
+caso                         acepta nativo      pasos  pág
+ed_gen0                           1      1  3,284,755    5
+ed_msg_otro_gen0                  0      0  3,277,090    5
+ed_R_alterado_gen0                0      0    424,518    4
+ed_de_gen0_en_gen1                1      1  3,284,755    5
+ed_msg_otro_gen1                  0      0  3,277,090    5
+ml_gen1                           1      1  3,318,608   28
+ml_msg_otro_gen1                  0      0  3,318,387   28
+ml_firma_alterada_gen1            0      0  3,318,422   28
+ed_bytes_como_ml                  0      0         40    1
+ml_bytes_como_ed                  0      0          5    0
+ml_en_gen0: rechazada por formato (no invocó la máquina: True)

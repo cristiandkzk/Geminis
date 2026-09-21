@@ -1,0 +1,19 @@
+[package]
+name = "vm-firma"
+version = "0.1.0"
+edition = "2021"
+
+# Tres cosas en un binario, para que la prueba Python no reimplemente nada:
+#   firmar     — produce clave y firma en nativo (Python no tiene Ed25519 ni ML-DSA en su stdlib)
+#   verificar  — corre el guest en la maquina de §6.6 (`geminis/predicado/vm`, sin tocarla)
+#   nativo     — la misma verificacion en x86, para contrastar el veredicto de la maquina
+[dependencies]
+vm = { path = "../../../geminis/predicado/vm" }
+ed25519-dalek = { version = "2", default-features = false, features = ["fast"] }
+ml-dsa = { version = "0.1.1", default-features = false, features = ["alloc"] }
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
