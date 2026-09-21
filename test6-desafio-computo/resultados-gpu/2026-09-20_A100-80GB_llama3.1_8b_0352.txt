@@ -1,0 +1,65 @@
+# fecha:  2026-09-20
+# gpu:    NVIDIA A100 80GB PCIe, 81920 MiB, 580.95.05
+# ollama: ollama version is 0.34.2
+# modelo: llama3.1:8b
+
+# carga del modelo: 67.4s (fuera de la medición)
+
+Corriendo 30 intentos (+3 de warmup) contra llama3.1:8b en http://127.0.0.1:11434/v1/chat/completions
+
+  [1/33] es-cocina: 1.23s (warmup, descartado)
+  [2/33] en-historia: 0.92s (warmup, descartado)
+  [3/33] pt-tecnologia: 1.33s (warmup, descartado)
+  [4/33] es-producto: 2.10s — OK
+  [5/33] es-cocina: 1.43s — RECHAZADO (no es JSON válido)
+  [6/33] en-historia: 1.79s — OK
+  [7/33] pt-tecnologia: 1.00s — OK
+  [8/33] es-producto: 1.81s — OK
+  [9/33] es-cocina: 2.02s — OK
+  [10/33] en-historia: 2.21s — OK
+  [11/33] pt-tecnologia: 0.83s — OK
+  [12/33] es-producto: 1.76s — OK
+  [13/33] es-cocina: 1.35s — OK
+  [14/33] en-historia: 1.06s — OK
+  [15/33] pt-tecnologia: 1.18s — OK
+  [16/33] es-producto: 2.16s — OK
+  [17/33] es-cocina: 1.48s — OK
+  [18/33] en-historia: 1.28s — OK
+  [19/33] pt-tecnologia: 2.04s — OK
+  [20/33] es-producto: 1.84s — OK
+  [21/33] es-cocina: 1.89s — OK
+  [22/33] en-historia: 1.14s — OK
+  [23/33] pt-tecnologia: 1.34s — OK
+  [24/33] es-producto: 1.32s — OK
+  [25/33] es-cocina: 1.48s — OK
+  [26/33] en-historia: 1.13s — OK
+  [27/33] pt-tecnologia: 0.97s — OK
+  [28/33] es-producto: 1.62s — RECHAZADO (no es JSON válido)
+  [29/33] es-cocina: 1.49s — OK
+  [30/33] en-historia: 1.33s — OK
+  [31/33] pt-tecnologia: 1.12s — OK
+  [32/33] es-producto: 2.27s — OK
+  [33/33] es-cocina: 1.43s — OK
+
+==============================================================================
+Resultado
+==============================================================================
+
+Tasa de intentos que pasan el filtro estructural: 93% (28/30)
+
+Latencia de intentos válidos (segundos):
+  p50 = 1.46   p90 = 2.12   p99 = 2.25   peor caso = 2.27
+
+Por dominio:
+  es-producto          p50 = 1.84s  (n=7)
+  en-historia          p50 = 1.28s  (n=7)
+  pt-tecnologia        p50 = 1.12s  (n=7)
+  es-cocina            p50 = 1.48s  (n=7)
+
+Con tiempo_de_bloque = 6s, el peor caso medido da X ≈ 1 bloques.
+Si los intentos son secuenciales (no en paralelo), el tiempo esperado hasta
+el primero válido es aproximadamente p50 / tasa_de_éxito, no p50 solo.
+Esto es un solo modelo en una sola corrida — no alcanza para fijar X (ver README.es.md).
+
+NAME           ID              SIZE      PROCESSOR    CONTEXT    UNTIL               
+llama3.1:8b    46e0c10c039e    5.3 GB    100% GPU     4096       59 minutes from now
