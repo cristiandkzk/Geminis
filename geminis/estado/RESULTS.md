@@ -1,5 +1,9 @@
 # Phase 5 — results
 
+> **Update 2026-09-21.** The numbers in this document were measured with SHA-256 (4,898 steps per
+> compression). Genesis' hash became BLAKE2s (2,529, 0.52×): see `RESULTS-BLAKE2S.md`. They are kept
+> as they were measured.
+
 **English** · [Español](RESULTS.es.md)
 
 **Run on 21/8/2026.** The criteria are in `CRITERIA.md`, written before the first line of mechanism

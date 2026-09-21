@@ -1,5 +1,9 @@
 # El presupuesto del nodo, y qué margen pide el lazo
 
+> **Actualización 21/9/2026.** Los porcentajes de piso de este documento (77% con `d = 6`, más del
+> 100% con `d = 7`) se calcularon con SHA-256. Con BLAKE2s como hash de Genesis son 40% y 70%: ver
+> `geminis/estado/RESULTS-BLAKE2S.es.md`. Se conservan tal como se midieron.
+
 [English](RESULTS.md) · **Español**
 
 **Corrido el 18/8/2026.** Reproducir con `python medicion.py`. Sin datos externos.

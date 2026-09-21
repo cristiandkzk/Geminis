@@ -1,5 +1,9 @@
 # Fase 5 — resultados
 
+> **Actualización 21/9/2026.** Los números de este documento se midieron con SHA-256 (4.898 pasos por
+> compresión). El hash de Genesis pasó a BLAKE2s (2.529, 0,52×): ver `RESULTS-BLAKE2S.es.md`. Se
+> conservan tal como se midieron.
+
 [English](RESULTS.md) · **Español**
 
 **Corrida el 21/8/2026.** Los criterios están en `CRITERIA.es.md`, escritos antes de la primera

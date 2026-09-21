@@ -1,5 +1,9 @@
 # The node's budget, and what margin the loop asks for
 
+> **Update 2026-09-21.** The floor percentages in this document (77% at `d = 6`, over 100% at `d = 7`)
+> were computed with SHA-256. With BLAKE2s as Genesis' hash they are 40% and 70%: see
+> `geminis/estado/RESULTS-BLAKE2S.md`. They are kept as they were measured.
+
 **English** · [Español](RESULTS.es.md)
 
 **Run on 18/8/2026.** Reproduce with `python medicion.py`. No external data.

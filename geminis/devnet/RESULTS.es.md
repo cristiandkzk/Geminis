@@ -83,15 +83,30 @@ conjunto entero cada 25 épocas.
 | | |
 |---|---:|
 | desalojos por bloque en régimen | **99** |
-| pasos por bloque | 12.661.007 |
+| pasos por bloque | 20.869.067 |
 | presupuesto del bloque | 420.000.000 |
-| **fracción del bloque** | **3,01%** |
+| **fracción del bloque** | **4,97%** |
 
-**Queda el 97%** para todo lo demás, contra el 10% de headroom que la Fase 3 midió que necesita
+**Queda el 95%** para todo lo demás, contra el 10% de headroom que la Fase 3 midió que necesita
 la cola para drenar con once nodos. No ata.
 
-> El número sale de la medición de la Fase 5 —4.898 pasos por compresión SHA-256, 26 hashes por
-> actualización del árbol— así que **no es una estimación**: se mueve solo si se mueve aquélla.
+> El número sale de la medición de la Fase 5 —2.529 pasos por compresión BLAKE2s, 83 hashes por
+> actualización del árbol con el corte `d = 6`— así que **no es una estimación**: se mueve solo si
+> se mueve aquélla.
+
+**Historia de este número, porque informar solo el último sería informar de menos** (los tres salen
+de la misma cuenta, `Devnet.costo_del_desalojo_por_bloque`):
+
+| | hashes por actualización | pasos por compresión | pasos por bloque | fracción |
+|---|---:|---:|---:|---:|
+| esta sección tal como se escribió | 26 (`d = 1`, árbol sin construir) | 4.898 (SHA-256) | 12.661.007 | 3,01% |
+| con el árbol corregido, hash de entonces | 83 (`d = 6`) | 4.898 (SHA-256) | 40.417.829 | **9,62%** |
+| **hoy: hash de Genesis = BLAKE2s** | 83 (`d = 6`) | **2.529** (BLAKE2s) | **20.869.067** | **4,97%** |
+
+**El 3,01% ya estaba desactualizado antes del cambio de hash:** cuando la Fase 5 construyó el árbol
+(22/8/2026) y el corte pasó a `d = 6`, este documento no se recalculó. Se descubrió el 21/9/2026 al
+regenerar el número. La conclusión (no ata) se mantiene en las tres filas; lo que cambia es cuánto
+margen queda, y con SHA-256 y el árbol corregido eran 90%, no 97%.
 
 ---
 

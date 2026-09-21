@@ -15,8 +15,9 @@ python herramientas/replay_blobs.py   # Phase 2, case 2: the blobSchedule
 python herramientas/replay_gas.py     # Phase 2, case 3: the gas limit
 python herramientas/cola.py           # Phase 3: the challenge queue under attack
 python herramientas/techo.py          # the VM step ceiling, derived (§10.3)
+python herramientas/independencia.py  # the hash and signature successions, independent (§6.6)
 
-cd predicado/vm && cargo test --release   # the machine: 20 criteria (Phase 4)
+cd predicado/vm && cargo test --release   # the machine: 22 criteria (Phase 4 and BLAKE2s)
 ```
 
 The Ethereum series the replay uses are already in the repo (`herramientas/datos/`,

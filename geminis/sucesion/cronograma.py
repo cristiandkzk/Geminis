@@ -87,6 +87,7 @@ from protocolo.invariantes import (
     i5_aditiva,
 )
 from protocolo.linaje import Checkpoint, calcular_h0
+from protocolo.serializacion import hash_vigente
 
 
 class SucesorInvalido(ValueError):
@@ -329,7 +330,13 @@ class Cronograma:
 
             checkpoint = Checkpoint(
                 generacion=params.generacion,
-                h0=calcular_h0(base.h0, disparo.state_trigger, params),
+                # Con el hash del ruleset ANCESTRO (`base`), no el que `params` introduce.
+                h0=calcular_h0(
+                    base.h0,
+                    disparo.state_trigger,
+                    params,
+                    hash_vigente(base.formatos),
+                ),
                 h0_ancestro=base.h0,
                 state_trigger=disparo.state_trigger,
                 params=params,

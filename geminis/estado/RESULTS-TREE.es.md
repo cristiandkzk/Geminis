@@ -1,5 +1,9 @@
 # `estado/arbol.py` — resultados
 
+> **Actualización 21/9/2026.** Los pisos de este documento (19,25 épocas, 77% de `L_max` con `d = 6`)
+> se calcularon con SHA-256. Con BLAKE2s como hash de Genesis son 9,94 épocas y 40%: ver
+> `RESULTS-BLAKE2S.es.md`. Se conservan tal como se midieron.
+
 [English](RESULTS-TREE.md) · **Español**
 
 **Corrido el 22/8/2026.** Criterios en `CRITERIA-TREE.es.md`, escritos antes.

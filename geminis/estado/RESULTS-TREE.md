@@ -1,5 +1,9 @@
 # `estado/arbol.py` — results
 
+> **Update 2026-09-21.** The floors in this document (19.25 epochs, 77% of `L_max` at `d = 6`) were
+> computed with SHA-256. With BLAKE2s as Genesis' hash they are 9.94 epochs and 40%: see
+> `RESULTS-BLAKE2S.md`. They are kept as they were measured.
+
 **English** · [Español](RESULTS-TREE.es.md)
 
 **Run on 22/8/2026.** Criteria in `CRITERIA-TREE.md`, written beforehand.

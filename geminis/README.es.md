@@ -14,8 +14,9 @@ python herramientas/replay_blobs.py   # Fase 2, caso 2: el blobSchedule
 python herramientas/replay_gas.py     # Fase 2, caso 3: el gas limit
 python herramientas/cola.py           # Fase 3: la cola de impugnaciones bajo ataque
 python herramientas/techo.py          # el techo de pasos de VM, derivado (§10.3)
+python herramientas/independencia.py  # las sucesiones de hash y de firma, independientes (§6.6)
 
-cd predicado/vm && cargo test --release   # la máquina: 20 criterios (Fase 4)
+cd predicado/vm && cargo test --release   # la máquina: 22 criterios (Fase 4 y BLAKE2s)
 ```
 
 Las series de Ethereum que usa el replay ya están en el repo (`herramientas/datos/`,

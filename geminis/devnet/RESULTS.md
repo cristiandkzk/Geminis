@@ -81,15 +81,29 @@ set is evicted every 25 epochs.
 | | |
 |---|---:|
 | evictions per block in steady state | **99** |
-| steps per block | 12,661,007 |
+| steps per block | 20,869,067 |
 | block budget | 420,000,000 |
-| **fraction of the block** | **3.01%** |
+| **fraction of the block** | **4.97%** |
 
-**97% is left** for everything else, against the 10% of headroom Phase 3 measured the queue needs to
+**95% is left** for everything else, against the 10% of headroom Phase 3 measured the queue needs to
 drain with eleven nodes. It does not bind.
 
-> The number comes out of the Phase 5 measurement —4,898 steps per SHA-256 compression, 26 hashes per
-> tree update— so **it is not an estimate**: it moves only if that one moves.
+> The number comes out of the Phase 5 measurement —2,529 steps per BLAKE2s compression, 83 hashes per
+> tree update with the cut `d = 6`— so **it is not an estimate**: it moves only if that one moves.
+
+**The history of this number, because reporting only the last one would be reporting too little** (all
+three come out of the same computation, `Devnet.costo_del_desalojo_por_bloque`):
+
+| | hashes per update | steps per compression | steps per block | fraction |
+|---|---:|---:|---:|---:|
+| this section as it was written | 26 (`d = 1`, tree not yet built) | 4,898 (SHA-256) | 12,661,007 | 3.01% |
+| with the corrected tree, hash of the time | 83 (`d = 6`) | 4,898 (SHA-256) | 40,417,829 | **9.62%** |
+| **today: Genesis hash = BLAKE2s** | 83 (`d = 6`) | **2,529** (BLAKE2s) | **20,869,067** | **4.97%** |
+
+**The 3.01% was already out of date before the hash change:** when Phase 5 built the tree
+(2026-08-22) and the cut became `d = 6`, this document was not recomputed. It was found on
+2026-09-21 while regenerating the number. The conclusion (it does not bind) holds in all three rows;
+what changes is how much margin is left, and with SHA-256 and the corrected tree it was 90%, not 97%.
 
 ---
 

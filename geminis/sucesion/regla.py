@@ -29,6 +29,7 @@ from typing import Any
 from protocolo import genesis as g
 from protocolo.generacion import Params, Ruleset
 from protocolo.invariantes import MODO_APROXIMACION, MODO_CAPACIDAD
+from protocolo.serializacion import HASH_SHA3
 
 
 class ReglaTransicion(ABC):
@@ -153,6 +154,53 @@ class ReglaCanarioCriptografico(ReglaTransicion):
 
     def progreso(self, estado: Any) -> int:
         return estado.canarios_gastados
+
+    def umbral(self, estado: Any) -> int:
+        return estado.lockins_de(self.nombre) + 1
+
+    def params_sucesor(self, estado: Any, ruleset: Ruleset) -> Params:
+        return Params(
+            generacion=ruleset.generacion + 1,
+            internos=dict(ruleset.params.internos),
+            formatos=ruleset.formatos | {self.formato_sucesor},
+        )
+
+
+class ReglaCanarioHash(ReglaTransicion):
+    """Un canario de hash gastado activa el hash sucesor (`hash/sha3-256`, SHA-3 / Keccak).
+
+    Gemela de `ReglaCanarioCriptografico` y en el mismo modo: **por capacidad demostrada**. No mide
+    cuánta gente adoptó nada —eso sería un voto ponderado por monedas, y `progreso` sólo lee el
+    estado (I2)—: mide que alguien hizo el trabajo de hash que el canario pide
+    (`g.resuelve_canario_hash`).
+
+    **Es independiente de la de firma:** otra regla, otro canario, otro formato. Cada una avanza sin
+    que la otra se entere, y en cualquier orden. Lo que sí las acopla es el chequeo de núcleo
+    compartido (`protocolo/nucleo.py`), que **reporta** el escalón donde `H` y una firma en vigor
+    comparten familia y no lo bloquea.
+
+    A diferencia de la de firma, el gasto se verifica en el estado. La transición es **aditiva** (I5):
+    agrega el formato de hash nuevo, y el viejo no se retira acá.
+    """
+
+    clase = g.CRIPTOGRAFICA
+    modo = MODO_CAPACIDAD
+    capacidad = (
+        "hacer el trabajo de hash que pide el canario derivado de la semilla pública "
+        "(g.CANARIO_HASH_SEMILLA): H(semilla || solucion) con g.CANARIO_HASH_BITS bits "
+        "en cero; nadie retiene una trampa porque el problema no tiene atajo conocido"
+    )
+
+    def __init__(
+        self,
+        formato_sucesor: str = HASH_SHA3,
+        nombre: str = "cripto/canario-hash",
+    ) -> None:
+        self.formato_sucesor = formato_sucesor
+        self.nombre = nombre
+
+    def progreso(self, estado: Any) -> int:
+        return estado.canarios_hash_gastados
 
     def umbral(self, estado: Any) -> int:
         return estado.lockins_de(self.nombre) + 1

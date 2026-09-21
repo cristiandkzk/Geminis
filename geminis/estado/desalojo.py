@@ -27,14 +27,15 @@ el estado presente alcance para decidir.
 
 from __future__ import annotations
 
-import hashlib
 from dataclasses import dataclass, field
+
+from protocolo.serializacion import hasher
 
 
 def _h(etiqueta: bytes, *partes: bytes) -> bytes:
     """Hash con dominio separado. Sin dominio, un nodo interno del árbol se puede
     presentar como una hoja y la prueba deja de significar lo que dice."""
-    d = hashlib.sha256()
+    d = hasher()
     d.update(etiqueta)
     for p in partes:
         d.update(p)

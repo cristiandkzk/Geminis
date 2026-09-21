@@ -39,11 +39,11 @@ esa fase:
 
 from __future__ import annotations
 
-import hashlib
 from dataclasses import dataclass
 from enum import Enum
 
 from protocolo import genesis as g
+from protocolo.serializacion import hasher
 
 #: Los veredictos de la máquina, en la codificación canónica de `vm/maquina.rs`.
 #: **Están duplicados a propósito y hay una prueba que los verifica contra el Rust.**
@@ -95,7 +95,7 @@ class Predicado:
 
     def huella(self) -> bytes:
         """Identidad canónica. Entra en `H0_B` cuando el predicado es de Genesis."""
-        h = hashlib.sha256()
+        h = hasher()
         h.update(self.programa)
         for entrada, salida in self.vectores:
             h.update(len(entrada).to_bytes(4, "little"))
@@ -138,7 +138,7 @@ class Corrida:
             self.veredicto.canonico(self.dato)
             + self.pasos.to_bytes(8, "little")
             + self.paginas.to_bytes(4, "little")
-            + hashlib.sha256(self.salida).digest()
+            + hasher(self.salida).digest()
         )
 
     def entra_en(self, presupuesto: Presupuesto) -> bool:

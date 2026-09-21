@@ -285,6 +285,38 @@ MUTACIONES = [
         "        if paginas > presupuesto.paginas:",
         "        if False:",
     ),
+    # Sucesión del hash y chequeo de núcleo (21/9/2026)
+    (
+        "el checkpoint se calcula con el hash que introduce y no con el del ancestro",
+        "sucesion/cronograma.py",
+        "                    hash_vigente(base.formatos),",
+        "                    hash_vigente(params.formatos),",
+    ),
+    (
+        "el verificador de linaje usa siempre el hash de Genesis",
+        "protocolo/linaje.py",
+        "        hash_del_ancestro = hash_vigente(punto.params.formatos)",
+        "        hash_del_ancestro = HASH_GENESIS",
+    ),
+    (
+        "el canario de hash se gasta sin verificar la solucion",
+        "estado/sintetico.py",
+        "        if not g.resuelve_canario_hash(solucion):",
+        "        if False:",
+    ),
+    (
+        "el nodo no cambia de hash al activar la generacion",
+        "nodo/pod.py",
+        "            self.estado.hash_id = hash_vigente(self.ruleset.formatos)\n"
+        "            self.historial_rulesets.append((altura, self.ruleset))",
+        "            self.historial_rulesets.append((altura, self.ruleset))",
+    ),
+    (
+        "el chequeo de nucleo esconde el acople en vez de reportarlo",
+        "nodo/pod.py",
+        "        return nucleo.acoples(self.estado.hash_id, self.ruleset.formatos)",
+        "        return []",
+    ),
 ]
 
 

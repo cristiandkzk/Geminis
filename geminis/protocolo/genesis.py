@@ -26,7 +26,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from protocolo.generacion import Params, Ruleset
-from protocolo.serializacion import huella
+from protocolo.serializacion import HASH_GENESIS, HASH_SHA3, ceros_iniciales, huella
 
 # --------------------------------------------------------------------------- #
 # I1 · la máquina
@@ -187,6 +187,9 @@ FORMATOS_CONOCIDOS = frozenset(
         "firma/ed25519",
         "firma/ml-dsa-44",
         "recibo/gen0",
+        #: El hash sucesor, igual que la firma: ya está adentro desde el bloque 0. SHA-3
+        #: (Keccak), no el Keccak-256 de Ethereum. `hash/blake2s`, el de Genesis, no figura.
+        HASH_SHA3,
     }
 )
 
@@ -216,6 +219,40 @@ CANARIO_SEMILLA = (
 )
 
 CANARIO_INSTANCIA = huella(CANARIO_SEMILLA, dominio="canario")
+
+#: **El canario del hash.** Gemelo del de firma, y con la diferencia que importa: acá el gasto **se
+#: verifica**. Gastarlo exige una `solucion` tal que `H(semilla ‖ solucion)` empiece con
+#: `CANARIO_HASH_BITS` bits en cero, con `H` = el hash **de Genesis** (BLAKE2s), no el vigente: es el
+#: hash bajo amenaza el que se debilita.
+#:
+#: Sin trampa, por la misma razón que arriba: el problema sale de una semilla pública y no hay atajo
+#: que quien la fijó conozca; el único camino es trabajo de hash.
+#:
+#: **Lo que este canario mide y lo que no.** Mide *capacidad de cómputo*: cuánto hash puede hacer
+#: alguien. Una debilidad *estructural* de BLAKE2s lo abarataría por debajo de `2^CANARIO_HASH_BITS`,
+#: pero desde afuera es indistinguible de más hardware. Detectar estructura exigiría una variante de
+#: menos rondas, que no existe en `hashlib`.
+#:
+#: **`CANARIO_HASH_BITS = 16` es un valor de demostración, no calibrado**: se resuelve en una fracción
+#: de segundo, para que las pruebas lo gasten de verdad. El real se calibra contra la capacidad de
+#: atacante que Genesis declare, igual que `Δ`, y es constante de Genesis por el mismo motivo que
+#: `CORTE_ARBOL`: dos nodos con otro valor divergen.
+CANARIO_HASH_SEMILLA = (
+    "genesis/canario/hash/1 · instancia debilitada de hash/blake2s · "
+    "derivada, no generada · nadie retiene la trampa"
+)
+CANARIO_HASH_BITS = 16
+
+
+def resuelve_canario_hash(solucion: bytes) -> bool:
+    """¿`solucion` gasta el canario de hash? Determinístico y sólo función de Genesis."""
+    digest = huella(
+        {"semilla": CANARIO_HASH_SEMILLA, "solucion": solucion},
+        dominio="canario/hash",
+        hash_id=HASH_GENESIS,
+    )
+    return ceros_iniciales(digest) >= CANARIO_HASH_BITS
+
 
 # --------------------------------------------------------------------------- #
 # Los tres tiempos (§3)
@@ -417,6 +454,10 @@ PRESUPUESTO_ESTADO_BYTES = 4 * 2**30
 #: Se deja en 6, que es el que el diseño eligió cuando sólo se miraban dos de las tres
 #: monedas. **Que a 7 el piso ya supere `L_max` dice que el margen es más fino de lo que
 #: parecía**, y elegir de nuevo es una decisión abierta.
+#:
+#: **21/9/2026: la columna de porcentajes se calculó con SHA-256.** Con el hash de Genesis en
+#: BLAKE2s (2.529 pasos por compresión, no 4.898) es 12% / 18% / **40%** / 70%. `d = 6` no se
+#: re-decidió, y a `d = 7` el piso ya no supera a `L_max`: ver `estado/RESULTS-BLAKE2S.es.md`.
 CORTE_ARBOL = 6
 
 #: `L_max` en épocas (§8.5): tope a la vida comprable de una vez. **Es condición

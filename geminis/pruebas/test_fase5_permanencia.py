@@ -294,14 +294,20 @@ class A8ElPisoEsUnaCuentaYElPaperEstaMal(unittest.TestCase):
         """**El insumo que faltaba, medido el 21/8/2026.**
 
         Sacada la firma del ciclo, el término dominante pasó a ser cuántos pasos cuesta un
-        SHA-256 — y estaba estimado. Se midió como `steps_per_verify`: un SHA-256 escrito a
+        hash — y estaba estimado. Se midió como `steps_per_verify`: un SHA-256 escrito a
         mano, compilado a RV32IM y corrido en la máquina de §6.6. **4.898 pasos por
         compresión**, contra los 10.000 que se habían estimado.
+
+        **El 21/9/2026 el hash de Genesis pasó a BLAKE2s** (§10.1: `H` no puede compartir
+        núcleo con la firma inicial, y Ed25519 hashea con SHA-512). Se midió de nuevo, igual
+        y validado contra el vector de la RFC 7693: **2.529 pasos por compresión**, 0,52× los
+        de SHA-256. Este pin es el de BLAKE2s; el de SHA-256 sigue en Rust como medición
+        histórica.
 
         El número vive en `permanencia.py` y su regresión en Rust
         (`predicado/vm/tests/criterios.rs`), que es donde se puede volver a medir.
         """
-        self.assertEqual(perm.PASOS_POR_HASH, 4_898)
+        self.assertEqual(perm.PASOS_POR_HASH, 2_529)
 
     def test_el_piso_con_el_arbol_de_verdad_pone_en_duda_la_estructura_de_8_5(self):
         """**Este criterio se cayó el 22/8/2026 y se reescribió para decir la verdad.**
@@ -313,20 +319,27 @@ class A8ElPisoEsUnaCuentaYElPaperEstaMal(unittest.TestCase):
         todos los nodos internos: la opción que el diseño descartó por costar 32 B por
         entrada. Con el corte que el diseño sí eligió son 83, y el piso **77% de `L_max`**.
 
+        **El 21/9/2026 bajó a 40%, y no por mérito del árbol:** el hash pasó de SHA-256 (4.898
+        pasos por compresión) a BLAKE2s (2.529), así que el mismo árbol cuesta 0,52×. El piso
+        pasó de 19,25 a 9,94 épocas. **El criterio original —por debajo del 35%— sigue sin
+        cumplirse**: por eso el umbral de abajo es 0,35 y no se aflojó.
+
         No se afloja el umbral: se registra que el número cambió y qué implica.
         """
         piso = perm.piso_en_epocas()
-        self.assertAlmostEqual(piso, 19.25, places=1)
+        self.assertAlmostEqual(piso, 9.94, places=1)
         self.assertLess(piso, g.L_MAX_EPOCAS, "el piso superó al depósito máximo")
-        self.assertGreater(piso / g.L_MAX_EPOCAS, 0.7, "si bajó, revisar por qué")
+        self.assertGreater(piso / g.L_MAX_EPOCAS, 0.35, "el criterio original de la Fase 5 pasó a cumplirse: revisar por qué")
 
     def test_para_una_entrada_de_vida_corta_el_piso_es_casi_todo_el_costo(self):
         """**Y ahí es donde §8.5 queda en duda, que es lo que importa.**
 
         La sección descarta el cargo a la creación con un argumento que no depende de la
         magnitud: *no reduce la creación, reduce la registración de la creación*. Con el
-        piso en 19,25 épocas, quien sólo quiere una entrada por poco tiempo paga casi todo
-        al crearla — que es exactamente la forma que la sección rechaza.
+        piso en 9,94 épocas (19,25 con SHA-256), quien sólo quiere una entrada por una época
+        paga el 91% al crearla (95% con SHA-256) — que es exactamente la forma que la
+        sección rechaza. **El margen contra el 0,9 de abajo es fino (0,909):** el cambio de
+        hash acercó este criterio a su umbral, y con un piso apenas menor dejaría de cumplirse.
         """
         piso = perm.piso_en_epocas()
         corta = piso / (piso + 1)      # una entrada que compra una época
@@ -336,7 +349,8 @@ class A8ElPisoEsUnaCuentaYElPaperEstaMal(unittest.TestCase):
         self.assertLess(larga, 0.5, "para vida larga todavía no domina")
 
     def test_pero_sigue_sin_ser_las_dieciseis_horas_del_paper(self):
-        """Nueve veces más. El paper quedó corregido: ya no afirma el número viejo."""
+        """Quince veces más (14,9× con BLAKE2s; 28,9× con SHA-256). El paper quedó corregido: ya
+        no afirma el número viejo."""
         self.assertGreater(perm.piso_en_epocas() / self.PAPER_EPOCAS, 8)
 
 

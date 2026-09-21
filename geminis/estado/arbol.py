@@ -27,12 +27,13 @@ es la fila de *guardar todo*, la que cuesta 32 B por entrada y que el diseño de
 
 from __future__ import annotations
 
-import hashlib
 from dataclasses import dataclass, field
+
+from protocolo.serializacion import hasher
 
 
 def _h(etiqueta: bytes, *partes: bytes) -> bytes:
-    d = hashlib.sha256()
+    d = hasher()
     d.update(etiqueta)
     for p in partes:
         d.update(p)

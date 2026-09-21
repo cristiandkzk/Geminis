@@ -77,20 +77,24 @@ def hashes_por_actualizacion(tamano_bytes: int = ENTRADA_BYTES) -> int:
     return Arbol(altura=altura, corte=g.CORTE_ARBOL).hashes_por_actualizacion()
 
 
-#: Pasos de VM por compresión SHA-256. **MEDIDO** el 21/8/2026, no estimado.
+#: Pasos de VM por compresión de BLAKE2s. **MEDIDO** el 21/9/2026, no estimado.
 #:
 #: Es el número que le faltaba al piso, y el que hizo falta ir a buscar: la primera
 #: versión de este archivo lo estimó en 10.000 y lo declaró inofensivo *"porque la
 #: verificación de firma lo domina"*. Era circular —sacar la firma del ciclo es
 #: justamente la corrección— y con la firma afuera **este término es el único que queda**.
 #:
-#: Se midió como `steps_per_verify` en Test 2: un SHA-256 escrito a mano, compilado a
-#: RV32IM (`predicado/vm/guest-sha/`) y corrido en la máquina de §6.6, restando dos
-#: tandas para que el marco de la llamada no entre. El conteo es **exacto e independiente
-#: de la arquitectura**: es una propiedad del programa, no del reloj.
+#: **Cambió el 21/9/2026 al pasar el hash de Genesis de SHA-256 a BLAKE2s** (§10.1: `H` no puede
+#: compartir núcleo con la firma inicial, y Ed25519 hashea con SHA-512). Con SHA-256 medía
+#: **4.898**; BLAKE2s cuesta **2.529**, 0,52×. Se midió igual que `steps_per_verify` en Test 2:
+#: un BLAKE2s escrito a mano (RFC 7693), compilado a RV32IM (`predicado/vm/guest-blake2s/`),
+#: **validado contra el vector de la RFC** y corrido en la máquina de §6.6, restando dos tandas
+#: para que el marco de la llamada no entre. El conteo es **exacto e independiente de la
+#: arquitectura**: es una propiedad del programa, no del reloj.
 #:
-#: El estimado estaba 2× arriba, o sea en la dirección conservadora.
-PASOS_POR_HASH = 4_898
+#: Que el piso baje a la mitad no es un mérito del diseño del árbol: es el costo de otro hash.
+#: La medición de SHA-256 sigue en `predicado/vm/guest-sha/` y en `estado/RESULTS-BLAKE2S.md`.
+PASOS_POR_HASH = 2_529
 
 #: Pasos de una verificación de firma en la máquina de §6.6. **Medido** (Test 2, Fase 4).
 PASOS_POR_FIRMA = 3_339_364
@@ -109,7 +113,7 @@ def costo_del_ciclo_en_pasos(
     las dos actualizaciones del árbol, y eso es lo que el piso tiene que cubrir.
 
     Se deja el otro camino computable porque es el que el paper describe, y la diferencia
-    entre los dos es de un factor siete — lo bastante como para que convenga que se vea.
+    entre los dos es de casi un orden de magnitud — lo bastante como para que convenga que se vea.
     """
     arbol = 2 * hashes_por_actualizacion(tamano_bytes) * PASOS_POR_HASH
     return arbol + (PASOS_POR_FIRMA if incluir_firma else 0)
