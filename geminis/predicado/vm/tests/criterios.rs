@@ -371,3 +371,51 @@ fn la_admision_acepta_un_segundo_binario_independiente() {
     assert_eq!(m.pasos, 0);
     assert!(syms.contains_key("comprimir"));
 }
+
+/// **El hash de Genesis desde el 21/9/2026, y el número que hoy cierra el piso de §8.5.**
+///
+/// Un BLAKE2s escrito a mano (RFC 7693), compilado a RV32IM y corrido acá: 2.529 pasos por
+/// compresion, 0,52x los de SHA-256. **Antes de fijar el numero se valida que el guest
+/// calcule BLAKE2s de verdad**: el digest de `"abc"` tiene que ser el del Apendice B de la
+/// RFC. Un conteo de pasos de un algoritmo que calcula otra cosa no es una regresion de nada.
+#[test]
+fn el_costo_de_un_blake2s_no_se_mueve_y_calcula_blake2s() {
+    const ABC: [u8; 32] = [
+        0x50, 0x8c, 0x5e, 0x8c, 0x32, 0x7c, 0x14, 0xe2, 0xe1, 0xa7, 0x2b, 0xa3, 0x4e, 0xeb,
+        0x45, 0x2f, 0x37, 0x45, 0x8b, 0x20, 0x9e, 0xd6, 0x3a, 0x29, 0x4d, 0x99, 0x9b, 0x4c,
+        0x86, 0x67, 0x59, 0x82,
+    ];
+    let (mut m, syms) = admitir(vm::GUEST_BLAKE2S, u64::MAX).expect("admitir guest-blake2s");
+    m.arrancar();
+    let comprimir = *syms.get("comprimir").expect("simbolo comprimir");
+    let palabra = *syms.get("digest_palabra").expect("simbolo digest_palabra");
+
+    let mut digest = [0u8; 32];
+    for i in 0..8u32 {
+        match m.llamar(palabra, &[i]) {
+            Veredicto::Retorno(w) => {
+                digest[i as usize * 4..i as usize * 4 + 4].copy_from_slice(&w.to_le_bytes())
+            }
+            otro => panic!("digest_palabra({}) no retorno: {:?}", i, otro),
+        }
+    }
+    assert_eq!(digest, ABC, "el guest no calcula BLAKE2s-256");
+
+    let base = m.pasos;
+    m.llamar(comprimir, &[100]);
+    let p100 = m.pasos - base;
+    let base = m.pasos;
+    m.llamar(comprimir, &[200]);
+    let p200 = m.pasos - base;
+
+    assert_eq!((p200 - p100) / 100, 2_529, "pasos por compresion BLAKE2s");
+}
+
+/// La admision acepta tambien el guest de BLAKE2s: un tercer binario, del mismo repo pero de
+/// otro algoritmo, sin dependencias.
+#[test]
+fn la_admision_acepta_el_guest_de_blake2s() {
+    let (m, syms) = admitir(vm::GUEST_BLAKE2S, u64::MAX).expect("guest-blake2s tiene que entrar");
+    assert_eq!(m.pasos, 0);
+    assert!(syms.contains_key("comprimir") && syms.contains_key("digest_palabra"));
+}

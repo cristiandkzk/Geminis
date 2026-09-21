@@ -1,0 +1,15 @@
+[package]
+name = "guest-blake2s"
+version = "0.1.0"
+edition = "2021"
+
+# Sin dependencias, por la misma razon que `guest-sha`: lo que se mide es el costo del algoritmo
+# en la maquina, y una implementacion de terceros metaria sus propias decisiones de
+# desenrollado y de tablas en el medio del numero. Esta es la version de la RFC 7693.
+[dependencies]
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"

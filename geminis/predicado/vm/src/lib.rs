@@ -100,3 +100,11 @@ pub const GUEST_RV: &[u8] =
 /// este lo produjo el nuestro, asi que C2 y C4 quedan probados contra dos binarios y
 /// no contra uno.
 pub const GUEST_SHA: &[u8] = include_bytes!("../guest-sha/guest.elf");
+
+/// Un BLAKE2s escrito a mano y compilado a RV32IM (`guest-blake2s/`).
+///
+/// **Es el hash de Genesis desde el 21/9/2026** (`H`, I4): la firma inicial, Ed25519, hashea
+/// con SHA-512 por dentro y un `H` SHA-2 compartiria nucleo con ella (§10.1). Su costo por
+/// compresion es el que alimenta el piso de §8.5, no el de `GUEST_SHA`, que queda como
+/// medicion historica y como segunda carga independiente para la admision.
+pub const GUEST_BLAKE2S: &[u8] = include_bytes!("../guest-blake2s/guest.elf");
