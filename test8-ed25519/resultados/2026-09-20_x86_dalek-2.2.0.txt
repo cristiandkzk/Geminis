@@ -1,0 +1,19 @@
+# Test 8 — Ed25519 en la maquina de §6.6 — x86-64 (Windows), 2026-09-20
+# guest: ed25519-dalek 2.2.0 + curve25519-dalek 4.1.3 (backend u32, elegido por el target) + sha2 0.10.9; opt-level 3, lto
+# maquina: geminis/predicado/vm en el commit daab109 (arbol limpio en geminis/predicado/vm: 0 cambios)
+
+# guest-ed25519 admitido: 187716 bytes, 63 simbolos
+
+modo,descripcion,pasos_1,pasos_11,pasos_por_verificacion,exitos_en_11,paginas
+0,from_bytes + verify,3014026,33150986,3013696,11,6
+1,verify (clave ya decodificada),2802100,30819780,2801768,11,6
+2,from_bytes + verify_strict,3285175,36133625,3284845,11,6
+3,control negativo (firma alterada),3028195,33306805,3027861,0,6
+4,RFC 8032 vector 1,2998032,32975012,2997698,11,6
+
+# bajo el techo inicial (7000000 pasos, 96 paginas): Retorno(1), uso 3285175 pasos
+
+# contra ML-DSA-44 decode+verify = 3339364 pasos
+modo 0: 3013696 pasos = 1.11x menos que ML-DSA-44 -> tx_por_bloque con margen 2x: 17 (ML-DSA-44: 15)
+modo 1: 2801768 pasos = 1.19x menos que ML-DSA-44 -> tx_por_bloque con margen 2x: 18 (ML-DSA-44: 15)
+modo 2: 3284845 pasos = 1.02x menos que ML-DSA-44 -> tx_por_bloque con margen 2x: 15 (ML-DSA-44: 15)

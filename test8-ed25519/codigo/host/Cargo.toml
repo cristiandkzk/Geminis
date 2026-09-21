@@ -1,0 +1,15 @@
+[package]
+name = "host-ed25519"
+version = "0.1.0"
+edition = "2021"
+
+# La maquina de §6.6 tal cual esta en `geminis/predicado/vm`: no se copia ni se toca. Lo que se
+# mide es el conteo de pasos y de paginas de *esa* maquina, con *su* admision delante.
+[dependencies]
+vm = { path = "../../../geminis/predicado/vm" }
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
