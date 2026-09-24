@@ -2146,8 +2146,18 @@ explored what could be done on the network side, and where it ends:
   it.
 - **The way out that holds equally on any device is on the wallet's side:** splitting the secret
   across several of the user's own devices, with a threshold (two of three, say). It is mathematics and
-  depends on no chip, so it is equally strong on Android, iPhone or PC. Which scheme, how many devices
-  at minimum, and how a loss is recovered **is not defined.**
+  depends on no chip, so it is equally strong on Android, iPhone or PC. **But it is only as mature as
+  the primitive it is applied to:** for Ed25519 there is FROST (RFC 9591, an IRTF document); for ML-DSA
+  there is no standard —NIST's call for threshold schemes is in progress— though there are two schemes
+  whose output verifies under an unmodified FIPS 204 verifier (Mithril and Quorus, both USENIX
+  Security '26), so this way out depends on one existing for the primitive in force. What the chain
+  sees was measured in `test11-umbral-mldsa/`: a 2-of-3 signature from Mithril's public prototype
+  costs the §6.6 machine the same steps as an ordinary one (3,318,732 against 3,318,658 at the
+  median), while the same protection without threshold cryptography —a 2-of-3 multisig on-chain, with
+  loose signatures— spends 6.78 M steps, halves the capacity per block, and a 3-of-3 does not fit
+  under the initial ceiling. The cost moves to the wallet, and that prototype is academic: its public
+  code deals the keys from a seed (a dealer), with no distributed key generation. Which scheme, how
+  many devices at minimum, and how a loss is recovered **is not defined.**
 
 And what stays declared as a frontier, without looking for a way out:
 
@@ -2622,10 +2632,10 @@ operable with a number.
 > **And reproducibility across architectures was verified**: the seven vectors —verdict, steps, pages
 > and register fingerprint— come out identical on x86-64 and on aarch64.
 
-**Tests 6 and 7 are used where they belong, and then three more came.** Test 6 (`test6-desafio-computo/`) measures
-the compute-challenge budget of §6.7.1 and Test 7 (`test7-firma-compuesta/`) the mitigation of §10.2. The three that
-follow measure the signature and its succession, and are of the same class as the fifth: they could not be run
-without the machine.
+**Tests 6 and 7 are used where they belong, and then four more came.** Test 6 (`test6-desafio-computo/`) measures
+the compute-challenge budget of §6.7.1 and Test 7 (`test7-firma-compuesta/`) the mitigation of §10.2. The four that
+follow measure the signature, its succession and how an account is protected, and are of the same class as the
+fifth: they could not be run without the machine.
 
 **Test 8 · Ed25519 on the machine.** ✅ **Run** (September 2026). "Ed25519 is more efficient" was an intuition:
 until then everything measured on the machine was ML-DSA. ed25519-dalek was compiled to RV32IM and run on the §6.6
@@ -2658,6 +2668,22 @@ address; and a signature with a high `s` is rejected (EIP-2).
 > initial ceiling** of 7 M. Migrating to ML-DSA-44 would give capacity back; what grows is size, ~38×. *And a finding
 > about the node:* invariant I4 is checked against Geminis' `H0_GENESIS`, so today the node does not support another
 > Genesis. One crate per primitive, untuned; **it is not claimed that Ethereum should choose ML-DSA-44**.
+
+**Test 11 · Threshold ML-DSA-44: does the chain see anything other than an ordinary signature?** ✅ **Run**
+(September 2026). §10.2 said that a threshold across the owner's own devices leaves the network seeing one ordinary
+signature; that was an argument. The public prototype of Mithril (USENIX Security '26), unmodified, signs 2-of-3 with
+each of the three possible pairs, and those signatures are verified on the §6.6 machine untouched, under the ceilings
+of the initial ruleset, against a competitor with no threshold cryptography: a k-of-n multisig on-chain, with loose
+signatures (`test11-umbral-mldsa/`).
+
+> **Result: the chain sees an ordinary signature.** 90 of 90 verify at a median of 3,318,732 steps and 28 pages,
+> against 3,318,658 for an ordinary one (0.002 %); altered ones give zero. The multisig without threshold costs 2× at
+> 2-of-3 (6.78 M steps, 3.1 % of the ceiling left, 7 transactions per block instead of 15) and a 3-of-3 (10.1 M)
+> **does not fit** under the initial ceiling. The cost moves to the wallet: ~1.7 attempts of three rounds each, ~27 KB
+> per party per signature. *And a trap:* the same guest cost 46 % more steps after a patch bump of a transitive
+> dependency (`keccak` 0.2.1 → 0.2.2): a cost belongs to a binary, not to a crate name. Signing in-process on one
+> machine, without a network or a phone; keys dealt from a seed; **academic prototype, not audited here**; the security
+> of the scheme is not tested.
 
 **Tests 1 and 4 were independent and gave opposite results.** Test 1 decided whether the generational
 mechanism has a customer and found one, smaller than the mechanism; Test 4 decided whether the

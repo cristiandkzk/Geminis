@@ -2147,7 +2147,18 @@ diferencia. Se exploró qué se podía hacer del lado de la red, y dónde termin
 - **La salida que sí vale igual en cualquier dispositivo está del lado de la wallet:** repartir el
   secreto entre varios dispositivos propios del usuario, con un umbral (dos de tres, por ejemplo).
   Es matemática y no depende de ningún chip, así que es igual de fuerte en Android, iPhone o PC.
-  Qué esquema, cuántos dispositivos como mínimo y cómo se recupera una pérdida **no está definido.**
+  **Pero solo es tan madura como la primitiva a la que se aplica:** para Ed25519 existe FROST (RFC
+  9591, un documento del IRTF); para ML-DSA no hay estándar —la convocatoria del NIST para esquemas de
+  umbral está en curso— aunque sí dos esquemas cuya salida verifica con un verificador FIPS 204 sin
+  modificar (Mithril y Quorus, ambos en USENIX Security '26), así que esta salida depende de que
+  exista uno para la primitiva vigente. Lo que ve la cadena se midió en `test11-umbral-mldsa/`: una
+  firma 2-de-3 del prototipo público de Mithril le cuesta a la máquina de §6.6 los mismos pasos que una
+  común (3.318.732 contra 3.318.658 en la mediana), mientras que la misma protección sin criptografía
+  de umbral —un multisig 2-de-3 on-chain, con firmas sueltas— gasta 6,78 M pasos, parte a la mitad la
+  capacidad por bloque, y un 3-de-3 no cabe bajo el techo inicial. El costo pasa a la wallet, y ese
+  prototipo es académico: su código público reparte las claves desde una semilla (un dealer), sin
+  generación distribuida de claves. Qué esquema, cuántos dispositivos como mínimo y cómo se recupera una
+  pérdida **no está definido.**
 
 Y queda declarado como frontera, sin buscarle salida:
 
@@ -2627,9 +2638,10 @@ operables con un número.
 > **Y la reproducibilidad entre arquitecturas quedó verificada**: los siete vectores —veredicto,
 > pasos, páginas y huella de los registros— dan idénticos en x86-64 y en aarch64.
 
-**Los Tests 6 y 7 se usan donde corresponden, y después vinieron tres más.** El 6 (`test6-desafio-computo/`) mide el
-presupuesto del desafío de cómputo de §6.7.1 y el 7 (`test7-firma-compuesta/`) la mitigación de §10.2. Los tres que
-siguen miden la firma y su sucesión, y son de la misma clase que el quinto: no se podían correr sin la máquina.
+**Los Tests 6 y 7 se usan donde corresponden, y después vinieron cuatro más.** El 6 (`test6-desafio-computo/`) mide el
+presupuesto del desafío de cómputo de §6.7.1 y el 7 (`test7-firma-compuesta/`) la mitigación de §10.2. Los cuatro que
+siguen miden la firma, su sucesión y cómo se protege una cuenta, y son de la misma clase que el quinto: no se podían
+correr sin la máquina.
 
 **Test 8 · Ed25519 en la máquina.** ✅ **Corrido** (septiembre 2026). "Ed25519 es más eficiente" era una intuición:
 hasta acá todo lo medido en la máquina era ML-DSA. Se compiló ed25519-dalek a RV32IM y se corrió en la máquina de
@@ -2662,6 +2674,22 @@ misma dirección; y se rechaza la firma con `s` alto (EIP-2).
 > M. Migrar a ML-DSA-44 devolvería capacidad; lo que crece es el tamaño, ~38×. *Y un hallazgo sobre el nodo:* la
 > invariante I4 se revisa contra el `H0_GENESIS` de Geminis, así que hoy el nodo no soporta otro Génesis. Un crate
 > por primitiva, sin ajustar; **no se afirma que Ethereum deba elegir ML-DSA-44**.
+
+**Test 11 · ML-DSA-44 con umbral: ¿la cadena ve algo distinto de una firma común?** ✅ **Corrido** (septiembre
+2026). §10.2 decía que un umbral entre los dispositivos propios del dueño deja a la red viendo una firma común; eso
+era un argumento. El prototipo público de Mithril (USENIX Security '26), sin modificar, firma 2-de-3 con cada uno de
+los tres pares posibles, y esas firmas se verifican en la máquina de §6.6 sin tocarla, bajo los techos del ruleset
+inicial, contra un competidor sin criptografía de umbral: un multisig k-de-n on-chain, con firmas sueltas
+(`test11-umbral-mldsa/`).
+
+> **Resultado: la cadena ve una firma común.** 90 de 90 verifican con una mediana de 3.318.732 pasos y 28 páginas,
+> contra 3.318.658 de una común (0,002 %); las alteradas dan cero. El multisig sin umbral cuesta 2× en 2-de-3 (6,78 M
+> pasos, queda el 3,1 % del techo, 7 transacciones por bloque en vez de 15) y un 3-de-3 (10,1 M) **no cabe** bajo el
+> techo inicial. El costo pasa a la wallet: ~1,7 intentos de tres rondas cada uno, ~27 KB por parte por firma. *Y una
+> trampa:* el mismo guest costó 46 % más pasos tras un cambio de parche de una dependencia transitiva (`keccak` 0.2.1
+> → 0.2.2): un costo pertenece a un binario, no a un nombre de crate. Firma en proceso en una máquina, sin red ni
+> teléfono; claves repartidas desde una semilla; **prototipo académico, no auditado acá**; la seguridad del esquema
+> no se prueba.
 
 **Los tests 1 y 4 eran independientes y dieron resultados opuestos.** El Test 1 decidía si el
 mecanismo generacional tiene cliente y encontró uno, más chico que el mecanismo; el Test 4 decidía
