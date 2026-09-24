@@ -1,0 +1,18 @@
+[package]
+name = "guest-multisig"
+version = "0.1.0"
+edition = "2021"
+
+# El competidor del umbral: un multisig k-de-n **on-chain**, con firmas ML-DSA-44 sueltas. La cuenta
+# es `BLAKE2s(clave_1 || ... || clave_n)`; la transaccion trae las n claves, k firmas y los indices de
+# quienes firmaron. El mismo crate `ml-dsa` 0.1.1 y el mismo perfil que Test 2 y Test 9, para que la
+# unica diferencia con la verificacion simple sea cuantas verificaciones hace.
+[dependencies]
+ml-dsa = { version = "0.1.1", default-features = false, features = ["alloc"] }
+blake2 = { version = "0.10", default-features = false }
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"

@@ -1,0 +1,36 @@
+# Test 11 — firma umbral ML-DSA-44 y multisig on-chain, en la máquina de §6.6 — x86-64 (Windows), 2026-09-24
+# máquina: geminis/predicado/vm en el commit 992dfb4 (cambios sin commitear en geminis/predicado/vm: 0)
+# guests: ml-dsa 0.1.1 · keccak 0.2.1 · blake2 0.10.6 (Cargo.lock del guest simple, copiado a propósito: ver RESULTS.md, 'Una trampa')
+# firmante: go1.27.1 · prototipo de Mithril 66e269e75dd8f5d722675a3d276a1aedc58bc4ef (sin modificar)
+
+.................
+----------------------------------------------------------------------
+Ran 17 tests in 19.711s
+
+OK
+
+# techos del ruleset inicial: 7,000,000 pasos, 96 paginas
+## B · multisig k-de-n on-chain (firmas ML-DSA-44 sueltas + BLAKE2s de las n claves)
+   forma       pasos  pag    bajo el techo tx/bloque  bytes claves+firmas
+  1-de-1   3,370,359   29           acepta        15                3,732
+  2-de-2   6,737,639   30           acepta         7                7,464
+  2-de-3   6,782,939   30           acepta         7                8,776
+  3-de-3  10,107,025   31    TechoExcedido         5               11,196
+  control firma-mala      : acepta=0 Retorno(0) pasos=3,458,699
+  control direccion-mala  : acepta=0 Retorno(0) pasos=134,554
+  control indice-repetido : acepta=0 Retorno(0) pasos=134,794
+
+## A · firma umbral 2-de-3 (prototipo de Mithril) en la maquina de §6.6
+caso                            acepta   pasos min     mediana         max  pag
+umbral 2-de-3 (90 firmas)       90/90    3,318,613   3,318,732   3,318,814   28
+firma comun, 1 firmante (30)    30/30    3,318,542   3,318,658   3,318,863   28
+umbral + bit-firma               0/90    3,318,369   3,318,512   3,318,599
+umbral + otro-mensaje            0/90    3,318,399   3,318,518   3,318,600
+umbral + otra-clave              0/90    3,318,406   3,318,525   3,318,607
+por debajo del umbral (t=2, n=3, 50 intentos de cada forma): una parte activa -> 0 firmas y 50 panics del prototipo; dos firman y Combine recibe una respuesta -> 0 firmas
+
+## lado de la wallet (esta maquina, en proceso, SIN red; Go)
+ t-de-n  intentos medio  max  ms medio   ms p95  bytes/parte/intento
+ 2-de-2            1.75    8      2.35     5.51               10,528
+ 2-de-3            1.70    7      3.43     8.19               15,776
+ 3-de-5            2.00   15     30.48    75.37               73,504

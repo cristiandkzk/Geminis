@@ -1,0 +1,19 @@
+[package]
+name = "vm-umbral"
+version = "0.1.0"
+edition = "2021"
+
+# Dos cosas en un binario, para que la prueba Python no reimplemente nada:
+#   simple    — verifica firmas ML-DSA-44 que le llegan de AFUERA (del firmante en Go) en la maquina
+#               de §6.6 (`geminis/predicado/vm`, sin tocarla) y en nativo con el crate `ml-dsa`
+#   multisig  — arma y verifica un multisig k-de-n on-chain con firmas sueltas, tambien en la maquina
+[dependencies]
+vm = { path = "../../../geminis/predicado/vm" }
+ml-dsa = { version = "0.1.1", default-features = false, features = ["alloc"] }
+blake2 = "0.10"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"

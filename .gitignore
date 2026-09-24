@@ -51,3 +51,6 @@ geminis/vm-telefono.tar.gz
 # ─── Correspondencia privada ───────────────────────────────────────────────────
 /docs privados
 
+
+# Test 11: el prototipo de Mithril es de terceros; se clona en el commit fijado en test11-umbral-mldsa/RESULTS.md
+test11-umbral-mldsa/codigo/mithril/

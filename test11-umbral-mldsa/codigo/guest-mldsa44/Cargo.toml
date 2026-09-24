@@ -1,0 +1,16 @@
+[package]
+name = "guest-mldsa44-io"
+version = "0.1.0"
+edition = "2021"
+
+# El mismo crate (`ml-dsa` 0.1.1) y el mismo perfil que el guest de Test 2, con la ABI de
+# `guest-ed25519`: clave, firma y mensaje entran por memoria. **El `guest.elf` publicado de Test 2
+# no se toca**: su fixture interno es parte de un artefacto ya publicado.
+[dependencies]
+ml-dsa = { version = "0.1.1", default-features = false, features = ["alloc"] }
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
