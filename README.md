@@ -270,7 +270,10 @@ evaporates —with fifty nodes the margin is that of one— and the wait of a le
 a fixed term but a ramp of `9·T`. It is fixed with no coordination: each node walks the queue in a
 pseudorandom order derived from its identity, and that is the cost from ten to eleven. At random the
 backlog **stabilizes** —with eleven nodes, ~400 challenges and a mean wait of four blocks— instead of
-growing.
+growing. **But the mean is not the promise:** with eleven nodes, about one in sixteen legitimate
+challenges waits longer than the 12-block window under sustained censorship (simulated), so the
+window stretches by itself when there is a queue, up to a hard per-class ceiling. The mechanism is
+implemented; the real queue that would feed it is not.
 
 The bond does not have to be large, only non-zero: **the honest challenger's comes back** and **the
 attacker's is burned**.

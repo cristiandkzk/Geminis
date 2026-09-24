@@ -447,6 +447,68 @@ tap. With eleven nodes the equilibrium settles at some four hundred challenges a
 four blocks; with twenty, at twenty challenges and two tenths of a block. *The queue is long, not
 infinite, and that is a different thing.*
 
+**But a queue that does not saturate is not the same as every challenge landing in time, and the two
+were read as one.** The mean wait of four blocks describes the queue's equilibrium, not what happens
+to any particular challenge: since each node picks at random among everything pending, the wait has a
+heavy tail. Measured with 19.6 million legitimate challenges under a sustained censorship attack,
+against the finality window of the initial ruleset (12 blocks):
+
+| PoD nodes | mean wait | maximum observed | wait longer than 12 blocks |
+|---|---|---|---|
+| 11 | 4.2 blocks | 89 | 6.2% |
+| 13 | 1.2 | 28 | 0.04% |
+| 15 | 0.6 | 16 | 0.0004% |
+
+With the eleven nodes the design declares sufficient, **about one in sixteen legitimate challenges is
+not verified inside the window, under the very attack this section exists to resist.** The queue does
+not fail: what does not hold is the finality promised in 12 blocks against its own worst case. *This
+is our own simulation, on the simulator that measured the rest of this section: evidence of the kind
+§11 distinguishes from a customer found outside.*
+
+**The fix is not to ask for more nodes**, because `N` is not a protocol parameter: there is no
+validator set, and anyone runs a PoD node or none. The only dial that exists is the window, and it has
+to be calibrated against the worst case the design already declared viable —eleven— and not against a
+better `N` that may never be running. Lengthening it by a fixed amount closes the gap, on the order of
+150 blocks, but charges that latency to **every** transfer even when nobody is attacking anything, and
+attacking costs burned bonds: the normal state is calm.
+
+> **Finality stretches only when there is a queue, and with a ceiling.** The window is the base while
+> the challenge backlog has stayed below a threshold for an entire window of consecutive blocks;
+> otherwise the only thing that matures the transition is the class's hard ceiling (§10.1). **There
+> are no intermediate values, on purpose:** a window that grew gradually with the backlog would make
+> any one-block difference between two queues move the maturation. With a threshold and a streak it
+> takes a *sustained* disagreement.
+
+Two measured things support the numbers. **The threshold is a plateau and not an optimum:** with a
+sustained flood of 70 to 100 junk challenges per block over a capacity of 100, the probability of
+waiting more than 12 blocks is negligible as long as the backlog does not pass about a hundred, and
+only then grows fast —0.00006 with an equilibrium backlog of 70, about 0.06 with 383— so **any
+threshold between 20 and 80 separates the harmless from what requires stretching the window**, and 40
+was chosen. The reason is that detection and damage are coupled: delay cannot be created without
+creating a proportional backlog, and that backlog is exactly what the threshold detects. And **the
+flood that really creates risk requires filling 85% or more of the entire block capacity with junk,
+sustained**, burning a bond for each one: near-total saturation, not a subtle attack. On the ceiling:
+with 59.4 million samples at eleven nodes and the full flood, **zero waits above 88 blocks.**
+
+**What is built and what is missing, stated whole.** The per-class hard ceiling of §10.1 is exactly
+the ceiling of this rule, and it was already written into the schedule with nothing activating it: the
+signal was missing. Now the node carries the backlog and a streak of calm blocks, and the maturation
+of the lock-in uses the base or the ceiling depending on that streak. **That is the signal and the
+reaction, not the source of the signal**: the challenge queue is not connected to the node's state, so
+today the backlog arrives as a parameter and nothing produces it. And for the finality of ordinary
+interactions the rule is specified and simulated, not implemented. Two things follow that have to be
+written down:
+
+- **As long as each node brings the backlog in from outside, it is not a fact of the chain.** A
+  challenge does not exist until it enters a block, so with the queue inside the state it would be
+  —every node would compute it the same—. Without that, two nodes with different views can mature at
+  different heights, and since those heights do not enter `h0`, the lineage does not tell them apart.
+  It closes one of two ways: the backlog comes out of the state, or the schedule's heights enter `h0`.
+- **The cryptographic class's ceiling does not cover the worst case measured.** It adds up to
+  12 + 32 = 44 blocks against an observed maximum of 89, and it is undecided on purpose: shortening
+  it buys urgency in the emergency migration and costs legitimate challenges coverage under
+  saturation, the same tension `Δ` already has (§3). The other classes' ceilings do cover it.
+
 The bond does not have to be large, only non-zero, and the reason is an asymmetry that plays
 entirely on the right side: **the honest challenger's bond comes back** —their proof verifies— **and
 the attacker's is burned.** Sending ten thousand copies of a valid proof costs the honest party
@@ -1700,7 +1762,8 @@ friction, and it is the price of the receiver being the watchman.
 
 **Finality is measured in minutes or hours, not in seconds.** It is the consequence of finalizing by
 challenge window instead of by quorum (§6.3). Not having a validator set is gained; it is paid for
-in latency.
+in latency. And it is not a number but a distribution: in calm it is the base window, and under
+saturation of the queue it stretches up to the class's ceiling (§6.3).
 
 **The work the protocol can pay for is a subset, not the whole.** Only requests with a verifiable
 deterministic predicate (§6.2). Issuance no longer depends on this —§7.1 decoupled it from work— but
@@ -1784,7 +1847,8 @@ challenge bonds would try to stretch the lock-in. It points in the worst directi
 urgent cryptographic migration — the same worst case that already strains the `Δ` window.
 
 **The fix is a hard ceiling on blocks of delay to lock-in, fixed in Geminis per transition class** —
-the same form as `Δ` in §3, applied to the other half of the schedule. A hard ceiling was chosen over
+the same form as `Δ` in §3, applied to the other half of the schedule. The ceiling is also the limit
+the adaptive window of §6.3 stretches to when there is a queue. A hard ceiling was chosen over
 a stepped challenge bond, and the criterion is worth more than the case:
 
 | | stepped bond | **hard ceiling** |
@@ -2057,12 +2121,44 @@ sharing a core bounds what falls together with what when something breaks; choos
 scrutinized primitive instead of the rarest (above, §10.1) bounds the probability that the break
 already exists without anyone having looked for it seriously; and a composite signature from a second
 family with no shared core, required only for transactions moving dormant value above a threshold, is
-a candidate mitigation —measured in `test7-firma-compuesta/` (~4.2× the cost of a simple verification
-under the engine that actually fit into the budget of Test 2), still without the phone run or the
-speed threshold that would make it adoptable— that would reduce the value of keeping quiet precisely
+a candidate mitigation —measured in `test7-firma-compuesta/` (~3.5× the cost of a simple verification
+in the same module, under the engine that actually fit into the budget of Test 2, and 3.9× on a real phone), still
+without the speed threshold or the size cost that would make it adoptable— that would reduce the value of keeping quiet precisely
 for the accounts most worth emptying. What none of the four covers is the lone adversary who reaches
 the complete break without passing through any public intermediate phase: that case is not covered
 because there is no information in the state with which to cover it.
+
+**And there is a second frontier, that of key theft and not of primitive breakage.** The ladder of
+canaries covers the mathematics giving way; it does not cover someone getting hold of an account's key
+by another route —phishing, malware, a side channel, a compromised device—, and for the same reason: a
+stolen signature is bit for bit the owner's signature, and no predicate reads the difference. We
+explored what could be done on the network side, and where it ends:
+
+- **A second secret that nobody knows cannot be born on the network.** If a node generates it, that
+  node saw it; if the machine generates it, since it runs under deterministic rules anyone with the
+  same data rederives it —determinism and secrecy exclude each other—; if it lives in the state, the
+  state is public and can only hold a commitment, never the secret. It is the rule of §6.6 turned
+  around: there the canary's instance is **derived** so that nobody keeps a trapdoor; here the secret
+  must be one that **nobody** can derive, and only a device of the owner provides that.
+- **Isolating a secret inside a compromised device does not exist without dedicated hardware**, and
+  requiring it breaks §6.1 —PoD runs on any hardware—, of the same family as the iOS/Android asymmetry
+  above but worse: it is not slower, it is being unable to use the protection. Geminis does not require
+  it.
+- **The way out that holds equally on any device is on the wallet's side:** splitting the secret
+  across several of the user's own devices, with a threshold (two of three, say). It is mathematics and
+  depends on no chip, so it is equally strong on Android, iPhone or PC. Which scheme, how many devices
+  at minimum, and how a loss is recovered **is not defined.**
+
+And what stays declared as a frontier, without looking for a way out:
+
+- **The coordinated compromise of all of a wallet's factors** is indistinguishable from its
+  legitimate use, by the same argument as the complete break.
+- **Accounts that operate on their own** —contracts, automatic nodes— are left without a second
+  factor. It is not impossible: an independent co-signer, on other infrastructure, that signs only if
+  the transaction meets a policy, is a real second factor with no human. But it requires a second
+  machine per account, that is, double the hardware, and collides with the zero entry moat of §6.1. It
+  was decided not to go that way: it is a limit **by cost**, not by impossibility. For those accounts
+  only the canary covers, and theft of the process stays open.
 
 **Declaring this is stronger than promising the opposite.** A design that said "this chain is
 unbreakable" would be promising something no cryptographic system can promise — section 6.6 already

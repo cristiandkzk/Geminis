@@ -445,6 +445,68 @@ equilibrio queda en unas cuatrocientas impugnaciones y una espera media de cuatr
 veinte, en veinte impugnaciones y dos décimas de bloque. *La cola es larga, no infinita, y eso es
 otra cosa.*
 
+**Pero que la cola no sature no es que cada impugnación entre a tiempo, y las dos cosas se leyeron
+como una.** La espera media de cuatro bloques describe el equilibrio de la cola, no lo que le pasa a
+una impugnación en particular: como cada nodo elige al azar entre todo lo pendiente, la espera tiene
+cola pesada. Medido con 19,6 millones de impugnaciones legítimas bajo un ataque de censura
+sostenido, contra la ventana de finalidad del ruleset inicial (12 bloques):
+
+| nodos PoD | espera media | máximo observado | espera mayor a 12 bloques |
+|---|---|---|---|
+| 11 | 4,2 bloques | 89 | 6,2% |
+| 13 | 1,2 | 28 | 0,04% |
+| 15 | 0,6 | 16 | 0,0004% |
+
+Con los once nodos que el diseño declara suficientes, **alrededor de una de cada dieciséis
+impugnaciones legítimas no se verifica dentro de la ventana, bajo el ataque exacto que esta sección
+existe para resistir.** La cola no falla: lo que no se sostiene es la finalidad prometida en 12
+bloques contra su propio peor caso. *Es simulación propia, sobre el simulador que midió el resto de
+esta sección: evidencia del tipo que §11 distingue de un cliente encontrado afuera.*
+
+**El arreglo no es pedir más nodos**, porque `N` no es un parámetro del protocolo: no hay conjunto de
+validadores, y cualquiera corre un nodo PoD o ninguno. El único dial que existe es la ventana, y hay
+que calibrarla contra el peor caso que el diseño ya declaró viable —once— y no contra un `N` mejor
+que quizá nunca esté corriendo. Alargarla de forma fija cierra la brecha, del orden de 150 bloques,
+pero le cobra esa latencia a **toda** transferencia aunque nadie ataque nada, y atacar cuesta bonos
+quemados: lo normal es la calma.
+
+> **La finalidad se estira solo cuando hay cola, y con tope.** La ventana es la base mientras el
+> backlog de impugnaciones estuvo por debajo de un umbral durante una ventana entera de bloques
+> seguidos; si no, lo único que madura la transición es el tope duro de la clase (§10.1). **No hay
+> valores intermedios, a propósito:** una ventana que creciera de a poco con el backlog haría que
+> cualquier diferencia de un bloque entre dos colas moviera la maduración. Con umbral y racha hace
+> falta un desacuerdo *sostenido*.
+
+Dos cosas medidas sostienen los números. **El umbral es una meseta y no un óptimo:** con un flood
+sostenido de 70 a 100 impugnaciones basura por bloque sobre una capacidad de 100, la probabilidad de
+esperar más de 12 bloques es despreciable mientras el backlog no pase de unas cien y recién ahí
+crece rápido —0,00006 con un backlog de equilibrio de 70, alrededor de 0,06 con 383—, así que
+**cualquier umbral entre 20 y 80 separa bien lo inofensivo de lo que exige estirar la ventana**, y
+se fijó en 40. La razón es que detección y daño están acoplados: no se puede crear demora sin crear
+un backlog proporcional, y ese backlog es justo lo que el umbral detecta. Y **el flood que de verdad
+genera riesgo exige ocupar el 85% o más de la capacidad entera del bloque con basura, sostenido**,
+quemando un bono por cada una: casi saturación total, no un ataque sutil. Sobre el tope: con 59,4
+millones de muestras a once nodos y el flood completo, **cero esperas por encima de 88 bloques.**
+
+**Lo que está construido y lo que falta, dicho entero.** El tope duro por clase de §10.1 es
+exactamente el techo de esta regla, y ya estaba escrito en el cronograma sin que nada lo activara:
+faltaba la señal. Ahora el nodo lleva el backlog y una racha de bloques en calma, y la maduración
+del lock-in usa la base o el tope según esa racha. **Eso es la señal y la reacción, no la fuente de
+la señal**: la cola de impugnaciones no está conectada al estado del nodo, así que hoy el backlog
+llega por parámetro y nada lo produce. Y para la finalidad de las interacciones ordinarias la regla
+está especificada y simulada, no implementada. De ahí salen dos cosas que hay que escribir:
+
+- **Mientras el backlog lo aporte cada nodo desde afuera, no es un hecho de la cadena.** Una
+  impugnación no existe hasta entrar en un bloque, así que con la cola dentro del estado sí lo
+  sería —todo nodo lo computaría igual—. Sin eso, dos nodos con vistas distintas pueden madurar en
+  alturas distintas, y como esas alturas no entran en `h0`, el linaje no los distingue. Se cierra de
+  una de dos formas: que el backlog salga del estado, o que las alturas del cronograma entren en
+  `h0`.
+- **El tope de la clase criptográfica no cubre el peor caso medido.** Suma 12 + 32 = 44 bloques
+  contra un máximo observado de 89, y está sin decidir a propósito: acortarlo compra urgencia en la
+  migración de emergencia y le cuesta cobertura a la impugnación legítima bajo saturación, la misma
+  tensión que ya tiene `Δ` (§3). Los topes de las otras clases sí lo cubren.
+
 El bono no tiene que ser grande, sólo distinto de cero, y la razón es una asimetría que juega
 entera del lado correcto: **el bono del impugnador honesto vuelve** —su prueba verifica— **y el
 del atacante se quema.** Mandar diez mil copias de una prueba válida no le cuesta nada al honesto,
@@ -1700,7 +1762,8 @@ humanos es fricción, y es el precio de que el receptor sea el vigilante.
 
 **La finalidad se mide en minutos u horas, no en segundos.** Es la consecuencia de finalizar por
 ventana de impugnación en vez de por quórum (§6.3). Se gana no tener conjunto de validadores; se
-paga en latencia.
+paga en latencia. Y no es un número sino una distribución: en calma es la ventana base, y bajo
+saturación de la cola se estira hasta el tope de la clase (§6.3).
 
 **El trabajo que el protocolo puede pagar es un subconjunto, no el total.** Solo los pedidos con
 predicado determinístico verificable (§6.2). La emisión ya no depende de esto —§7.1 la desacopló
@@ -1785,7 +1848,8 @@ justo en la migración criptográfica de urgencia — el mismo caso peor que ya 
 `Δ`.
 
 **El arreglo es un tope duro de bloques de demora al lock-in, fijado en Geminis por clase de
-transición** — la misma forma que `Δ` en §3, aplicada a la otra mitad del cronograma. Se eligió
+transición** — la misma forma que `Δ` en §3, aplicada a la otra mitad del cronograma. El tope es
+además el techo al que se estira la ventana adaptativa de §6.3 cuando hay cola. Se eligió
 tope duro por encima de un bono de impugnación escalonado, y el criterio vale más que el caso:
 
 | | bono escalonado | **tope duro** |
@@ -2057,12 +2121,44 @@ firma no compartan núcleo acota qué cae junto con qué cuando algo se rompe; e
 escrutinada en vez de la más rara (arriba, §10.1) acota la probabilidad de que la ruptura ya exista
 sin que nadie la haya buscado en serio; y una firma compuesta de una segunda familia sin núcleo
 compartido, exigida solo para transacciones que muevan valor dormiente por encima de un umbral,
-es una mitigación candidata —medida en `test7-firma-compuesta/` (~4,2× el costo de una verificación
-simple bajo el motor que de hecho entró en el presupuesto de Test 2), todavía sin la corrida en
-teléfono ni el umbral de velocidad que la haría adoptable— que reduciría el valor de callarse
+es una mitigación candidata —medida en `test7-firma-compuesta/` (~3,5× el costo de una verificación
+simple del mismo módulo bajo el motor que de hecho entró en el presupuesto de Test 2, y 3,9× en un teléfono real),
+todavía sin el umbral de velocidad ni el costo de tamaño que la harían adoptable— que reduciría el valor de callarse
 justo para las cuentas que más vale la pena vaciar. Lo que ninguna de las cuatro cubre es el
 adversario solitario que llega a la ruptura completa sin pasar por ninguna fase intermedia pública:
 ese caso no se cubre porque no hay información en el estado con la que cubrirlo.
+
+**Y hay una segunda frontera, la del robo de la clave y no la de la ruptura de la primitiva.** La
+escalera de canarios cubre que la matemática ceda; no cubre que alguien se quede con la clave de una
+cuenta por otro camino —phishing, malware, un canal lateral, un dispositivo comprometido—, y por la
+misma razón: una firma robada es bit a bit la firma del dueño, y ningún predicado lee la
+diferencia. Se exploró qué se podía hacer del lado de la red, y dónde termina:
+
+- **Un segundo secreto que nadie conozca no puede nacer en la red.** Si lo genera un nodo, ese nodo
+  lo vio; si lo genera la máquina, como corre bajo reglas deterministas cualquiera con los mismos
+  datos lo rederiva —determinismo y secreto se excluyen entre sí—; si vive en el estado, el estado
+  es público y solo puede guardar un compromiso, nunca el secreto. Es la regla de §6.6 dada vuelta:
+  allá la instancia del canario se **deriva** para que nadie se guarde una trampa; acá el secreto
+  tiene que **no** poder derivarlo nadie, y eso solo lo da un dispositivo del dueño.
+- **Aislar un secreto dentro de un dispositivo comprometido no existe sin hardware dedicado**, y
+  exigirlo rompe §6.1 —PoD corre en cualquier hardware—, de la misma familia que la asimetría
+  iOS/Android de arriba pero peor: no es más lento, es no poder usar la protección. Geminis no lo
+  exige.
+- **La salida que sí vale igual en cualquier dispositivo está del lado de la wallet:** repartir el
+  secreto entre varios dispositivos propios del usuario, con un umbral (dos de tres, por ejemplo).
+  Es matemática y no depende de ningún chip, así que es igual de fuerte en Android, iPhone o PC.
+  Qué esquema, cuántos dispositivos como mínimo y cómo se recupera una pérdida **no está definido.**
+
+Y queda declarado como frontera, sin buscarle salida:
+
+- **El compromiso coordinado de todos los factores de una wallet** es indistinguible de su uso
+  legítimo, por el mismo argumento que la ruptura completa.
+- **Las cuentas que operan solas** —contratos, nodos automáticos— quedan sin segundo factor. No es
+  imposible: un co-firmante independiente, en otra infraestructura, que firme solo si la
+  transacción cumple una política, es un segundo factor real y sin humano. Pero exige una segunda
+  máquina por cuenta, o sea el doble de hardware, y choca con el foso de entrada cero de §6.1. Se
+  decidió no ir por ahí: es un límite **por costo**, no por imposibilidad. Para esas cuentas solo
+  cubre el canario, y el robo del proceso queda abierto.
 
 **Declarar esto es más fuerte que prometer lo contrario.** Un diseño que dijera "esta cadena es
 irrompible" estaría prometiendo algo que ningún sistema criptográfico puede prometer — la sección

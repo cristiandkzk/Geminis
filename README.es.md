@@ -277,7 +277,11 @@ los `N` nodos verifican la misma impugnación, el paralelismo se evapora —con 
 margen es el de uno— y la espera de una impugnación legítima no es un plazo fijo sino una rampa
 de `9·T`. Se arregla sin coordinación: cada nodo recorre la cola en un orden pseudoaleatorio
 derivado de su identidad, y ése es el costo de diez a once. Al azar el atraso **se estabiliza**
-—con once nodos, ~400 impugnaciones y cuatro bloques de espera media— en vez de crecer.
+—con once nodos, ~400 impugnaciones y cuatro bloques de espera media— en vez de crecer. **Pero la
+media no es la promesa:** con once nodos, alrededor de una de cada dieciséis impugnaciones
+legítimas espera más que la ventana de 12 bloques bajo censura sostenida (simulado), así que la
+ventana se estira sola cuando hay cola, hasta un tope duro por clase. El mecanismo está
+implementado; la cola real que lo alimentaría, no.
 
 El bono no tiene que ser grande, sólo distinto de cero: **el del impugnador honesto vuelve** y
 **el del atacante se quema**.
