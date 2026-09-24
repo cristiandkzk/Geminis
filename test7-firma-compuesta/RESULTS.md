@@ -27,9 +27,13 @@ larger than the one in this table).
 | | native | cranelift (JIT) | wasmi (int.) |
 |---|---|---|---|
 | **ML-DSA-44** | 124.0 µs · 8,065/s | 471.3 µs · 2,122/s · **3.8×** | 3.51 ms · 285/s · **28.3×** |
-| **SLH-DSA-128s** | 1,265.4 µs · 790/s · **10.2× ML-DSA-44** | 1,158.1 µs · 863/s · **9.3× ML-DSA-44 · 0.9× its own native** | 10.18 ms · 98/s · **2.9× ML-DSA-44 · 8.0× its own native** |
+| **SLH-DSA-128s** | 1,265.4 µs · 790/s · **10.2× ML-DSA-44** | 1,158.1 µs · 863/s · **2.5× ML-DSA-44 · 0.9× its own native** | 10.18 ms · 98/s · **2.9× ML-DSA-44 · 8.0× its own native** |
 
 Signature: ML-DSA-44 = 2,420 B; SLH-DSA-128s = 7,856 B (3.2× heavier).
+
+*Corrected on 24/9/2026, after closing it:* the SLH-DSA-128s cell under Cranelift said **9.3×**, and that
+number compared SLH-DSA under Cranelift (1,158.1 µs) against **native** ML-DSA-44 (124.0 µs), that is,
+two different engines. On the same engine, 1,158.1 / 471.3 = **2.5×**. Also corrected in section 3.
 
 *Variance:* three complete runs. `wasmi` and `cranelift` stayed within ~3% between runs for both
 primitives — the table's figures are representative. `native` was noisier, above all ML-DSA-44
@@ -53,20 +57,22 @@ scattered memory access of a lattice.
 
 **Practical consequence:** measured natively, SLH-DSA-128s looks ~10× more expensive than ML-DSA-44.
 Under Cranelift —the engine that actually decides the budget, because it is the one used on the phone
-for Test 2's figure— the gap drops to **9.3×**, and the composite cost (both signatures verified
-together) gives **471 + 1,158 ≈ 1,630 µs**, against the 391 µs a single ML-DSA-44 verification cost
-on the real phone (Test 2). That is **~4.2×** the cost of a simple verification — not ~10× and not
-~30×, which is what a naive extrapolation from the native number would have suggested.
+for Test 2's figure— the gap drops to **2.5×**, and the composite cost (both signatures verified
+together) gives **471 + 1,158 ≈ 1,630 µs**. That is **~3.5×** a single ML-DSA-44 verification in
+this same module and engine (471 µs) — not ~10× and not ~30×, which is what a naive extrapolation
+from the native number would have suggested. *(Against Test 2's 391 µs it would be ~4.2×, but that
+figure came from a different module, ~20% faster for ML-DSA-44; see section 5. Corrected on
+24/9/2026: this section used the 4.2× as if it were this module's ratio.)*
 
-With Test 2's figure of ~640 tx/s per quarter core for an ML-DSA-44 verification alone, a composite
-verification at ~4.2× that cost would sustain on the order of ~150 tx/s — far above what the use case
-demands, which is **only** the transactions that trip the velocity circuit breaker (§8.5), not the
-chain's general traffic.
+At ~1,630 µs per composite verification, a quarter core sustains on the order of ~150 tx/s
+(0.25 / 1,630 µs) — far above what the use case demands, which is **only** the transactions that
+exceed the velocity threshold on dormant value (proposed, it does not exist yet in the paper or in
+the code: it is Part A), not the chain's general traffic.
 
 ## 4. What this number does NOT say yet
 
 - **The phone was run (section 5), but it is a single device** (Motorola Edge 40 Neo, MT6879). The
-  composite came out at 3.9× under Cranelift, close to the desktop's ~4.2×; but the interpreter costs
+  composite came out at 3.9× under Cranelift, close to the desktop's ~3.5× (same module); but the interpreter costs
   ~2× more than on x86, and a single SoC does not say whether that holds on other mid-range phones.
 - **It does not include the size cost.** An additional 7,856 B per affected transaction is a block
   size and state budget cost (§10.1) this test does not quantify — it only measures verification
@@ -127,7 +133,7 @@ composite is compared against ML-DSA-44 inside this same module (3.9×) and not 
   ARM's native code uses hardware SHA-2 instructions and the wasm guest cannot; the i5-9400 has no
   SHA-NI, so on x86 that advantage did not exist.
 - **The desktop's order of magnitude holds under Cranelift** (composite 3.9×, ~136 tx/s per quarter
-  core, against ~4.2× and ~150 tx/s). **What changes is the interpreter:** ~27.6 ms per composite
+  core, against ~3.5× and ~150 tx/s). **What changes is the interpreter:** ~27.6 ms per composite
   verification, ~9 tx/s per quarter core, about 15× fewer than Cranelift. Which of the two numbers
   applies to the budget depends on which engine the real VM uses, and this test does not decide that.
 

@@ -29,9 +29,13 @@ penalidad real contra el mejor nativo posible es mayor que la de esta tabla).
 | | native | cranelift (JIT) | wasmi (int.) |
 |---|---|---|---|
 | **ML-DSA-44** | 124,0 µs · 8 065/s | 471,3 µs · 2 122/s · **3,8×** | 3,51 ms · 285/s · **28,3×** |
-| **SLH-DSA-128s** | 1 265,4 µs · 790/s · **10,2× ML-DSA-44** | 1 158,1 µs · 863/s · **9,3× ML-DSA-44 · 0,9× su propio nativo** | 10,18 ms · 98/s · **2,9× ML-DSA-44 · 8,0× su propio nativo** |
+| **SLH-DSA-128s** | 1 265,4 µs · 790/s · **10,2× ML-DSA-44** | 1 158,1 µs · 863/s · **2,5× ML-DSA-44 · 0,9× su propio nativo** | 10,18 ms · 98/s · **2,9× ML-DSA-44 · 8,0× su propio nativo** |
 
 Firma: ML-DSA-44 = 2 420 B; SLH-DSA-128s = 7 856 B (3,2× más pesada).
+
+*Corregido el 24/9/2026, después de cerrarlo:* la celda de SLH-DSA-128s bajo Cranelift decía **9,3×**, y
+ese número comparaba SLH-DSA bajo Cranelift (1 158,1 µs) contra ML-DSA-44 **nativo** (124,0 µs), o sea
+dos motores distintos. En el mismo motor, 1 158,1 / 471,3 = **2,5×**. Corregido también en la sección 3.
 
 *Varianza:* tres corridas completas. `wasmi` y `cranelift` se mantuvieron
 dentro del ~3% entre corridas para las dos primitivas — las cifras de la
@@ -61,23 +65,25 @@ reticulado.
 **Consecuencia práctica:** medido en nativo, SLH-DSA-128s parece ~10× más caro
 que ML-DSA-44. Bajo Cranelift —el motor que de hecho decide el presupuesto,
 porque fue el que se usó en el teléfono para la cifra de Test 2— la brecha
-baja a **9,3×**, y el costo compuesto (las dos firmas verificadas juntas) da
-**471 + 1 158 ≈ 1 630 µs**, contra los 391 µs que costó una sola verificación
-ML-DSA-44 en el teléfono real (Test 2). Es **~4,2×** el costo de una
-verificación simple — no ~10× ni ~30×, que es lo que una extrapolación
-ingenua desde el número nativo habría sugerido.
+baja a **2,5×**, y el costo compuesto (las dos firmas verificadas juntas) da
+**471 + 1 158 ≈ 1 630 µs**. Es **~3,5×** una verificación ML-DSA-44 sola en este
+mismo módulo y motor (471 µs) — no ~10× ni ~30×, que es lo que una extrapolación
+ingenua desde el número nativo habría sugerido. *(Contra los 391 µs de Test 2 daría
+~4,2×, pero ese número salió de otro módulo, ~20% más rápido para ML-DSA-44; ver
+sección 5. Corregido el 24/9/2026: esta sección usaba el 4,2× como si fuera la razón
+de este módulo.)*
 
-Con la cifra de Test 2 de ~640 tx/s por cuarto de núcleo para una verificación
-ML-DSA-44 sola, una verificación compuesta a ~4,2× ese costo sostendría del
-orden de ~150 tx/s — muy por encima de lo que exige el caso de uso, que es
-**solo** las transacciones que disparan el circuit breaker de velocidad
-(§8.5), no el tráfico general de la cadena.
+A ~1 630 µs por verificación compuesta, un cuarto de núcleo sostiene del orden de
+~150 tx/s (0,25 / 1 630 µs) — muy por encima de lo que exige el caso de uso, que es
+**solo** las transacciones que superen el umbral de velocidad sobre valor dormiente
+(propuesto, todavía no existe ni en el paper ni en el código: es la Parte A), no el
+tráfico general de la cadena.
 
 ## 4. Lo que este número NO dice todavía
 
 - **El teléfono se corrió (sección 5), pero es un solo aparato** (Motorola Edge 40
-  Neo, MT6879). El compuesto salió 3,9× bajo Cranelift, cerca del ~4,2× del
-  escritorio; pero el intérprete cuesta ~2× más que en x86, y un solo SoC no dice
+  Neo, MT6879). El compuesto salió 3,9× bajo Cranelift, cerca del ~3,5× del
+  escritorio (mismo módulo); pero el intérprete cuesta ~2× más que en x86, y un solo SoC no dice
   si eso se sostiene en otros teléfonos de gama media.
 - **No incluye el costo de tamaño.** 7 856 B adicionales por transacción
   afectada es un costo de tamaño de bloque y de presupuesto de estado
@@ -143,7 +149,7 @@ compara contra ML-DSA-44 dentro de este mismo módulo (3,9×) y no contra los
   SHA-2 por hardware y el guest wasm no puede; el i5-9400 no tiene SHA-NI, así que
   en x86 esa ventaja no existía.
 - **El orden de magnitud del escritorio se sostiene bajo Cranelift** (compuesto
-  3,9×, ~136 tx/s por cuarto de núcleo, contra ~4,2× y ~150 tx/s). **Lo que cambia
+  3,9×, ~136 tx/s por cuarto de núcleo, contra ~3,5× y ~150 tx/s). **Lo que cambia
   es el intérprete:** ~27,6 ms por verificación compuesta, ~9 tx/s por cuarto de
   núcleo, unas 15× menos que Cranelift. Cuál de los dos números vale para el
   presupuesto depende de qué motor use la VM real, y eso este test no lo decide.
