@@ -1,6 +1,6 @@
 """Test 11 — firma umbral ML-DSA-44: ¿la cadena ve algo distinto de una firma común?
 
-C25.12 razonó que un umbral entre dispositivos propios produce **una firma común bajo la clave
+§10.2 razona que un umbral entre dispositivos propios produce **una firma común bajo la clave
 de la cuenta**, así que la máquina de §6.6 no ve nada nuevo. Eso era un argumento. Acá se mide:
 
   A. Un esquema de umbral real (el prototipo de Mithril, USENIX Security '26, sin modificar) firma
@@ -205,7 +205,7 @@ class TestUmbralEnLaMaquina(unittest.TestCase):
         self.assertLessEqual(max(int(f["paginas"]) for f in filas), PAGINAS)
 
     def test_cuesta_lo_mismo_que_una_firma_comun(self):
-        """La afirmacion de C25.12, medida: no hay un costo del umbral en la cadena."""
+        """La afirmacion de §10.2, medida: no hay un costo del umbral en la cadena."""
         um = _pasos(self.o["maq"]["ok"])
         si = _pasos(self.o["maq_simple"])
         self.assertEqual(_aceptadas(self.o["maq_simple"]), len(si))
