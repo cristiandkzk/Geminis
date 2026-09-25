@@ -2022,6 +2022,41 @@ it gives them is market power and the ability to strand their own clients, which
 *"your exchange can go bust"*: true of every asset that ever existed, and no protocol ever solved it.
 It is measured and published as telemetry; that is where it ends.
 
+**Who assembles each block: resistance to censorship grows with the honest population and is minimal at launch.** Nodes
+re-execute and reject what is invalid, so whoever assembles a block cannot corrupt the state; the only thing they control is **what
+goes in**. The candidate rule draws the proposer without replacement per epoch among the seats of a pool —accounts with activity
+in a window—: whoever has already proposed is excluded until the pool renews, and a slow node yields its turn as a local policy, not
+as a validity rule. It was measured against the attack that §6.3 has to resist, with an attacker who **knows the epoch's permutation
+and chooses the moment**: a legitimate challenge is buried if the attacker proposes `W` blocks in a row. With the 12-block window,
+an attacker can hold up to 19–23% of the seats at a 1% annual risk, and the risk per block goes as `(1 − s)·s^W`, a cliff:
+
+| attacker's seats (out of 1,000) | first run of 12 blocks |
+|---|---|
+| 25% | ~5 years |
+| 33% | ~64 days |
+| 50% | ~15 hours |
+
+Drawing without replacement has a property an independent draw does not: each epoch contains all the honest seats, so an
+attacker's run is worth at most twice their seats and **with fewer than `W`/2 they cannot bury anything**. It holds as long as
+nobody yields: every honest node that yields leaves turns to the attacker, and with half of them yielding the margin drops by 44%.
+
+**And the cost of seats does not fix it.** A seat costs the permanence rent at the initial level of §10.3 (10⁻⁵ token per day) plus
+the creation floor (6.6·10⁻⁶), and the activity that keeps it in the pool adds nothing: the fee is a proportional burn with integer
+division, and a dust transfer burns zero. An attacker who joins 1,000 honest seats until holding a third pays ~0.31 token, 3·10⁻⁷
+of the supply (assumed on the order of 10⁶ tokens); the cheapest attack, with ~56% of the seats, costs ~0.01 token for a run every
+~4 hours. Neither the window nor the rate moves it: with `W` = 130 it stays at 0.24 token, and raising `r0` enough (×327) would make
+filling the state cost three times the supply. **It is the argument of §6.1 turned around:** that entry costs one phone stops a
+coalition that refuses from lasting —it excludes itself—, but does not stop someone from **diluting**: cheap entry also lets an
+attacker flood the seats and lower the honest fraction.
+
+What remains is a boundary, and it is declared without looking for a way out. The resistance grows with the honest seats —an attack
+holding a third of the seats would only cost 10⁻⁴ of the supply with about 350,000 honest ones— and it is weakest right at launch.
+Nor is it covered by what §6.3 already shows: that the queue cannot be clogged is about filling, not about omission, and the adaptive
+window counts challenges that are in the state, so one the proposer omitted, which never entered a block, does not stretch it. And
+what the previous paragraph says about holdings is still true —capital does not buy turns— but seats are something else, and they
+cost almost nothing. The measurement does not include the wait in the queue once the challenge has entered, the bias of the seed by the
+previous proposer, or the level of the rate after Geminis; they are in `sorteo-proponente/`.
+
 **It is possible to pay to bring a transition closer, though not to change which one.** It is the
 flip side of the previous paragraph, and it appears only when indexing the permanence rate of §8.5
 to state occupancy, which is the only variable it can be indexed to without violating I2 (§10.3).
@@ -2619,6 +2654,22 @@ operable with a number.
 > found by the mutation sweep taking minutes, not by a correctness test. The third is that the segment
 > flags of an ELF do not distinguish code from constants, so the predicate format had to start
 > requiring the binary to **declare where its code is**.
+>
+> *And a second round, prompted by an external review, found that this was not enough.* Testing the
+> loader with **constructed, well-formed inputs** —not with altered bytes of a legitimate ELF, which
+> only finds `panic`s— uncovered five families where the work depended on what the ELF **declares**
+> and not on its bytes: one of 168 bytes cost 197 ms to admit (a real 275 KB predicate, 1.2 ms),
+> overlapping segments reached 0.56 s, and a symbol table whose names had no terminator took 9.7 s
+> at 880 KB. All of it happened **before the first step**, so neither the step ceiling nor the page
+> ceiling covered it. It was closed with a principle and a format rule: **admission is work, and all
+> work goes under the meter** —its cost comes only from the headers, before reserving anything, and
+> is deducted from the same ceiling as execution—, and declared code has to be backed by bytes of the
+> file. Symbols, which were a convenience of the harness, left the consensus path. The worst ELF the
+> meter lets in costs ~15 ms on a desktop and no input in the corpus goes past 25. Along the way the
+> timing criterion caught the meter itself —it undercharged headers— and **had to be corrected twice
+> itself**, with the date in its file; the nine mutations applied to the fix all fell. Not measured
+> on a phone. Criteria and results in `geminis/predicado/CRITERIA-CARGADOR.es.md` and
+> `RESULTS-CARGADOR.es.md`.
 >
 > *And a lesson of method that cost three published corrections.* The measurement that fixes
 > `R_declarado` **was wrong four times, and all four towards the same side**: the unsafe one. Three

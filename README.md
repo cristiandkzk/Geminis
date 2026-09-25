@@ -599,6 +599,13 @@ maintained knowingly. The ones that weigh most:
   What bounds it is that the canary does not need to attract the optimal adversary but **anyone** who
   gets there first — which is what historically happened with DES, MD5 and SHA-1. **It is an
   empirical assumption about how cryptanalysis spreads, not a property of the design.**
+- **Resistance to censorship by whoever assembles the block grows with the honest population and is
+  minimal at launch.** With the proposer drawn without replacement and the 12-block window, an
+  attacker can hold 19–23% of the seats at a 1% annual risk, and with a third the first run of 12
+  blocks arrives in ~64 days. Seats cost almost nothing (10⁻⁵ token per day), and neither a longer
+  window nor a dearer rate fixes it: **cheap entry stops a coalition that refuses from lasting, but
+  not someone who dilutes.** It is declared without looking for a way out. Measured in
+  `sorteo-proponente/`.
 - **There is no incentive paid by the protocol to run a node before demand exists.** The claim buys
   the day-1 cohort and after that the income is fees from real demand or nothing. It is a deliberate
   choice between two failures: the old design started off safely and farmed itself; this one does not

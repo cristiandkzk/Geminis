@@ -2024,6 +2024,42 @@ sus propios clientes, que es lo mismo que *"tu exchange puede quebrar"*: cierto 
 activos que existieron, y no lo resolvió ningún protocolo nunca. Se mide y se publica como
 telemetría; ahí se termina.
 
+**Quién arma cada bloque: la resistencia a la censura crece con la población honesta y es mínima al arranque.** Los nodos
+re-ejecutan y rechazan lo inválido, así que quien arma un bloque no puede corromper el estado; lo único que controla es **qué
+entra**. La regla candidata sortea al proponente sin reposición por época entre los asientos de un pool —cuentas con actividad en
+una ventana—: quien ya propuso queda excluido hasta que el pool se renueva, y un nodo lento cede el turno como política local, no
+como regla de validez. Se midió contra el ataque que §6.3 tiene que resistir, con un atacante que **conoce la permutación de la
+época y elige el momento**: una impugnación legítima queda enterrada si el atacante propone `W` bloques seguidos. Con la ventana
+de 12 bloques, un atacante puede tener hasta el 19–23 % de los asientos con un riesgo anual de 1 %, y el riesgo por bloque va como
+`(1 − s)·s^W`, un acantilado:
+
+| asientos del atacante (de 1.000) | primera racha de 12 bloques |
+|---|---|
+| 25 % | ~5 años |
+| 33 % | ~64 días |
+| 50 % | ~15 horas |
+
+El sorteo sin reposición tiene una propiedad que uno independiente no tiene: cada época contiene a todos los honestos, así que una
+racha del atacante vale a lo sumo el doble de sus asientos y **con menos de `W`/2 no puede enterrar nada**. Vale mientras nadie
+ceda: cada honesto que cede le deja turnos al atacante, y con la mitad cediendo el margen baja un 44 %.
+
+**Y el costo de los asientos no lo arregla.** Un asiento cuesta la renta de permanencia al nivel inicial de §10.3 (10⁻⁵ token por
+día) más el piso de creación (6,6·10⁻⁶), y la actividad que lo mantiene en el pool no suma nada: el fee es una quema proporcional
+con división entera, y una transferencia de polvo quema cero. Un atacante que se suma a 1.000 asientos honestos hasta tener un
+tercio paga ~0,31 token, 3·10⁻⁷ del supply (supuesto del orden de 10⁶ tokens); el ataque más barato, con ~56 % de los asientos,
+cuesta ~0,01 token por una racha cada ~4 horas. Ni la ventana ni la tasa lo mueven: con `W` = 130 sigue en 0,24 token, y subir `r0`
+lo bastante (×327) haría que llenar el estado costara tres veces el supply. **Es el argumento de §6.1 dado vuelta:** que entrar
+cueste un teléfono impide que una coalición que se niega se sostenga —se excluye sola—, pero no impide que alguien **diluya**:
+entrar barato también le permite inundar los asientos y bajar la fracción honesta.
+
+Lo que queda es una frontera, y se declara sin buscarle salida. La resistencia crece con los asientos honestos —un ataque con un
+tercio de los asientos recién costaría 10⁻⁴ del supply con unos 350.000 asientos honestos— y es más débil justo al arranque. Tampoco la cubre lo que
+§6.3 ya demuestra: que la cola no se pueda saturar es sobre el llenado, no sobre la omisión, y la ventana adaptativa cuenta
+impugnaciones que están en el estado, así que una que el proponente omitió, que no entró a ningún bloque, no la estira. Y lo que
+el párrafo anterior dice de la tenencia sigue siendo cierto —el capital no compra turnos—, pero los asientos son otra cosa, y
+cuestan casi nada. La medición no incluye la espera en la cola una vez que la impugnación entró, el sesgo de la semilla por el
+proponente anterior ni el nivel de la tasa después de Geminis; están en `sorteo-proponente/`.
+
 **Sí se puede pagar por acercar una transición, aunque no por cambiar cuál.** Es la contracara del
 párrafo anterior, y aparece recién al indexar la tasa de permanencia de §8.5 a la ocupación del
 estado, que es la única variable a la que puede indexarse sin violar I2 (§10.3). Quien ocupa disco
@@ -2625,6 +2661,22 @@ operables con un número.
 > encontró que el barrido de mutaciones tardara minutos, no un test de corrección. El tercero es que
 > las banderas de segmento de un ELF no distinguen código de constantes, así que el formato de
 > predicado tuvo que empezar a exigir que el binario **declare dónde está su código**.
+>
+> *Y una segunda ronda, a raíz de una revisión externa, encontró que eso no alcanzaba.* Probar el
+> cargador con entradas **construidas y bien formadas** —y no con bytes alterados de un ELF legítimo,
+> que solo encuentra `panic`s— destapó cinco familias donde el trabajo dependía de lo que el ELF
+> **declara** y no de sus bytes: uno de 168 bytes costaba 197 ms de admisión (un predicado real de
+> 275 KB, 1,2 ms), unos segmentos superpuestos llegaban a 0,56 s, y una tabla de símbolos con nombres
+> sin terminador tardaba 9,7 s con 880 KB. Todo ocurría **antes del primer paso**, así que ni el techo
+> de pasos ni el de páginas lo cubrían. Se cerró con un principio y una regla de formato: **la
+> admisión es trabajo, y todo trabajo va bajo el medidor** —su costo sale solo de las cabeceras, antes
+> de reservar nada, y se descuenta del mismo techo que la ejecución—, y el código declarado tiene que
+> estar respaldado por bytes del archivo. Los símbolos, que eran comodidad del arnés, salieron del
+> camino de consenso. El peor ELF que el medidor deja entrar cuesta ~15 ms en un escritorio y ninguna
+> entrada del corpus pasa de 25. En el camino el criterio de tiempo cazó al propio medidor —cobraba de
+> menos las cabeceras— y **tuvo que corregirse él dos veces**, con fecha en su archivo; las nueve
+> mutaciones aplicadas al arreglo cayeron. No está medido en teléfono. Criterios y resultados en
+> `geminis/predicado/CRITERIA-CARGADOR.es.md` y `RESULTS-CARGADOR.es.md`.
 >
 > *Y una lección de método que costó tres correcciones publicadas.* La medición que fija
 > `R_declarado` **estuvo mal cuatro veces, y las cuatro hacia el mismo lado**: el inseguro. Tres eran

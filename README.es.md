@@ -610,6 +610,13 @@ sabiendas. Las que más pesan:
   acota que el canario no necesita atraer al adversario óptimo sino a **cualquiera** que llegue
   primero — que es lo que históricamente pasó con DES, MD5 y SHA-1. **Es un supuesto empírico sobre
   cómo se difunde el criptoanálisis, no una propiedad del diseño.**
+- **La resistencia a la censura de quien arma el bloque crece con la población honesta y es mínima
+  al arranque.** Con el proponente sorteado sin reposición y la ventana de 12 bloques, un atacante
+  puede tener el 19–23 % de los asientos con un riesgo anual de 1 %, y con un tercio la primera
+  racha de 12 bloques llega en ~64 días. Los asientos cuestan casi nada (10⁻⁵ token por día), y ni
+  una ventana más larga ni una tasa más cara lo arreglan: **entrar barato impide que una coalición
+  que se niega se sostenga, pero no que alguien diluya.** Se declara sin buscarle salida.
+  Medido en `sorteo-proponente/`.
 - **No hay incentivo pagado por el protocolo a correr un nodo antes de que exista demanda.** El
   claim compra la cohorte del día 1 y después el ingreso es fee de demanda real o nada. Es una
   elección deliberada entre dos fallas: el diseño viejo arrancaba seguro y se auto-farmeaba; éste
