@@ -16,7 +16,8 @@ python herramientas/cola.py           # Fase 3: la cola de impugnaciones bajo at
 python herramientas/techo.py          # el techo de pasos de VM, derivado (§10.3)
 python herramientas/independencia.py  # las sucesiones de hash y de firma, independientes (§6.6)
 
-cd predicado/vm && cargo test --release   # la máquina: 22 criterios (Fase 4 y BLAKE2s)
+cd predicado/vm && cargo test --release   # la máquina: 34 criterios (Fase 4, BLAKE2s y el cargador)
+cd predicado/vm && cargo run --release --bin cargador   # el cargador bajo un adversario: L2, L3 y L6, con reloj
 ```
 
 Las series de Ethereum que usa el replay ya están en el repo (`herramientas/datos/`,

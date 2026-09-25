@@ -17,7 +17,8 @@ python herramientas/cola.py           # Phase 3: the challenge queue under attac
 python herramientas/techo.py          # the VM step ceiling, derived (§10.3)
 python herramientas/independencia.py  # the hash and signature successions, independent (§6.6)
 
-cd predicado/vm && cargo test --release   # the machine: 22 criteria (Phase 4 and BLAKE2s)
+cd predicado/vm && cargo test --release   # the machine: 34 criteria (Phase 4, BLAKE2s and the loader)
+cd predicado/vm && cargo run --release --bin cargador   # the loader under an adversary: L2, L3 and L6, with a clock
 ```
 
 The Ethereum series the replay uses are already in the repo (`herramientas/datos/`,

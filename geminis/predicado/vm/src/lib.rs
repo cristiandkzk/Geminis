@@ -18,7 +18,7 @@
 pub mod admision;
 pub mod maquina;
 
-pub use admision::{admitir, Rechazo};
+pub use admision::{admitir, admitir_para_consenso, costo_de_admision, Rechazo};
 pub use maquina::{Causa, Clase, Maquina, Op, Veredicto, MEM, TEXT_BASE};
 
 /// El techo de pasos del ruleset inicial, de `protocolo/genesis.py`:
